@@ -364,7 +364,7 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-siz
       <button class="admin-tab active" onclick="showAdminTab(event,'respondents')">👥 Участники</button>
       <button class="admin-tab" onclick="showAdminTab(event,'compare')">⚖️ Сравнение</button>
       <button class="admin-tab" onclick="showAdminTab(event,'rasci')">📊 RASCI-сводка</button>
-      <button class="admin-tab" onclick="showAdminTab(event,'analysis')">🤖 ИИ-анализ</button>
+      <button class="admin-tab" onclick="showAdminTab(event,'analysis')">📥 Экспорт</button>
     </div>
 
     <!-- TAB: Respondents -->
@@ -413,23 +413,23 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-siz
       <div id="rasciOutput"></div>
     </div>
 
-    <!-- TAB: AI Analysis -->
+    <!-- TAB: Export -->
     <div class="admin-panel" id="tab-analysis">
       <div class="ai-section">
-        <h3>ИИ-анализ ответов</h3>
-        <p>Выберите участника и получите аналитический вывод с уточняющими вопросами для интервью.</p>
-        <select id="aiRespSelect" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 14px;font-family:var(--sans);font-size:13.5px;outline:none;cursor:pointer;margin-bottom:14px;display:block">
-          <option value="">— выберите участника —</option>
-        </select>
+        <h3>📥 Экспорт данных</h3>
+        <p>Скачайте ответы всех участников в формате CSV — открывается в Excel.</p>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn-ai" onclick="runAiAnalysis('single')">Анализ участника</button>
-          <button class="btn-ai" onclick="runAiAnalysis('all')" style="background:linear-gradient(135deg,#065f46,#059669)">Сводный анализ всех</button>
+          <button class="btn-ai" onclick="exportCSV()">⬇️ Скачать CSV (Excel)</button>
+          <button class="btn-ai" onclick="exportJSON()" style="background:linear-gradient(135deg,#065f46,#059669)">⬇️ Скачать JSON</button>
         </div>
-        <div class="ai-loading" id="aiLoading">
-          <div class="ai-spinner"></div>
-          <span>Анализ данных, пожалуйста подождите...</span>
+        <div id="exportMsg" style="margin-top:14px;font-size:13px;color:var(--green-m);display:none">✓ Файл скачан!</div>
+        <div style="margin-top:20px;background:var(--lavender-2);border-radius:8px;padding:16px;font-size:13px;color:var(--ink-2);line-height:1.7">
+          <strong>Как открыть CSV в Excel:</strong><br>
+          1. Скачайте файл → откройте Excel<br>
+          2. Файл → Открыть → выберите скачанный файл<br>
+          3. В мастере импорта выберите разделитель <strong>«Запятая»</strong><br>
+          4. Готово — все ответы в таблице
         </div>
-        <div class="ai-output" id="aiOutput"></div>
       </div>
     </div>
   </div>
@@ -1266,7 +1266,42 @@ function runComparison(){
   document.getElementById('compareOutput').innerHTML=html;
 }
 
-// AI
+// EXPORT
+function exportCSV(){
+  const list=sGet('respondents_list')||[];
+  if(!list.length){alert('Нет данных для экспорта');return;}
+  const qIds=QUESTIONS.map(q=>q.id);
+  const header=['Имя','Дата начала','Завершено',...qIds].join(',');
+  const rows=list.map(resp=>{
+    const d=sGet('resp_'+resp.id)||{};
+    const ans=d.answers||{};const nt=d.notes||{};
+    const getVal=q=>{
+      if(q.type==='radio'){const v=ans[q.id];const o=v?q.options.find(o=>o.val===v):null;return o?`"${o.label.replace(/"/g,"'")}"`:'';}
+      if(q.type==='checkbox'){const vv=ans[q.id];return Array.isArray(vv)&&vv.length?`"${vv.map(v=>{const o=q.options.find(o=>o.val===v);return o?o.label:v;}).join('; ').replace(/"/g,"'")}"`:''}
+      if(q.type==='textarea') return nt[q.id]?`"${nt[q.id].replace(/"/g,"'")}"`:''
+      return '';
+    };
+    return[`"${resp.name}"`,`"${new Date(resp.startedAt).toLocaleDateString('ru-RU')}"`,d.meta&&d.meta.submitted?'Да':'Нет',...QUESTIONS.map(q=>getVal(q))].join(',');
+  });
+  const csv='\uFEFF'+[header,...rows].join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='survey_results_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  const m=document.getElementById('exportMsg');if(m){m.style.display='block';setTimeout(()=>m.style.display='none',3000);}
+}
+function exportJSON(){
+  const list=sGet('respondents_list')||[];
+  if(!list.length){alert('Нет данных для экспорта');return;}
+  const data=list.map(resp=>({...resp,responses:sGet('resp_'+resp.id)||{}}));
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='survey_results_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  const m=document.getElementById('exportMsg');if(m){m.style.display='block';setTimeout(()=>m.style.display='none',3000);}
+}
+
+// AI (disabled on external hosting)
 async function runAiAnalysis(mode){
   const loading=document.getElementById('aiLoading');
   const output=document.getElementById('aiOutput');
