@@ -1295,81 +1295,181 @@ function runComparison(){
   document.getElementById('compareOutput').innerHTML=html;
 }
 
-// LOCAL AI ANALYSIS — no API needed
+// DEEP LOCAL ANALYSIS
 function generateLocalAnalysis(list){
-  const roleDesc={A:'Accountable (конечная ответственность)',R:'Responsible (выполняет работу)',S:'Support (помогает)',C:'Consulted (консультирует)',I:'Informed (информируется)'};
-  const funcLabels={B1:'Планирование закупок',B2A:'Подготовка договора (до подписания)',B2B:'Сопровождение договора (после подписания)',B3:'Заявки и бюджетный контроль',B4:'Исполнение договоров и оплаты',B5:'Процессы и регламенты',B6:'Профиль взаимодействия'};
+  const roleDesc={A:'Accountable — конечная ответственность за результат',R:'Responsible — физически выполняет работу',S:'Support — помогает исполнителю',C:'Consulted — привлекается как эксперт',I:'Informed — только получает информацию'};
+  const blockInterpretations={
+    B1:{
+      A:'Группа несёт КОНЕЧНУЮ ответственность за план закупок. Это означает: при срывах плана вопрос идёт напрямую к ним. Высокий уровень полномочий и ответственности.',
+      R:'Группа ИСПОЛНЯЕТ работу по планированию: собирает потребности, консолидирует, передаёт. Операционная роль без финальной ответственности.',
+      S:'Группа ПОМОГАЕТ ДЦЗ или ВЗ — предоставляет данные по запросу. Вспомогательная роль.',
+      C:'Группа привлекается как консультант — мнение спрашивают, но решение принимают другие.',
+      I:'Группа только получает информацию о плане. Минимальное участие.',
+      '?':'Недостаточно данных для определения роли в планировании закупок.'
+    },
+    B2A:{
+      A:'Группа ОТВЕЧАЕТ за договорной цикл до подписания. Задержки и ошибки — их зона ответственности перед руководством.',
+      R:'Группа выполняет pre-processing договоров: адаптация шаблонов, согласование, загрузка. Ключевой операционный исполнитель.',
+      S:'Группа помогает юристам или ДЦЗ — передаёт данные, оформляет по запросу.',
+      C:'Участвует в согласовании как одна из сторон, без ответственности за итог.',
+      I:'Только информируется о подписанных договорах.',
+      '?':'Роль в подготовке договоров до подписания не определена.'
+    },
+    B2B:{
+      A:'Группа отвечает за сроки и качество после подписания. Задержки загрузки в SAP — их ответственность.',
+      R:'Группа проверяет, вносит в реестр, передаёт в ССП. Операционный контроль договорного цикла.',
+      S:'Передаёт документы в ССП, уведомляет ВЗ. Поддерживающая роль.',
+      C:'Подключается при возникновении проблем.',
+      I:'Узнаёт о статусе постфактум.',
+      '?':'Роль после подписания договора не определена.'
+    },
+    B3:{
+      A:'Группа несёт ответственность за бюджетный контроль по подразделениям. Перерасход — их зона.',
+      R:'Группа ведёт оперативный учёт бюджета, формирует заявки, отслеживает лимиты.',
+      S:'Предоставляет данные Бюджетному Контролю по запросу.',
+      C:'Привлекается при расхождениях данных.',
+      I:'Получает бюджетные данные от БК, сама не ведёт.',
+      '?':'Блок не применим или данных недостаточно.'
+    },
+    B4:{
+      A:'Группа — первая точка ответственности за документы подрядчиков и сроки оплат.',
+      R:'Принимает и проверяет первичку, возвращает с замечаниями, готовит пакет для ССП.',
+      S:'Помогает организовать подписание актов, уведомляет стороны.',
+      C:'Привлекается при спорах по документам.',
+      I:'Узнаёт об оплатах по факту.',
+      '?':'Роль в исполнении договоров и оплатах не определена.'
+    },
+    B5:{
+      A:'Группа инициирует и отвечает за оптимизацию процессов.',
+      R:'Анализирует проблемы, разрабатывает регламенты и шаблоны.',
+      S:'Помогает другим подразделениям при реформировании процессов.',
+      C:'Привлекается как одна из сторон при межфункциональных проблемах.',
+      I:'Работает в существующих процессах, не участвует в их изменении.',
+      '?':'Роль в оптимизации процессов не определена.'
+    },
+    B6:{
+      R:'Группа является операционным центром взаимодействия — к ней обращаются по статусам, документам, процессам.',
+      '?':'Профиль взаимодействия требует уточнения на интервью.'
+    }
+  };
 
-  let out='═══════════════════════════════════════════\n';
-  out+='   АВТОМАТИЧЕСКИЙ RASCI-АНАЛИЗ · BCS-TD\n';
-  out+='═══════════════════════════════════════════\n\n';
+  const rows=[];
+  rows.push(['RASCI-АНАЛИЗ · BCS-TD · KCELL · '+new Date().toLocaleDateString('ru-RU')]);
+  rows.push(['']);
 
-  // Per respondent
+  // Section 1: Per respondent deep analysis
+  rows.push(['1. ИНДИВИДУАЛЬНЫЙ АНАЛИЗ ПО УЧАСТНИКАМ']);
+  rows.push(['']);
+
   list.forEach(resp=>{
     const d=sGet('resp_'+resp.id)||{};
-    const ans=d.answers||{};
-    out+=`▶ УЧАСТНИК: ${resp.name}\n${'─'.repeat(50)}\n`;
-    Object.entries(funcLabels).forEach(([bid,label])=>{
-      const bQs=QUESTIONS.filter(q=>q.block===bid&&q.rasciSignal);
-      let role='?';
-      for(const p of['A','R','S','C','I']){
-        const found=bQs.some(q=>{
-          if(q.type==='radio') return q.rasciSignal[ans[q.id]]===p;
-          if(q.type==='checkbox'&&Array.isArray(ans[q.id])) return ans[q.id].some(v=>q.rasciSignal[v]===p);
-          return false;
-        });
-        if(found){role=p;break;}
-      }
-      out+=`  ${label}: ${role!=='?'?roleDesc[role]:'Недостаточно данных'}\n`;
+    const ans=d.answers||{};const nt=d.notes||{};
+    rows.push([`УЧАСТНИК: ${resp.name} | Дата: ${new Date(resp.startedAt).toLocaleDateString('ru-RU')} | Завершено: ${d.meta&&d.meta.submitted?'Да':'Нет'}`]);
+
+    const blockRoles={};
+    Object.keys(blockInterpretations).forEach(bid=>{
+      blockRoles[bid]=getRoleForBlock(bid,ans);
     });
-    out+='\n';
+
+    // Role summary
+    rows.push(['Функциональный блок','Роль','Расшифровка роли','Интерпретация для BCS-TD']);
+    Object.entries(blockInterpretations).forEach(([bid,interp])=>{
+      const funcName={B1:'Планирование закупок',B2A:'Подготовка договора (до)',B2B:'Сопровождение договора (после)',B3:'Заявки и бюджет',B4:'Исполнение и оплаты',B5:'Процессы и регламенты',B6:'Профиль взаимодействия'}[bid];
+      const role=blockRoles[bid];
+      rows.push([funcName, role, roleDesc[role]||'—', interp[role]||interp['?']||'—']);
+    });
+
+    // Key signals from answers
+    rows.push(['']);
+    rows.push(['Ключевые сигналы из ответов:']);
+    // Check accountable markers
+    const acctQs=['q1_5','q2a_8','q2b_5','q4_4'];
+    acctQs.forEach(qid=>{
+      const q=QUESTIONS.find(q=>q.id===qid);if(!q||!ans[qid]) return;
+      const opt=q.options.find(o=>o.val===ans[qid]);
+      if(opt) rows.push([`  • ${q.text.substr(0,60)}… → "${opt.label}"`]);
+    });
+
+    // Notes
+    const hasNotes=QUESTIONS.filter(q=>nt[q.id]&&nt[q.id].trim().length>2);
+    if(hasNotes.length>0){
+      rows.push(['Комментарии участника:']);
+      hasNotes.forEach(q=>rows.push([`  • ${q.text.substr(0,50)}…: ${nt[q.id]}`]));
+    }
+    rows.push(['─'.repeat(80)]);
+    rows.push(['']);
   });
 
-  // Contradictions
-  if(list.length>1){
-    out+='═══════════════════════════════════════════\n';
-    out+='   СРАВНЕНИЕ И РАСХОЖДЕНИЯ\n';
-    out+='═══════════════════════════════════════════\n\n';
-    Object.entries(funcLabels).forEach(([bid,label])=>{
-      const roles=list.map(resp=>{
-        const ans=(sGet('resp_'+resp.id)||{}).answers||{};
-        const bQs=QUESTIONS.filter(q=>q.block===bid&&q.rasciSignal);
-        for(const p of['A','R','S','C','I']){
-          if(bQs.some(q=>{
-            if(q.type==='radio') return q.rasciSignal[ans[q.id]]===p;
-            if(q.type==='checkbox'&&Array.isArray(ans[q.id])) return ans[q.id].some(v=>q.rasciSignal[v]===p);
-            return false;
-          })) return p;
-        }
-        return'?';
-      });
+  // Section 2: Contradictions
+  rows.push(['2. РАСХОЖДЕНИЯ МЕЖДУ УЧАСТНИКАМИ (зоны неопределённости)']);
+  rows.push(['']);
+  if(list.length<2){
+    rows.push(['Для сравнения нужно минимум 2 участника.']);
+  } else {
+    let foundAny=false;
+    Object.keys(blockInterpretations).forEach(bid=>{
+      const funcName={B1:'Планирование закупок',B2A:'Подготовка договора (до)',B2B:'Сопровождение договора (после)',B3:'Заявки и бюджет',B4:'Исполнение и оплаты',B5:'Процессы и регламенты',B6:'Профиль взаимодействия'}[bid];
+      const roles=list.map(resp=>getRoleForBlock(bid,(sGet('resp_'+resp.id)||{}).answers||{}));
       const unique=[...new Set(roles.filter(r=>r!=='?'))];
       if(unique.length>1){
-        out+=`⚠ РАСХОЖДЕНИЕ — ${label}:\n`;
-        list.forEach((resp,i)=>out+=`  ${resp.name}: ${roles[i]!=='?'?roleDesc[roles[i]]:'нет данных'}\n`);
-        out+='\n';
+        foundAny=true;
+        rows.push([`⚠ ${funcName} — РАСХОЖДЕНИЕ:`]);
+        list.forEach((resp,i)=>rows.push([`   ${resp.name}: ${roles[i]} — ${roleDesc[roles[i]]||'нет данных'}`]));
+        rows.push(['   Вывод: разные участники воспринимают роль группы по-разному. Требует обсуждения на интервью.']);
+        rows.push(['']);
       }
     });
+    if(!foundAny) rows.push(['Расхождений не обнаружено — все участники описывают роль группы согласованно.']);
   }
+  rows.push(['']);
 
-  // Recommendations
-  out+='═══════════════════════════════════════════\n';
-  out+='   РЕКОМЕНДУЕМЫЕ ВОПРОСЫ ДЛЯ ИНТЕРВЬЮ\n';
-  out+='═══════════════════════════════════════════\n\n';
-  const intQs=[
-    '1. Опишите типичный день — с чего начинаете и чем заканчиваете?',
-    '2. Какие задачи занимают больше всего времени и почему?',
-    '3. Когда что-то идёт не так — кто принимает финальное решение?',
-    '4. Есть ли задачи, которые формально ваши, но фактически делает кто-то другой?',
-    '5. Какие полномочия вам нужны, но которых сейчас нет?',
-    '6. Что изменилось бы если бы вашей группы не было?',
-    '7. Как бы вы описали роль вашей группы одной фразой?',
+  // Section 3: Interview questions per block
+  rows.push(['3. РЕКОМЕНДУЕМЫЕ ВОПРОСЫ ДЛЯ ЖИВОГО ИНТЕРВЬЮ']);
+  rows.push(['']);
+  const interviewQs=[
+    ['Общие (любому участнику)',''],
+    ['1.','Опишите типичный рабочий день — с чего начинаете и чем заканчиваете?'],
+    ['2.','Какая задача занимает больше всего времени? Почему именно она?'],
+    ['3.','Когда что-то идёт не так с договором или оплатой — кто принимает финальное решение?'],
+    ['4.','Есть ли задачи, которые формально ваши, но фактически выполняет кто-то другой?'],
+    ['5.','Что изменилось бы в работе смежных подразделений, если бы вашей группы не было?'],
+    [''],
+    ['По планированию закупок',''],
+    ['6.','Кто несёт ответственность если план закупок по вашим подразделениям сорван — вы или ДЦЗ?'],
+    ['7.','Как часто ВЗ приходят к вам за помощью в формулировке потребности?'],
+    [''],
+    ['По договорам',''],
+    ['8.','Можете ли вы остановить договор если видите в нём ошибку — без согласования с руководством?'],
+    ['9.','Кто первым звонит подрядчику если документы некорректны — вы или ССП?'],
+    [''],
+    ['По бюджету',''],
+    ['10.','Чьи данные по бюджету считаются "правдой" — ваши или Бюджетного Контроля?'],
+    ['11.','Предупреждаете ли вы ВЗ заранее если бюджет близок к лимиту?'],
   ];
-  intQs.forEach(q=>out+=q+'\n');
+  interviewQs.forEach(r=>rows.push(r));
+  rows.push(['']);
 
-  out+='\n═══════════════════════════════════════════\n';
-  out+=`Сформировано автоматически · ${new Date().toLocaleDateString('ru-RU')}\n`;
-  return out;
+  // Section 4: Conclusions
+  rows.push(['4. ПРЕДВАРИТЕЛЬНЫЕ ВЫВОДЫ И РЕКОМЕНДАЦИИ']);
+  rows.push(['']);
+  list.forEach(resp=>{
+    const d=sGet('resp_'+resp.id)||{};const ans=d.answers||{};
+    const aRoles=Object.keys(blockInterpretations).map(bid=>getRoleForBlock(bid,ans));
+    const aCount=aRoles.filter(r=>r==='A').length;
+    const rCount=aRoles.filter(r=>r==='R').length;
+    rows.push([`Участник: ${resp.name}`]);
+    if(aCount>=4) rows.push(['  → Высокий уровень ответственности (A в большинстве блоков). Группа воспринимает себя как владельца процессов. Проверить соответствие полномочий.']);
+    else if(rCount>=4) rows.push(['  → Преимущественно исполнительская роль (R). Группа — операционный pre-processing layer. Типично для SSC-модели.']);
+    else rows.push(['  → Смешанная роль. Требует уточнения границ ответственности на интервью.']);
+
+    // Check if group has autonomy
+    if(ans['q2b_4']==='a'||ans['q4_2']==='a') rows.push(['  → Группа заявляет самостоятельные полномочия (A-сигналы). Проверить закреплено ли это в Положении.']);
+    if(ans['q2b_4']==='d'||ans['q4_2']==='d') rows.push(['  → Группа не оценивает документы самостоятельно. Возможно дублирование функций с ССП.']);
+    rows.push(['']);
+  });
+
+  rows.push(['Сформировано автоматически системой опроса BCS-TD · '+new Date().toLocaleDateString('ru-RU')]);
+  return rows;
 }
 
 // EXPORT — rich multi-sheet Excel via SheetJS
@@ -1485,19 +1585,10 @@ async function exportCSV(){
   ws3['!cols']=[{wch:50},...list.map(()=>({wch:25})),{wch:15}];
   XLSX.utils.book_append_sheet(wb,ws3,'Сравнение');
 
-  // ── SHEET 4: Local AI Analysis ──
-  const aiText=generateLocalAnalysis(list);
-  const aiRows=[
-    ['RASCI-АНАЛИЗ · BCS-TD · KCELL'],
-    [''],
-    ...aiText.split('\n').map(line=>[line])
-  ];
+  // ── SHEET 4: Deep Analysis ──
+  const aiRows=generateLocalAnalysis(list);
   const ws4=XLSX.utils.aoa_to_sheet(aiRows);
-  ws4['!cols']=[{wch:100}];
-  // Style header
-  if(!ws4['!rows']) ws4['!rows']=[];
-  ws4['!rows'][0]={hpt:24};
-  applyStyle(ws4,'A1',{font:{bold:true,sz:14,color:{rgb:'4C1D95'}},fill:{fgColor:{rgb:'EDE9FE'}}});
+  ws4['!cols']=[{wch:45},{wch:8},{wch:40},{wch:70}];
   XLSX.utils.book_append_sheet(wb,ws4,'ИИ-анализ');
 
   // Helper: apply style to cell
