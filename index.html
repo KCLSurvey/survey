@@ -643,7 +643,10 @@ window.addEventListener('DOMContentLoaded', () => {
       answers = saved.answers || {};
       notes   = saved.notes   || {};
       timeGrid= saved.timeGrid|| {};
-      if (saved.meta && saved.meta.submitted) { showThankYouDirect(); return; }
+      if (saved.meta && saved.meta.submitted) {
+    document.getElementById('respondent-view').style.display='block';
+    showThankYouDirect(); return;
+  }
       showSurvey();
       restoreAnswers();
       updateProgress();
