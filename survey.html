@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Карта рабочих процессов · Взаимодействие подразделений</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{--ink:#0f0c1a;--ink-2:#3d3560;--ink-3:#8b83a8;--purple:#4c1d95;--violet:#6d28d9;--lavender:#ede9fe;--lavender-2:#f5f3ff;--accent:#7c3aed;--accent-2:#8b5cf6;--surface:#fafafa;--card:#fff;--border:#e5e1f5;--border-2:#d1c7f0;--green:#065f46;--green-l:#d1fae5;--green-m:#059669;--amber:#92400e;--amber-l:#fef3c7;--amber-m:#d97706;--red:#991b1b;--red-l:#fee2e2;--red-m:#dc2626;--blue:#1e3a8a;--blue-l:#dbeafe;--blue-m:#2563eb;--shadow:0 1px 3px rgba(76,29,149,.08),0 4px 16px rgba(76,29,149,.06);--shadow-lg:0 8px 32px rgba(76,29,149,.14);--r:12px;--sans:'Manrope',sans-serif;--mono:'JetBrains Mono',monospace}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-size:15px;line-height:1.65;min-height:100vh}
+
+/* HEADER */
+.site-header{background:linear-gradient(135deg,#2d1060 0%,#4c1d95 50%,#5b21b6 100%);padding:56px 40px 48px;position:relative;overflow:hidden}
+.site-header::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%,rgba(139,92,246,.25) 0%,transparent 60%);pointer-events:none}
+.header-inner{position:relative;z-index:1;max-width:760px;margin:0 auto}
+.header-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#c4b5fd;font-size:11.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:5px 14px;border-radius:20px;margin-bottom:20px}
+.header-title{font-size:34px;font-weight:800;color:#fff;line-height:1.15;letter-spacing:-.03em;margin-bottom:12px}
+.header-sub{font-size:15px;color:#c4b5fd;max-width:540px}
+.header-meta{margin-top:28px;display:flex;gap:12px;flex-wrap:wrap}
+.meta-chip{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#ddd6fe;font-size:12.5px;padding:6px 14px;border-radius:8px;display:flex;align-items:center;gap:6px}
+
+/* PROGRESS */
+.progress-bar-wrap{background:#fff;border-bottom:1px solid var(--border);padding:0 40px;position:sticky;top:0;z-index:200;box-shadow:0 2px 8px rgba(76,29,149,.06)}
+.progress-bar-inner{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:16px;padding:12px 0}
+.pb-track{flex:1;height:5px;background:var(--lavender);border-radius:3px;overflow:hidden}
+.pb-fill{height:100%;background:linear-gradient(90deg,var(--violet),var(--accent-2));border-radius:3px;transition:width .5s cubic-bezier(.4,0,.2,1);width:0%}
+.pb-label{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);white-space:nowrap}
+.pb-saved{font-size:11px;color:var(--green-m);display:none;align-items:center;gap:4px}
+
+/* MAIN */
+.main{max-width:760px;margin:0 auto;padding:40px 40px 100px}
+
+/* INSTRUCTION */
+.instr-card{background:var(--lavender-2);border:1.5px solid var(--border-2);border-left:5px solid var(--violet);border-radius:var(--r);padding:22px 26px;margin-bottom:36px;display:flex;gap:16px;align-items:flex-start}
+.instr-icon{width:38px;height:38px;min-width:38px;background:var(--violet);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.instr-body h3{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--violet);font-weight:700;margin-bottom:6px}
+.instr-body p{font-size:13.5px;color:var(--ink-2);line-height:1.7}
+.instr-list{margin-top:10px;padding-left:16px}
+.instr-list li{font-size:13px;color:var(--ink-2);margin-bottom:4px}
+
+/* SECTION */
+.section-hd{margin:44px 0 20px;display:flex;align-items:flex-start;gap:14px}
+.section-num{width:36px;height:36px;min-width:36px;background:var(--purple);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:600;margin-top:2px}
+.section-info{flex:1}
+.section-title{font-size:17px;font-weight:700;color:var(--purple);letter-spacing:-.01em}
+.section-desc{font-size:12.5px;color:var(--ink-3);margin-top:3px}
+.section-line{border:none;border-top:2px solid var(--lavender);margin:8px 0 24px}
+
+/* QUESTION CARD */
+.q-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow);transition:border-color .2s,box-shadow .2s}
+.q-card:hover{border-color:var(--border-2);box-shadow:var(--shadow-lg)}
+.q-card.answered{border-color:#a78bfa}
+.q-card.skipped-by-filter{border-color:#c4b5fd;opacity:.75}
+.q-card.unanswered-required{border-color:#f87171!important;box-shadow:0 0 0 3px rgba(248,113,113,.2)!important}
+.q-head{display:flex;align-items:flex-start;gap:12px;padding:18px 20px 14px}
+.q-num{font-family:var(--mono);font-size:10.5px;font-weight:600;color:#fff;background:var(--violet);padding:3px 8px;border-radius:4px;flex-shrink:0;margin-top:3px;letter-spacing:.04em}
+.q-num.required::after{content:' *';color:#fca5a5}
+.q-text{font-size:14.5px;font-weight:600;color:var(--ink);line-height:1.5}
+.q-type-hint{font-size:11px;color:var(--ink-3);font-weight:400;display:block;margin-top:4px;font-family:var(--mono)}
+
+/* FILTER BANNER */
+.filter-banner{margin:0 20px 14px;background:#f5f0ff;border:1.5px solid #c4b5fd;border-radius:8px;padding:10px 14px;font-size:12.5px;color:#4c1d95;line-height:1.6;display:flex;gap:10px;align-items:flex-start}
+.filter-banner-icon{font-size:16px;flex-shrink:0}
+.filter-banner-toggle{margin-top:6px;font-size:12px;color:var(--violet);font-weight:600;cursor:pointer;text-decoration:underline;display:inline-block}
+
+/* OPTIONS */
+.q-options{padding:0 20px 14px;display:flex;flex-direction:column;gap:5px}
+.opt{display:flex;align-items:flex-start;gap:10px;padding:9px 13px;border-radius:8px;border:1.5px solid transparent;background:var(--surface);cursor:pointer;transition:all .15s;user-select:none}
+.opt:hover{background:var(--lavender-2);border-color:#c4b5fd}
+.opt input[type=radio],.opt input[type=checkbox]{width:16px;height:16px;accent-color:var(--violet);margin-top:2px;flex-shrink:0;cursor:pointer}
+.opt:has(input:checked){background:var(--lavender);border-color:var(--violet)}
+.opt-text{font-size:13.5px;color:var(--ink);line-height:1.5}
+
+/* TIME GRID */
+.time-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 20px 18px}
+.time-row{display:flex;align-items:center;gap:10px}
+.time-label{font-size:13px;color:var(--ink-2);flex:1}
+.time-input{width:64px;border:1.5px solid var(--border);border-radius:6px;padding:6px 10px;font-family:var(--mono);font-size:13px;text-align:center;outline:none;transition:border-color .15s;background:var(--surface)}
+.time-input:focus{border-color:var(--violet);background:#fff}
+.time-total{font-size:12px;color:var(--ink-3);font-family:var(--mono)}
+.time-total.ok{color:var(--green-m)}
+.time-total.over{color:#dc2626}
+
+/* NOTE / TEXTAREA */
+.q-note{padding:0 20px 18px}
+.note-label{font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);margin-bottom:6px;display:block}
+.note-ta{width:100%;min-height:64px;border:1.5px solid var(--border);border-radius:8px;padding:9px 13px;font-family:var(--sans);font-size:13.5px;color:var(--ink);background:var(--surface);resize:vertical;outline:none;transition:border-color .15s}
+.note-ta:focus{border-color:var(--violet);background:#fff}
+
+/* REQUIRED INDICATOR */
+.req-error{margin:0 20px 12px;background:var(--red-l);border-left:4px solid var(--red-m);border-radius:0 6px 6px 0;padding:8px 13px;font-size:12.5px;color:var(--red);display:none;align-items:center;gap:6px}
+.req-error.show{display:flex}
+
+/* SUBMIT */
+.submit-area{margin-top:48px;text-align:center}
+.btn-submit{background:linear-gradient(135deg,var(--purple),var(--accent));color:#fff;border:none;padding:15px 48px;border-radius:10px;font-family:var(--sans);font-size:15.5px;font-weight:700;cursor:pointer;letter-spacing:-.01em;box-shadow:0 4px 20px rgba(76,29,149,.3);transition:transform .15s,box-shadow .15s}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(76,29,149,.4)}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.submit-note{font-size:12px;color:var(--ink-3);margin-top:10px}
+.unanswered-warn{font-size:13px;color:var(--red-m);margin-top:10px;padding:10px 16px;background:var(--red-l);border-radius:8px;display:none}
+
+/* THANK YOU */
+#thank-you{display:none;text-align:center;padding:80px 40px;max-width:600px;margin:0 auto}
+.ty-icon{font-size:64px;margin-bottom:24px}
+.ty-title{font-size:28px;font-weight:800;color:var(--purple);margin-bottom:16px;letter-spacing:-.02em}
+.ty-body{font-size:15px;color:var(--ink-2);line-height:1.8}
+.ty-badge{margin:28px auto;display:inline-block;background:linear-gradient(135deg,var(--lavender),#fff);border:2px solid var(--border-2);border-radius:var(--r);padding:20px 32px;font-size:15px;font-weight:600;color:var(--purple);line-height:1.7;max-width:440px}
+.btn-back-survey{margin-top:24px;background:none;border:2px solid var(--violet);color:var(--violet);padding:12px 32px;border-radius:10px;font-family:var(--sans);font-size:15px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-back-survey:hover{background:var(--violet);color:#fff}
+
+/* NAME ENTRY */
+#name-entry{display:none;text-align:center;padding:80px 40px}
+.name-box{max-width:440px;margin:0 auto;background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:40px;box-shadow:var(--shadow-lg)}
+.name-icon{font-size:44px;margin-bottom:16px}
+.name-title{font-size:22px;font-weight:800;color:var(--purple);margin-bottom:8px}
+.name-sub{font-size:14px;color:var(--ink-3);margin-bottom:24px}
+.name-input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:11px 16px;font-family:var(--sans);font-size:15px;outline:none;transition:border-color .15s}
+.name-input:focus{border-color:var(--violet)}
+.name-btn{width:100%;margin-top:14px;background:var(--violet);color:#fff;border:none;padding:13px;border-radius:8px;font-family:var(--sans);font-size:15px;font-weight:700;cursor:pointer;transition:all .15s}
+.name-btn:hover{background:var(--purple)}
+
+/* ADMIN LOGIN */
+#admin-login{display:none;text-align:center;padding:80px 40px}
+.login-box{max-width:420px;margin:0 auto;background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:40px;box-shadow:var(--shadow-lg)}
+.login-title{font-size:22px;font-weight:800;color:var(--purple);margin-bottom:8px}
+.login-sub{font-size:14px;color:var(--ink-3);margin-bottom:28px}
+.login-input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:11px 16px;font-family:var(--sans);font-size:15px;outline:none;transition:border-color .15s}
+.login-input:focus{border-color:var(--violet)}
+.login-btn{width:100%;margin-top:14px;background:var(--violet);color:#fff;border:none;padding:13px;border-radius:8px;font-family:var(--sans);font-size:15px;font-weight:700;cursor:pointer;transition:all .15s}
+.login-btn:hover{background:var(--purple)}
+.login-err{color:#dc2626;font-size:13px;margin-top:10px;display:none}
+
+/* ADMIN VIEW */
+#admin-view{display:none}
+.admin-header{background:linear-gradient(135deg,#0f172a,#1e1b4b);color:#fff;padding:32px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.admin-title{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.admin-badge{background:#7c3aed;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:4px;letter-spacing:.08em;text-transform:uppercase}
+.admin-main{max-width:1100px;margin:0 auto;padding:32px 40px 80px}
+.admin-tabs{display:flex;gap:4px;border-bottom:2px solid var(--border);margin-bottom:28px}
+.admin-tab{padding:10px 20px;font-size:13.5px;font-weight:600;color:var(--ink-3);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;border-radius:6px 6px 0 0}
+.admin-tab.active{color:var(--violet);border-bottom-color:var(--violet);background:var(--lavender-2)}
+.admin-panel{display:none}
+.admin-panel.active{display:block}
+
+/* HOW TO ACCESS - admin info box */
+.access-info{background:var(--lavender-2);border:1.5px solid var(--border-2);border-radius:var(--r);padding:24px;margin-bottom:24px}
+.access-info h3{font-size:14px;font-weight:700;color:var(--purple);margin-bottom:14px;text-transform:uppercase;letter-spacing:.06em}
+.access-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.access-label{font-size:13px;color:var(--ink-2);font-weight:600;min-width:160px}
+.access-url{font-family:var(--mono);font-size:12px;background:#fff;border:1.5px solid var(--border-2);border-radius:6px;padding:7px 12px;flex:1;min-width:200px;word-break:break-all;color:var(--ink)}
+.access-copy{background:var(--violet);color:#fff;border:none;padding:7px 14px;border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s}
+.access-copy:hover{background:var(--purple)}
+.access-note{font-size:12px;color:var(--ink-3);margin-top:6px;padding:8px 12px;background:rgba(0,0,0,.03);border-radius:6px;line-height:1.6}
+
+/* RESPONDENT CARDS */
+.resp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:24px}
+.resp-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:20px;cursor:pointer;transition:all .15s;box-shadow:var(--shadow)}
+.resp-card:hover{border-color:var(--violet);box-shadow:var(--shadow-lg)}
+.resp-name{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.resp-meta{font-size:12px;color:var(--ink-3);font-family:var(--mono)}
+.resp-pct{font-size:22px;font-weight:800;color:var(--violet)}
+.resp-bar{height:4px;background:var(--lavender);border-radius:2px;margin-top:6px;overflow:hidden}
+.resp-bar-fill{height:100%;background:linear-gradient(90deg,var(--violet),var(--accent-2));border-radius:2px}
+.resp-status{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;margin-top:8px}
+.resp-status.done{background:var(--green-l);color:var(--green)}
+.resp-status.partial{background:var(--amber-l);color:var(--amber)}
+.resp-status.started{background:var(--blue-l);color:var(--blue)}
+
+/* DETAIL VIEW */
+.detail-header{display:flex;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+.btn-back{background:none;border:1.5px solid var(--border);padding:8px 16px;border-radius:8px;font-family:var(--sans);font-size:13px;cursor:pointer;color:var(--ink-2);font-weight:600;transition:all .15s}
+.btn-back:hover{border-color:var(--violet);color:var(--violet)}
+.detail-name{font-size:20px;font-weight:800;color:var(--ink)}
+.ans-block{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow)}
+.ans-block-head{background:var(--lavender-2);padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.ans-block-title{font-size:13px;font-weight:700;color:var(--purple)}
+.ans-block-q{font-size:13.5px;font-weight:600;color:var(--ink);padding:14px 20px 4px}
+.ans-block-a{padding:6px 20px 14px}
+.ans-val{font-size:13.5px;color:var(--ink-2)}
+.ans-val.empty{color:var(--ink-3);font-style:italic}
+.ans-note{font-size:12.5px;color:var(--ink-3);margin-top:6px;padding-top:6px;border-top:1px dashed var(--border);font-style:italic}
+.audit-hint{margin:4px 20px 14px;background:#f8f4ff;border-left:4px solid #a78bfa;border-radius:0 8px 8px 0;padding:10px 14px;font-size:12px;color:#4c1d95;line-height:1.6}
+.rasci-badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:4px;font-family:var(--mono);letter-spacing:.06em;margin-left:8px}
+.rasci-R{background:#dbeafe;color:#1e3a8a}
+.rasci-A{background:#fce7f3;color:#831843}
+.rasci-S{background:#d1fae5;color:#065f46}
+.rasci-C{background:#fef3c7;color:#78350f}
+.rasci-I{background:#f3f4f6;color:#374151}
+.rasci-none{background:#fee2e2;color:#991b1b}
+
+/* COMPARE */
+.compare-table{width:100%;border-collapse:collapse;font-size:13px}
+.compare-table th{background:var(--purple);color:#fff;padding:10px 14px;text-align:left;font-size:12px;font-weight:600}
+.compare-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+.compare-table tr:hover td{background:var(--lavender-2)}
+.compare-match{background:var(--green-l);color:var(--green);font-weight:600;font-size:11px;padding:2px 7px;border-radius:4px}
+.compare-diff{background:var(--amber-l);color:var(--amber);font-weight:600;font-size:11px;padding:2px 7px;border-radius:4px}
+
+/* AI */
+.ai-section{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:24px;box-shadow:var(--shadow);margin-top:20px}
+.ai-section h3{font-size:15px;font-weight:700;color:var(--purple);margin-bottom:4px}
+.ai-section p{font-size:13px;color:var(--ink-3);margin-bottom:16px}
+.btn-ai{background:linear-gradient(135deg,var(--purple),var(--accent));color:#fff;border:none;padding:11px 28px;border-radius:8px;font-family:var(--sans);font-size:13.5px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-ai:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(76,29,149,.3)}
+.ai-output{margin-top:18px;background:#fafaf9;border:1px solid var(--border);border-radius:8px;padding:18px;font-size:13.5px;line-height:1.75;color:var(--ink);display:none}
+.ai-loading{display:none;align-items:center;gap:10px;color:var(--ink-3);font-size:13px;margin-top:12px}
+.ai-spinner{width:16px;height:16px;border:2px solid var(--lavender);border-top-color:var(--violet);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* RASCI MATRIX */
+.rasci-matrix{width:100%;border-collapse:collapse;margin-top:16px}
+.rasci-matrix th{background:var(--ink);color:#fff;padding:10px 14px;font-size:12px;text-align:left}
+.rasci-matrix td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px}
+.rasci-matrix tr:hover td{background:var(--lavender-2)}
+
+/* MISC */
+.flex-between{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.hidden{display:none!important}
+.section-filter-note{margin:0 0 20px;background:var(--amber-l);border-left:5px solid var(--amber-m);border-radius:0 8px 8px 0;padding:10px 16px;font-size:12.5px;color:#78350f;display:none;align-items:center;gap:8px}
+.section-filter-note.show{display:flex}
+
+@media(max-width:640px){
+  .site-header{padding:36px 20px 32px}
+  .main,.admin-main{padding-left:20px;padding-right:20px}
+  .progress-bar-wrap{padding:0 20px}
+  .header-title{font-size:26px}
+  .time-grid{grid-template-columns:1fr}
+  .access-row{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<!-- NAME ENTRY -->
+<div id="name-entry">
+  <div class="name-box">
+    <div class="name-icon">👋</div>
+    <div class="name-title">Добро пожаловать</div>
+    <div class="name-sub">Пожалуйста, укажите ваше имя и фамилию — чтобы мы могли корректно сохранить ваши ответы.</div>
+    <input type="text" class="name-input" id="nameInput" placeholder="Имя Фамилия" maxlength="80" onkeydown="if(event.key==='Enter')startSurvey()">
+    <button class="name-btn" onclick="startSurvey()">Начать заполнение →</button>
+    <div id="nameErr" style="color:#dc2626;font-size:13px;margin-top:10px;display:none">Пожалуйста, введите ваше имя</div>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="admin-login">
+  <div class="login-box">
+    <div style="font-size:40px;margin-bottom:16px">🔒</div>
+    <div class="login-title">Панель аудитора</div>
+    <div class="login-sub">Введите ключ доступа для просмотра результатов</div>
+    <input type="password" class="login-input" id="adminKeyInput" placeholder="Ключ доступа" onkeydown="if(event.key==='Enter')checkAdminKey()">
+    <button class="login-btn" onclick="checkAdminKey()">Войти</button>
+    <div class="login-err" id="loginErr">Неверный ключ доступа</div>
+  </div>
+</div>
+
+<!-- RESPONDENT VIEW -->
+<div id="respondent-view" style="display:none">
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Карта рабочих процессов
+      </div>
+      <h1 class="header-title">Взаимодействие подразделений:<br>как устроена ваша работа</h1>
+      <p class="header-sub">Анкета для руководителей и ключевых сотрудников в рамках проекта по улучшению процессов</p>
+      <div class="header-meta">
+        <div class="meta-chip">⏱ Около 25–30 минут</div>
+        <div class="meta-chip">🔒 Ответы конфиденциальны</div>
+        <div class="meta-chip">💾 Сохраняется автоматически</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-inner">
+      <div class="pb-track"><div class="pb-fill" id="pbFill"></div></div>
+      <div class="pb-label" id="pbLabel">0 / 0 вопросов</div>
+      <div class="pb-saved" id="pbSaved">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Сохранено
+      </div>
+    </div>
+  </div>
+
+  <main class="main" id="surveyMain">
+    <div class="instr-card">
+      <div class="instr-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <div class="instr-body">
+        <h3>Как заполнять</h3>
+        <p>Описывайте как работа реально устроена сегодня — не как написано в положении, а как происходит на практике.</p>
+        <ul class="instr-list">
+          <li>Где указано <strong>«один ответ»</strong> — выберите наиболее точный вариант</li>
+          <li>Где указано <strong>«несколько ответов»</strong> — отметьте все подходящие</li>
+          <li>Вопросы со <strong>звёздочкой *</strong> — обязательные</li>
+          <li>Ответы <strong>сохраняются автоматически</strong> — можно закрыть и вернуться позже</li>
+          <li>Некоторые блоки могут пропускаться автоматически — это нормально</li>
+        </ul>
+      </div>
+    </div>
+    <div id="questionsContainer"></div>
+    <div class="submit-area">
+      <button class="btn-submit" id="btnSubmit" onclick="submitSurvey()">Завершить анкету</button>
+      <div class="submit-note">После нажатия ваши ответы будут отправлены</div>
+      <div class="unanswered-warn" id="unansweredWarn">
+        ⚠️ Пожалуйста, ответьте на все обязательные вопросы (отмечены красной рамкой и *).<br>
+        Они выделены ниже — прокрутите страницу чтобы найти их.
+      </div>
+    </div>
+  </main>
+
+  <!-- THANK YOU -->
+  <div id="thank-you">
+    <div class="ty-icon">🌟</div>
+    <h2 class="ty-title">Большое спасибо!</h2>
+    <div class="ty-badge">
+      Работа вашей группы — это незаметный, но критически важный фундамент.<br><br>
+      Без вас внутренние заказчики просто не справились бы с потоком документов, согласований и дедлайнов.
+    </div>
+    <p class="ty-body">Ваши ответы помогут сделать работу ещё эффективнее и убрать лишние барьеры.</p>
+    <button class="btn-back-survey" onclick="returnToSurvey()">← Вернуться к анкете</button>
+  </div>
+</div>
+
+<!-- ADMIN VIEW -->
+<div id="admin-view">
+  <div class="admin-header">
+    <div>
+      <div class="admin-title">Панель аудитора · Карта рабочих процессов</div>
+      <div style="font-size:12px;color:#a78bfa;margin-top:4px;font-family:var(--mono)">Только для внутреннего использования</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span class="admin-badge">АУДИТОР</span>
+      <button onclick="adminLogout()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#c4b5fd;padding:7px 14px;border-radius:7px;font-family:var(--sans);font-size:12.5px;cursor:pointer;font-weight:600">Выйти</button>
+    </div>
+  </div>
+  <div class="admin-main">
+
+    <!-- HOW TO ACCESS INFO -->
+    <div class="access-info">
+      <h3>📎 Как открыть опросник</h3>
+      <div class="access-row">
+        <span class="access-label">👤 Ссылка для участника:</span>
+        <span class="access-url" id="urlRespondent">—</span>
+        <button class="access-copy" onclick="copyUrl('respondent')">Копировать</button>
+      </div>
+      <div class="access-row">
+        <span class="access-label">🔐 Ссылка для аудитора:</span>
+        <span class="access-url" id="urlAdmin">—</span>
+        <button class="access-copy" onclick="copyUrl('admin')">Копировать</button>
+      </div>
+      <div class="access-note">
+        💡 <strong>Как отправить участнику:</strong> скопируйте ссылку участника и отправьте по почте, WhatsApp или Telegram. Каждый участник открывает по своему браузеру — его ответы сохраняются отдельно. Если участник закрыл вкладку — он может открыть ту же ссылку снова, ответы сохранятся (в том же браузере).<br>
+        🔐 <strong>Ссылка аудитора:</strong> содержит ключ доступа — не отправляйте её участникам. Открывайте только сами.
+      </div>
+    </div>
+
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="showAdminTab(event,'respondents')">👥 Участники</button>
+      <button class="admin-tab" onclick="showAdminTab(event,'compare')">⚖️ Сравнение</button>
+      <button class="admin-tab" onclick="showAdminTab(event,'rasci')">📊 RASCI-сводка</button>
+      <button class="admin-tab" onclick="showAdminTab(event,'analysis')">🤖 ИИ-анализ</button>
+    </div>
+
+    <!-- TAB: Respondents -->
+    <div class="admin-panel active" id="tab-respondents">
+      <div id="respListView">
+        <div class="flex-between" style="margin-bottom:20px">
+          <h2 style="font-size:18px;font-weight:800;color:var(--ink)">Участники опроса</h2>
+          <button onclick="refreshAdmin()" style="background:var(--lavender);border:1.5px solid var(--border-2);color:var(--violet);padding:8px 16px;border-radius:8px;font-family:var(--sans);font-size:13px;cursor:pointer;font-weight:600">↻ Обновить</button>
+        </div>
+        <div class="resp-grid" id="respGrid"></div>
+        <div id="noRespondents" style="text-align:center;padding:60px;color:var(--ink-3);display:none">
+          <div style="font-size:40px;margin-bottom:16px">📭</div>
+          <div style="font-size:16px;font-weight:600">Ещё нет ответов</div>
+          <div style="font-size:13px;margin-top:6px">Отправьте ссылку участникам</div>
+        </div>
+      </div>
+      <div id="respDetailView" style="display:none">
+        <div class="detail-header">
+          <button class="btn-back" onclick="backToList()">← Назад к списку</button>
+          <div>
+            <div class="detail-name" id="detailName"></div>
+            <div style="font-size:12px;color:var(--ink-3);font-family:var(--mono)" id="detailMeta"></div>
+          </div>
+        </div>
+        <div id="detailContent"></div>
+      </div>
+    </div>
+
+    <!-- TAB: Compare -->
+    <div class="admin-panel" id="tab-compare">
+      <h2 style="font-size:18px;font-weight:800;color:var(--ink);margin-bottom:6px">Сравнение ответов</h2>
+      <p style="font-size:13px;color:var(--ink-3);margin-bottom:20px">Выберите двух или более участников</p>
+      <div id="compareSelect" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px"></div>
+      <button onclick="runComparison()" class="btn-ai" style="margin-bottom:24px">Сравнить выбранных →</button>
+      <div id="compareOutput"></div>
+    </div>
+
+    <!-- TAB: RASCI -->
+    <div class="admin-panel" id="tab-rasci">
+      <div class="flex-between" style="margin-bottom:16px">
+        <h2 style="font-size:18px;font-weight:800;color:var(--ink)">RASCI-сводка</h2>
+        <select id="rasciSelect" onchange="buildRasci()" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 14px;font-family:var(--sans);font-size:13.5px;outline:none;cursor:pointer">
+          <option value="">— выберите участника —</option>
+        </select>
+      </div>
+      <div id="rasciOutput"></div>
+    </div>
+
+    <!-- TAB: AI Analysis -->
+    <div class="admin-panel" id="tab-analysis">
+      <div class="ai-section">
+        <h3>ИИ-анализ ответов</h3>
+        <p>Выберите участника и получите аналитический вывод с уточняющими вопросами для интервью.</p>
+        <select id="aiRespSelect" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 14px;font-family:var(--sans);font-size:13.5px;outline:none;cursor:pointer;margin-bottom:14px;display:block">
+          <option value="">— выберите участника —</option>
+        </select>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn-ai" onclick="runAiAnalysis('single')">Анализ участника</button>
+          <button class="btn-ai" onclick="runAiAnalysis('all')" style="background:linear-gradient(135deg,#065f46,#059669)">Сводный анализ всех</button>
+        </div>
+        <div class="ai-loading" id="aiLoading">
+          <div class="ai-spinner"></div>
+          <span>Анализ данных, пожалуйста подождите...</span>
+        </div>
+        <div class="ai-output" id="aiOutput"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────
+// CONFIG
+// ─────────────────────────────────────────────────
+const ADMIN_KEY = 'KCELL2025';
+const STORE_PREFIX = 'wms2_';
+let autosaveTimer = null;
+let currentRID = null;
+let answers = {}, notes = {}, timeGrid = {};
+
+// ─────────────────────────────────────────────────
+// STORAGE — localStorage with in-memory fallback
+// ─────────────────────────────────────────────────
+const MEM = {};
+function sGet(key) {
+  try {
+    const v = localStorage.getItem(STORE_PREFIX + key);
+    return v ? JSON.parse(v) : null;
+  } catch {
+    return MEM[key] !== undefined ? MEM[key] : null;
+  }
+}
+function sSet(key, val) {
+  try { localStorage.setItem(STORE_PREFIX + key, JSON.stringify(val)); }
+  catch { MEM[key] = val; }
+}
+// Also try window.storage (Claude artifacts env) silently
+async function sSetShared(key, val) {
+  sSet(key, val); // always save locally
+  try {
+    if (window.storage) await window.storage.set(STORE_PREFIX + key, JSON.stringify(val), true);
+  } catch {}
+}
+async function sGetShared(key) {
+  try {
+    if (window.storage) {
+      const r = await window.storage.get(STORE_PREFIX + key, true);
+      if (r) return JSON.parse(r.value);
+    }
+  } catch {}
+  return sGet(key); // fallback to local
+}
+
+// ─────────────────────────────────────────────────
+// QUESTION DATA
+// ─────────────────────────────────────────────────
+const BLOCKS = [
+  {id:'B0',num:'0',title:'Общий профиль группы',desc:'Помогает корректно интерпретировать остальные ответы'},
+  {id:'B1',num:'1',title:'Планирование и консолидация потребностей в закупках',desc:''},
+  {id:'B2A',num:'2А',title:'Подготовка договора до подписания',desc:''},
+  {id:'B2B',num:'2Б',title:'После подписания договора',desc:''},
+  {id:'B3',num:'3',title:'Заявки на работы и контроль бюджета',desc:'',filterQ:'q3_filter'},
+  {id:'B4',num:'4',title:'Контроль исполнения договоров и оплат',desc:''},
+  {id:'B5',num:'5',title:'Сопровождение процессов и регламенты',desc:''},
+  {id:'B6',num:'6',title:'Общий профиль взаимодействия',desc:''},
+];
+
+const QUESTIONS = [
+// B0
+{id:'q0_1',block:'B0',text:'Сколько человек в вашей группе, включая вас?',type:'radio',required:true,
+  auditHint:'Масштаб группы влияет на оценку реалистичности заявленного функционала.',
+  options:[{val:'a',label:'1–3 человека'},{val:'b',label:'4–6 человек'},{val:'c',label:'7–10 человек'},{val:'d',label:'Более 10 человек'}]},
+{id:'q0_2',block:'B0',text:'Какие подразделения обслуживает ваша группа?',type:'checkbox',required:true,
+  auditHint:'Определяет периметр ответственности BCS-TD.',
+  options:[{val:'a',label:'Технический департамент'},{val:'b',label:'Цифровой блок'},{val:'c',label:'Блок безопасности'},{val:'d',label:'Другие подразделения'},{val:'e',label:'Все подразделения компании'}]},
+{id:'q0_3',block:'B0',text:'Примерно как распределяется рабочее время вашей группы за типичную неделю? (в сумме около 100%)',type:'number-grid',required:false,
+  auditHint:'>40% на работу с документами = pre-processing layer (R). >40% на координацию = ближе к S.',
+  options:[{val:'docs',label:'Работа с документами'},{val:'status',label:'Контроль статусов'},{val:'reports',label:'Отчётность'},{val:'internal',label:'Переписка внутри компании'},{val:'vendors',label:'Переписка с поставщиками'},{val:'sap',label:'Работа в SAP'},{val:'other',label:'Другое'}]},
+{id:'q0_4',block:'B0',text:'Какими системами вы пользуетесь в работе?',type:'checkbox',required:false,
+  auditHint:'Право создавать/редактировать в SAP vs. только просматривать — прямой маркер R vs. I.',
+  options:[{val:'a',label:'SAP — просматриваю данные'},{val:'b',label:'SAP — создаю или редактирую документы'},{val:'c',label:'ИСЭЗ (портал Самрук)'},{val:'d',label:'Электронный документооборот (СЭД)'},{val:'e',label:'Excel / общие папки'},{val:'f',label:'Другие системы'},{val:'g',label:'Специализированных систем не использую'}]},
+// B1
+{id:'q1_1',block:'B1',text:'Как формируется информация о планируемых закупках подразделений?',type:'radio',required:true,
+  rasciSignal:{a:'R',b:'R',c:'S',d:'I',e:'S'},auditHint:'Глубина обработки данных до передачи в ДЦЗ.',
+  options:[{val:'a',label:'Собираем потребности от ВЗ сами — обходим, запрашиваем, сводим'},{val:'b',label:'ВЗ присылают потребности — мы консолидируем'},{val:'c',label:'Получаем готовый план от ДЦЗ'},{val:'d',label:'Каждый ВЗ работает с ДЦЗ напрямую — мы не участвуем'},{val:'e',label:'По-разному в зависимости от подразделения'}]},
+{id:'q1_2',block:'B1',text:'Что ваша группа делает с данными до передачи в ДЦЗ?',type:'checkbox',required:true,
+  rasciSignal:{a:'R',b:'R',c:'R',d:'R',e:'R',f:'S',g:'—'},auditHint:'Варианты 1–5 = R. Вариант 6 = S. Вариант 7 = вне RASCI.',
+  options:[{val:'a',label:'Проверяем наличие бюджета'},{val:'b',label:'Проверяем корректность описания'},{val:'c',label:'Уточняем у ВЗ детали'},{val:'d',label:'Формируем сводный реестр'},{val:'e',label:'Согласовываем приоритеты с ВЗ'},{val:'f',label:'Передаём как есть — без обработки'},{val:'g',label:'В консолидации не участвуем'}]},
+{id:'q1_3',block:'B1',text:'Если позиция плана закупок отстаёт от графика — как развивается ситуация?',type:'radio',required:true,
+  rasciSignal:{a:'R',b:'S',c:'C',d:'I',e:'—'},auditHint:'Вариант 1 = R. Вариант 2 = S. Варианты 3–4 = C/I.',
+  options:[{val:'a',label:'Мы первыми замечаем и сами принимаем меры'},{val:'b',label:'Замечаем и сообщаем руководителю — дальше они решают'},{val:'c',label:'Нам сообщает ДЦЗ — мы начинаем помогать'},{val:'d',label:'Нам сообщает руководство — мы выясняем ситуацию'},{val:'e',label:'Контроль сроков плана закупок не входит в нашу работу'}]},
+{id:'q1_4',block:'B1',text:'Как часто вы готовите сводную информацию о статусе плана закупок?',type:'radio',required:false,
+  options:[{val:'a',label:'Еженедельно — это регулярная часть нашей работы'},{val:'b',label:'Ежемесячно — как часть отчётности'},{val:'c',label:'По запросу — когда руководство или ДЦЗ спрашивают'},{val:'d',label:'Такую сводку готовит ДЦЗ или Бюджетный Контроль'},{val:'e',label:'Такой отчётности нет'}]},
+{id:'q1_5',block:'B1',text:'Если план закупок не исполнен — к кому обращается руководство?',type:'radio',required:true,
+  rasciSignal:{a:'A',b:'—',c:'—',d:'A',e:'—'},auditHint:'ПРЯМОЙ МАРКЕР Accountable.',
+  options:[{val:'a',label:'К нам — мы отвечаем за выполнение плана'},{val:'b',label:'К ДЦЗ — они ведут закупочный процесс'},{val:'c',label:'К ВЗ — они инициаторы потребности'},{val:'d',label:'К нам и ДЦЗ совместно'},{val:'e',label:'По-разному — зависит от причины'}]},
+// B2A
+{id:'q2a_1',block:'B2A',text:'Какие типы договоров сопровождает ваша группа?',type:'checkbox',required:true,
+  auditHint:'Базовый фильтр — понимает ли человек с какими типами договоров работает.',
+  options:[{val:'a',label:'Открытые тендеры (ОТ) — через ИСЭЗ'},{val:'b',label:'Договоры из одного источника (ОИ)'},{val:'c',label:'Договоры особого порядка'},{val:'d',label:'Рамочные договоры на строительство и монтаж'},{val:'e',label:'Со всеми типами одинаково'},{val:'f',label:'Затрудняюсь классифицировать'}]},
+{id:'q2a_2',block:'B2A',text:'По ОТ (через ИСЭЗ) — что делает ваша группа до подписания?',type:'checkbox',required:false,
+  rasciSignal:{a:'R',b:'R',c:'R',d:'R',e:'C',f:'—'},
+  options:[{val:'a',label:'Адаптируем типовой шаблон под конкретную закупку'},{val:'b',label:'Согласовываем с Юридическим департаментом'},{val:'c',label:'Согласовываем с Финансовым департаментом'},{val:'d',label:'Загружаем договор на ИСЭЗ'},{val:'e',label:'Контролируем прохождение процедуры на ИСЭЗ'},{val:'f',label:'Наша группа в этом не участвует'}]},
+{id:'q2a_3',block:'B2A',text:'По ОИ — кто формирует текст договора?',type:'radio',required:false,
+  rasciSignal:{a:'R',b:'S',c:'—',d:'C',e:'S'},
+  options:[{val:'a',label:'Наша группа формирует проект с нуля'},{val:'b',label:'Юридический департамент — мы передаём исходные данные'},{val:'c',label:'ДЦЗ формирует — мы не участвуем'},{val:'d',label:'ВЗ совместно с юристами — мы подключаемся позже'},{val:'e',label:'По-разному в зависимости от договора'}]},
+{id:'q2a_4',block:'B2A',text:'Договоры ОИ перед подписанием проходят согласование в SAP — кто этим занимается?',type:'radio',required:false,
+  rasciSignal:{a:'R',b:'S',c:'—',d:'—'},
+  options:[{val:'a',label:'Мы инициируем согласование в SAP и ведём его'},{val:'b',label:'Мы передаём в ССП — они запускают согласование'},{val:'c',label:'ДЦЗ или юристы — мы не участвуем'},{val:'d',label:'Не знаю как это происходит в SAP'}]},
+{id:'q2a_5',block:'B2A',text:'Если договор требует согласования Правления — кто готовит материалы?',type:'radio',required:false,
+  rasciSignal:{a:'R',b:'S',c:'—',d:'—',e:'—'},
+  options:[{val:'a',label:'Наша группа готовит Пояснительную Записку'},{val:'b',label:'ВЗ готовит — мы помогаем с оформлением'},{val:'c',label:'ВЗ готовит самостоятельно — наша группа не участвует'},{val:'d',label:'Другое подразделение'},{val:'e',label:'С такими случаями не сталкивались'}]},
+{id:'q2a_6',block:'B2A',text:'Если договор с авансовой оплатой — кто готовит материалы для Кредитного Комитета?',type:'radio',required:false,
+  rasciSignal:{a:'R',b:'S',c:'—',d:'—',e:'—'},
+  options:[{val:'a',label:'Наша группа'},{val:'b',label:'ВЗ — мы помогаем с оформлением'},{val:'c',label:'Бюджетный Контроль'},{val:'d',label:'ДЦЗ'},{val:'e',label:'С такими случаями не сталкивались'}]},
+{id:'q2a_7',block:'B2A',text:'После подписания — кто загружает договор в SAP?',type:'radio',required:false,
+  rasciSignal:{a:'R',b:'R',c:'R',d:'R',e:'R',f:'—'},
+  options:[{val:'a',label:'Наша группа'},{val:'b',label:'ССП'},{val:'c',label:'ВЗ самостоятельно'},{val:'d',label:'ДЦЗ'},{val:'e',label:'По-разному'},{val:'f',label:'Не знаю'}]},
+{id:'q2a_8',block:'B2A',text:'Если что-то пошло не так при согласовании договора — к кому обращается руководство?',type:'radio',required:true,
+  rasciSignal:{a:'A',b:'—',c:'—',d:'—',e:'—'},auditHint:'ПРЯМОЙ МАРКЕР Accountable по этапу до подписания.',
+  options:[{val:'a',label:'К нам — мы отвечаем за сопровождение'},{val:'b',label:'К ДЦЗ'},{val:'c',label:'К юристам'},{val:'d',label:'К ВЗ'},{val:'e',label:'Зависит от этапа'}]},
+// B2B
+{id:'q2b_1',block:'B2B',text:'После подписания договора — какие шаги выполняет ваша группа?',type:'checkbox',required:true,
+  rasciSignal:{a:'R',b:'R',c:'S',d:'R',e:'C',f:'S',g:'—'},
+  options:[{val:'a',label:'Проверяем договор на корректность'},{val:'b',label:'Вносим в внутренний реестр'},{val:'c',label:'Передаём в ССП для загрузки в SAP'},{val:'d',label:'Самостоятельно вносим в SAP'},{val:'e',label:'Контролируем что ССП загрузил в SAP'},{val:'f',label:'Уведомляем ВЗ'},{val:'g',label:'Ничего — договор идёт напрямую в ССП'}]},
+{id:'q2b_2',block:'B2B',text:'Как вы узнаёте что договор загружен в SAP?',type:'radio',required:true,
+  rasciSignal:{a:'R',b:'R',c:'I',d:'—',e:'—'},
+  options:[{val:'a',label:'Сами проверяем в SAP'},{val:'b',label:'Ведём трекер статуса загрузки'},{val:'c',label:'Ждём подтверждения от ССП'},{val:'d',label:'Узнаём от ВЗ когда возникает проблема'},{val:'e',label:'Этим не занимаемся'}]},
+{id:'q2b_3',block:'B2B',text:'Когда договор застрял — что делает ваша группа?',type:'radio',required:true,
+  rasciSignal:{a:'R',b:'C',c:'S',d:'I',e:'—'},
+  options:[{val:'a',label:'Сами связываемся и добиваемся движения'},{val:'b',label:'Сообщаем руководителю — они решают'},{val:'c',label:'Организуем встречу всех участников'},{val:'d',label:'Фиксируем и ждём'},{val:'e',label:'Это зона ДЦЗ или юристов'}]},
+{id:'q2b_4',block:'B2B',text:'Может ли ваша группа самостоятельно вернуть договор на доработку?',type:'radio',required:true,
+  rasciSignal:{a:'A',b:'R',c:'S',d:'I'},auditHint:'ПРЯМОЙ МАРКЕР A/R.',
+  options:[{val:'a',label:'Да — принимаем решение самостоятельно'},{val:'b',label:'Только при явных технических ошибках'},{val:'c',label:'Нет — можем сигнализировать, решение принимает ВЗ'},{val:'d',label:'Нет — мы только передаём документы'}]},
+{id:'q2b_5',block:'B2B',text:'Если договор подписан с задержкой — к кому обращается руководство?',type:'radio',required:true,
+  rasciSignal:{a:'A',b:'—',c:'—',d:'—',e:'—'},
+  options:[{val:'a',label:'К нам'},{val:'b',label:'К ДЦЗ'},{val:'c',label:'К юристам'},{val:'d',label:'К ВЗ'},{val:'e',label:'Зависит от причины'}]},
+// B3 filter
+{id:'q3_filter',block:'B3',text:'Работает ли ваша группа с заказами по рамочным договорам (строительство, модернизация сети)?',type:'radio',required:true,isFilter:true,
+  auditHint:'Фильтр-вопрос. Если "Нет" — вопросы B3 пропускаются. Вы всё равно можете ответить на них при желании.',
+  options:[{val:'yes',label:'Да — значительная часть нашей работы'},{val:'partial',label:'Да — но лишь иногда'},{val:'no',label:'Нет — этим занимается другое подразделение'}]},
+// B3 filtered
+{id:'q3_1',block:'B3',text:'По рамочным договорам — что делает ваша группа на этапе формирования заказа?',type:'checkbox',required:false,filterBy:'q3_filter',filterVals:['yes','partial'],
+  rasciSignal:{a:'R',b:'R',c:'R',d:'R',e:'S',f:'—'},
+  options:[{val:'a',label:'Помогаем ВЗ сформулировать объём работ'},{val:'b',label:'Проверяем соответствие рамочному договору'},{val:'c',label:'Проверяем наличие бюджета'},{val:'d',label:'Оформляем заявку (PR) в SAP'},{val:'e',label:'Передаём готовую заявку в ДЦЗ или ССП'},{val:'f',label:'Не участвуем'}]},
+{id:'q3_2',block:'B3',text:'Как ваша группа получает данные о состоянии бюджета (CAPEX/OPEX)?',type:'radio',required:false,filterBy:'q3_filter',filterVals:['yes','partial'],
+  rasciSignal:{a:'R',b:'R',c:'S',d:'C',e:'—'},
+  options:[{val:'a',label:'Ведём собственный файл'},{val:'b',label:'Смотрим напрямую в SAP'},{val:'c',label:'Получаем регулярно от Бюджетного Контроля'},{val:'d',label:'Запрашиваем по необходимости'},{val:'e',label:'Бюджетными данными не занимаемся'}]},
+{id:'q3_3',block:'B3',text:'Если данные по бюджету расходятся с данными Бюджетного Контроля — чьи данные берут за основу?',type:'radio',required:false,filterBy:'q3_filter',filterVals:['yes','partial'],
+  rasciSignal:{a:'A',b:'S',c:'S',d:'—'},
+  options:[{val:'a',label:'Наши — мы оперативный источник'},{val:'b',label:'Бюджетного Контроля — их данные приоритетны'},{val:'c',label:'Совместно выясняем причину'},{val:'d',label:'Такой ситуации не возникало'}]},
+{id:'q3_4',block:'B3',text:'Кто первым поднимает вопрос если бюджет близок к исчерпанию?',type:'radio',required:false,filterBy:'q3_filter',filterVals:['yes','partial'],
+  rasciSignal:{a:'R',b:'I',c:'—',d:'—',e:'—'},
+  options:[{val:'a',label:'Мы — отслеживаем и предупреждаем заранее'},{val:'b',label:'Бюджетный Контроль — они сигнализируют нам'},{val:'c',label:'SAP автоматически блокирует заявку'},{val:'d',label:'ВЗ сам замечает когда заявка не проходит'},{val:'e',label:'Такого контроля нет'}]},
+{id:'q3_5',block:'B3',text:'Как происходит прогнозирование расходов до конца периода?',type:'radio',required:false,filterBy:'q3_filter',filterVals:['yes','partial'],
+  rasciSignal:{a:'R',b:'S',c:'I',d:'—'},
+  options:[{val:'a',label:'Мы готовим прогноз и передаём в Бюджетный Контроль'},{val:'b',label:'Мы предоставляем данные — прогноз делает БК'},{val:'c',label:'БК делает самостоятельно'},{val:'d',label:'Прогнозирования нет'}]},
+{id:'q3_6',block:'B3',text:'Кто несёт ответственность за перерасход или недоиспользование бюджета?',type:'radio',required:false,filterBy:'q3_filter',filterVals:['yes','partial'],
+  rasciSignal:{a:'A',b:'—',c:'—',d:'—',e:'—'},
+  options:[{val:'a',label:'Мы — в части планирования и контроля закупок'},{val:'b',label:'Бюджетный Контроль'},{val:'c',label:'ВЗ — они распорядители бюджета'},{val:'d',label:'Ответственность распределена'},{val:'e',label:'Не касается нашей группы'}]},
+// B4
+{id:'q4_1',block:'B4',text:'Когда подрядчик привёз документы — что делает ваша группа?',type:'checkbox',required:true,
+  rasciSignal:{a:'R',b:'R',c:'R',d:'S',e:'R',f:'—'},
+  options:[{val:'a',label:'Принимаем документы первыми'},{val:'b',label:'Проверяем комплектность и корректность'},{val:'c',label:'При ошибках возвращаем подрядчику'},{val:'d',label:'Организуем подписание актов со стороны ВЗ'},{val:'e',label:'Готовим пакет и передаём в ССП'},{val:'f',label:'Документы идут напрямую к ВЗ или в ССП'}]},
+{id:'q4_2',block:'B4',text:'Может ли ваша группа самостоятельно вернуть документы подрядчику?',type:'radio',required:true,
+  rasciSignal:{a:'A',b:'R',c:'S',d:'—'},
+  options:[{val:'a',label:'Да — стандартная практика'},{val:'b',label:'Да — только при явных ошибках'},{val:'c',label:'Нет — сначала согласовываем'},{val:'d',label:'Нет — документы принимает ССП'}]},
+{id:'q4_3',block:'B4',text:'Как вы контролируете статус оплат?',type:'radio',required:false,
+  rasciSignal:{a:'R',b:'R',c:'I',d:'—'},
+  options:[{val:'a',label:'Ведём собственный реестр оплат'},{val:'b',label:'Смотрим в SAP'},{val:'c',label:'Уточняем у ССП когда нужно'},{val:'d',label:'Не контролируем — это ССП'}]},
+{id:'q4_4',block:'B4',text:'Если оплата задержалась — к кому обращаются подрядчик и руководство?',type:'radio',required:true,
+  rasciSignal:{a:'A',b:'—',c:'—',d:'—',e:'—'},auditHint:'ПРЯМОЙ МАРКЕР Accountable по своевременности оплат.',
+  options:[{val:'a',label:'К нам — мы первая точка контакта'},{val:'b',label:'В ССП'},{val:'c',label:'В казначейство'},{val:'d',label:'Зависит от причины'},{val:'e',label:'Не наша зона'}]},
+{id:'q4_5',block:'B4',text:'Если документы приняты с ошибками и обнаружены в ССП — кто разбирается?',type:'radio',required:false,
+  rasciSignal:{a:'A',b:'—',c:'—',d:'—'},
+  options:[{val:'a',label:'Мы — это наша ответственность'},{val:'b',label:'ССП сам связывается с подрядчиком'},{val:'c',label:'ВЗ решает напрямую'},{val:'d',label:'По-разному'}]},
+// B5
+{id:'q5_1',block:'B5',text:'Если возникает системная проблема в процессе — что делает ваша группа?',type:'radio',required:false,
+  rasciSignal:{a:'R',b:'S',c:'C',d:'—'},
+  options:[{val:'a',label:'Анализируем и предлагаем решение руководству'},{val:'b',label:'Сообщаем о проблеме — они решают'},{val:'c',label:'Передаём в ДЦЗ, ССП или другое подразделение'},{val:'d',label:'Работаем в существующих рамках'}]},
+{id:'q5_2',block:'B5',text:'Есть ли регламенты или шаблоны которые ваша группа разработала?',type:'radio',required:false,
+  rasciSignal:{a:'R',b:'R',c:'C',d:'—'},
+  options:[{val:'a',label:'Да — официально утверждённые документы'},{val:'b',label:'Есть рабочие шаблоны внутри команды'},{val:'c',label:'Используем документы других'},{val:'d',label:'Таких документов нет'}]},
+{id:'q5_3',block:'B5',text:'При системной проблеме с ДЦЗ, ССП или бухгалтерией — ваша группа участвует в решении?',type:'radio',required:false,
+  rasciSignal:{a:'R',b:'C',c:'—',d:'—'},
+  options:[{val:'a',label:'Да — сами инициируем обсуждение'},{val:'b',label:'Да — нас привлекают как одну из сторон'},{val:'c',label:'Нет — решают руководители подразделений'},{val:'d',label:'Нет — не наша зона'}]},
+// B6
+{id:'q6_1',block:'B6',text:'По каким вопросам к вашей группе чаще всего обращаются другие подразделения?',type:'checkbox',required:false,
+  options:[{val:'a',label:'Узнать статус заявки или договора'},{val:'b',label:'Проверить наличие бюджета'},{val:'c',label:'Узнать какие документы нужны для закупки'},{val:'d',label:'Получить помощь с оформлением документов'},{val:'e',label:'Разъяснение как работает процесс'},{val:'f',label:'К нам обращаются редко — сами инициируем'}]},
+{id:'q6_2',block:'B6',text:'Какие задачи занимают наибольшую часть времени прямо сейчас? (не более трёх)',type:'checkbox',required:false,maxChoices:3,
+  options:[{val:'a',label:'Сопровождение заявок на закупку (PR, PO)'},{val:'b',label:'Работа с договорами'},{val:'c',label:'Работа с документами по выполненным работам'},{val:'d',label:'Контроль бюджета и отчётность'},{val:'e',label:'Коммуникация с поставщиками'},{val:'f',label:'Подготовка сводных отчётов'},{val:'g',label:'Взаимодействие с ДЦЗ, ССП, БК'}]},
+{id:'q6_3',block:'B6',text:'Есть ли задачи в которых вашей группе не хватает полномочий или информации?',type:'textarea',required:false,
+  noteLabel:'Ответьте если есть что сказать (необязательно)'},
+];
+
+// ─────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const p = new URLSearchParams(window.location.search);
+  const mode = p.get('mode');
+  const key = p.get('key');
+
+  if (mode === 'admin') {
+    if (key === ADMIN_KEY) { showAdmin(); return; }
+    document.getElementById('admin-login').style.display = 'block';
+    return;
+  }
+
+  // Check for existing respondent session
+  const rid = sGet('current_rid');
+  if (rid) {
+    currentRID = rid;
+    const saved = sGet('resp_' + rid);
+    if (saved) {
+      answers = saved.answers || {};
+      notes   = saved.notes   || {};
+      timeGrid= saved.timeGrid|| {};
+      if (saved.meta && saved.meta.submitted) { showThankYouDirect(); return; }
+      showSurvey();
+      restoreAnswers();
+      updateProgress();
+      return;
+    }
+  }
+  document.getElementById('name-entry').style.display = 'block';
+});
+
+function showSurvey() {
+  document.getElementById('respondent-view').style.display = 'block';
+  document.getElementById('thank-you').style.display = 'none';
+  document.getElementById('surveyMain').style.display = 'block';
+  document.querySelector('.site-header').style.display = '';
+  document.querySelector('.progress-bar-wrap').style.display = '';
+  if (!document.getElementById('questionsContainer').children.length) buildQuestionnaire();
+}
+
+function startSurvey() {
+  const name = document.getElementById('nameInput').value.trim();
+  if (!name) { document.getElementById('nameErr').style.display = 'block'; return; }
+  document.getElementById('nameErr').style.display = 'none';
+
+  const rid = 'r_' + Date.now() + '_' + Math.random().toString(36).substr(2,6);
+  currentRID = rid;
+  sSet('current_rid', rid);
+  sSet('resp_' + rid, {
+    meta: { name, startedAt: new Date().toISOString(), submitted: false },
+    answers:{}, notes:{}, timeGrid:{}
+  });
+  // Add to respondents list
+  const list = sGet('respondents_list') || [];
+  list.push({ id: rid, name, startedAt: new Date().toISOString() });
+  sSet('respondents_list', list);
+
+  document.getElementById('name-entry').style.display = 'none';
+  showSurvey();
+  updateProgress();
+}
+
+// ─────────────────────────────────────────────────
+// BUILD QUESTIONNAIRE
+// ─────────────────────────────────────────────────
+function buildQuestionnaire() {
+  const container = document.getElementById('questionsContainer');
+  container.innerHTML = '';
+  let curBlock = null;
+
+  QUESTIONS.forEach(q => {
+    if (q.block !== curBlock) {
+      curBlock = q.block;
+      const bdef = BLOCKS.find(b => b.id === q.block);
+      if (bdef) {
+        const hdEl = document.createElement('div');
+        hdEl.className = 'section-hd';
+        hdEl.id = 'block_' + bdef.id;
+        hdEl.innerHTML = `<div class="section-num">${bdef.num}</div>
+          <div class="section-info">
+            <div class="section-title">${bdef.title}</div>
+            ${bdef.desc?`<div class="section-desc">${bdef.desc}</div>`:''}
+          </div>`;
+        container.appendChild(hdEl);
+        const hr = document.createElement('hr'); hr.className='section-line';
+        container.appendChild(hr);
+        // Filter block note
+        if (bdef.filterQ) {
+          const fn = document.createElement('div');
+          fn.className = 'section-filter-note';
+          fn.id = 'sfn_' + bdef.id;
+          fn.innerHTML = `<span>⚠️</span><span id="sfnText_${bdef.id}">Этот раздел автоматически пропущен на основании ответа на предыдущий вопрос. Вы всё равно можете ответить на вопросы ниже.</span>`;
+          container.appendChild(fn);
+        }
+      }
+    }
+    container.appendChild(buildCard(q));
+  });
+}
+
+function buildCard(q) {
+  const div = document.createElement('div');
+  div.className = 'q-card';
+  div.id = 'card_' + q.id;
+
+  // Head
+  let typeHint = '';
+  if (q.type==='radio') typeHint = 'Один ответ';
+  else if (q.type==='checkbox') typeHint = q.maxChoices ? `Несколько ответов (не более ${q.maxChoices})` : 'Можно выбрать несколько';
+  div.innerHTML = `<div class="q-head">
+    <span class="q-num${q.required?' required':''}">${q.id.toUpperCase().replace(/_/g,'.')}</span>
+    <span class="q-text">${q.text}${typeHint?`<span class="q-type-hint">${typeHint}</span>`:''}</span>
+  </div>`;
+
+  // Required error
+  const reqErr = document.createElement('div');
+  reqErr.className = 'req-error';
+  reqErr.id = 'err_' + q.id;
+  reqErr.innerHTML = '<span>⚠</span> Это обязательный вопрос — пожалуйста, выберите ответ';
+  div.appendChild(reqErr);
+
+  // Filter banner (if this question is filtered)
+  if (q.filterBy) {
+    const fb = document.createElement('div');
+    fb.className = 'filter-banner';
+    fb.id = 'fbanner_' + q.id;
+    fb.innerHTML = `<span class="filter-banner-icon">ℹ️</span>
+      <div>
+        <span id="fbText_${q.id}">Этот вопрос относится к разделу, который был пропущен на основании вашего ответа.</span>
+        <span class="filter-banner-toggle" onclick="toggleFilteredQ('${q.id}')">Всё равно ответить</span>
+      </div>`;
+    div.appendChild(fb);
+  }
+
+  if (q.type === 'number-grid') {
+    const grid = document.createElement('div'); grid.className='time-grid';
+    q.options.forEach(opt => {
+      const row = document.createElement('div'); row.className='time-row';
+      row.innerHTML=`<span class="time-label">${opt.label}</span>
+        <input type="number" class="time-input" min="0" max="100" placeholder="0"
+          id="tg_${q.id}_${opt.val}" oninput="handleTimeInput('${q.id}','${opt.val}',this.value)">
+        <span>%</span>`;
+      grid.appendChild(row);
+    });
+    const tot = document.createElement('div');
+    tot.style.cssText='padding:4px 0;display:flex;align-items:center;gap:10px;grid-column:1/-1';
+    tot.innerHTML=`<span style="font-size:13px;font-weight:600;color:var(--ink-2)">Итого:</span>
+      <span class="time-total" id="total_${q.id}">0%</span>`;
+    grid.appendChild(tot);
+    div.appendChild(grid);
+  } else if (q.type === 'textarea') {
+    const nd = document.createElement('div'); nd.className='q-note';
+    nd.innerHTML=`<span class="note-label">${q.noteLabel||'Ответ'}</span>
+      <textarea class="note-ta" id="nota_${q.id}" rows="3" placeholder="Введите ваш ответ..."
+        oninput="handleNote('${q.id}',this.value)"></textarea>`;
+    div.appendChild(nd);
+  } else {
+    const opts = document.createElement('div'); opts.className='q-options';
+    q.options.forEach(opt => {
+      const lbl = document.createElement('label'); lbl.className='opt';
+      const inp = document.createElement('input');
+      inp.type=q.type; inp.name=q.id; inp.value=opt.val;
+      inp.id=`opt_${q.id}_${opt.val}`;
+      inp.addEventListener('change',()=>handleAnswer(q,opt.val,inp));
+      const sp = document.createElement('span'); sp.className='opt-text'; sp.textContent=opt.label;
+      lbl.appendChild(inp); lbl.appendChild(sp);
+      opts.appendChild(lbl);
+    });
+    div.appendChild(opts);
+    // Note field
+    const nd = document.createElement('div'); nd.className='q-note';
+    nd.innerHTML=`<span class="note-label">Дополнительный комментарий</span>
+      <textarea class="note-ta" id="nota_${q.id}" placeholder="Уточнение или комментарий..." rows="2"
+        oninput="handleNote('${q.id}',this.value)"></textarea>`;
+    div.appendChild(nd);
+  }
+  return div;
+}
+
+// ─────────────────────────────────────────────────
+// FILTER TOGGLE — allow answering even if skipped
+// ─────────────────────────────────────────────────
+const forcedOpen = {};
+function toggleFilteredQ(qid) {
+  forcedOpen[qid] = true;
+  const fb = document.getElementById('fbanner_' + qid);
+  if (fb) fb.style.display='none';
+}
+
+// ─────────────────────────────────────────────────
+// ANSWER HANDLERS
+// ─────────────────────────────────────────────────
+function handleAnswer(q, val, inp) {
+  if (q.type==='radio') {
+    answers[q.id]=val;
+  } else if (q.type==='checkbox') {
+    if (!Array.isArray(answers[q.id])) answers[q.id]=[];
+    if (inp.checked && q.maxChoices && answers[q.id].length>=q.maxChoices) {
+      inp.checked=false; return;
+    }
+    if (inp.checked) answers[q.id]=[...answers[q.id].filter(v=>v!==val),val];
+    else answers[q.id]=answers[q.id].filter(v=>v!==val);
+  }
+  if (q.isFilter) applyFilters();
+  markAnswered(q.id);
+  updateProgress();
+  scheduleAutosave();
+}
+function handleNote(qid, val) {
+  notes[qid]=val;
+  markAnswered(qid);
+  scheduleAutosave();
+}
+function handleTimeInput(qid, field, val) {
+  timeGrid[qid+'_'+field]=parseInt(val)||0;
+  const q=QUESTIONS.find(q=>q.id===qid);
+  let tot=0; q.options.forEach(o=>{tot+=timeGrid[qid+'_'+o.val]||0;});
+  const el=document.getElementById('total_'+qid);
+  if(el){el.textContent=tot+'%';el.className='time-total'+(tot===100?' ok':tot>100?' over':'');}
+  scheduleAutosave();
+}
+
+function markAnswered(qid) {
+  const card=document.getElementById('card_'+qid);
+  if(!card) return;
+  card.classList.toggle('answered', isAnswered(qid));
+  card.classList.remove('unanswered-required');
+  const err=document.getElementById('err_'+qid);
+  if(err) err.classList.remove('show');
+}
+
+function isAnswered(qid) {
+  const q=QUESTIONS.find(q=>q.id===qid);
+  if(!q) return false;
+  if(q.type==='radio') return !!answers[qid];
+  if(q.type==='checkbox') return Array.isArray(answers[qid])&&answers[qid].length>0;
+  if(q.type==='number-grid') return q.options.some(o=>(timeGrid[qid+'_'+o.val]||0)>0);
+  if(q.type==='textarea') return !!(notes[qid]&&notes[qid].trim().length>2);
+  return false;
+}
+
+// ─────────────────────────────────────────────────
+// FILTER LOGIC
+// ─────────────────────────────────────────────────
+function applyFilters() {
+  const filterQs = QUESTIONS.filter(q=>q.isFilter);
+  filterQs.forEach(fq => {
+    const fval = answers[fq.id];
+    const bdef = BLOCKS.find(b=>b.filterQ===fq.id);
+
+    QUESTIONS.forEach(q => {
+      if (q.filterBy !== fq.id) return;
+      const card = document.getElementById('card_'+q.id);
+      const fb   = document.getElementById('fbanner_'+q.id);
+      if (!card) return;
+
+      const shouldShow = !fval || (q.filterVals||[]).includes(fval);
+
+      if (!shouldShow && !forcedOpen[q.id]) {
+        // Greyed out but still visible
+        card.classList.add('skipped-by-filter');
+        if (fb) {
+          const filterOpt = fq.options.find(o=>o.val===fval);
+          document.getElementById('fbText_'+q.id).textContent =
+            `Этот вопрос пропущен, потому что на вопрос "${fq.id.toUpperCase().replace(/_/g,'.')}" вы ответили: «${filterOpt?filterOpt.label:fval}». Если хотите — можете всё равно ответить.`;
+          fb.style.display='flex';
+        }
+      } else {
+        card.classList.remove('skipped-by-filter');
+        if (fb && !forcedOpen[q.id]) fb.style.display='none';
+      }
+    });
+
+    // Section note
+    if (bdef) {
+      const sfn = document.getElementById('sfn_'+bdef.id);
+      if (sfn) {
+        const isSkipped = fval==='no';
+        sfn.classList.toggle('show', isSkipped);
+        if (isSkipped) {
+          const filterOpt = fq.options.find(o=>o.val===fval);
+          document.getElementById('sfnText_'+bdef.id).textContent =
+            `Этот раздел пропущен, потому что на вопрос "${fq.id.toUpperCase().replace(/_/g,'.')}" вы ответили: «${filterOpt?filterOpt.label:fval}». Вы всё равно можете ответить на вопросы ниже если захотите.`;
+        }
+      }
+    }
+  });
+}
+
+// ─────────────────────────────────────────────────
+// RESTORE
+// ─────────────────────────────────────────────────
+function restoreAnswers() {
+  QUESTIONS.forEach(q => {
+    if (q.type==='radio'&&answers[q.id]) {
+      const inp=document.getElementById(`opt_${q.id}_${answers[q.id]}`);
+      if(inp) inp.checked=true;
+      markAnswered(q.id);
+    } else if (q.type==='checkbox'&&Array.isArray(answers[q.id])) {
+      answers[q.id].forEach(v=>{
+        const inp=document.getElementById(`opt_${q.id}_${v}`);
+        if(inp) inp.checked=true;
+      });
+      markAnswered(q.id);
+    } else if (q.type==='number-grid') {
+      q.options.forEach(opt=>{
+        const v=timeGrid[q.id+'_'+opt.val];
+        if(v){const inp=document.getElementById(`tg_${q.id}_${opt.val}`);if(inp)inp.value=v;}
+      });
+      let tot=0;q.options.forEach(o=>{tot+=timeGrid[q.id+'_'+o.val]||0;});
+      const el=document.getElementById('total_'+q.id);
+      if(el) el.textContent=tot+'%';
+    }
+    const ta=document.getElementById('nota_'+q.id);
+    if(ta&&notes[q.id]) ta.value=notes[q.id];
+  });
+  applyFilters();
+}
+
+// ─────────────────────────────────────────────────
+// PROGRESS
+// ─────────────────────────────────────────────────
+function updateProgress() {
+  // Count ALL questions (filtered ones still count — they're visible but greyed)
+  const allQ = QUESTIONS;
+  const answered = allQ.filter(q => isAnswered(q.id));
+  const pct = allQ.length>0 ? Math.round(answered.length/allQ.length*100) : 0;
+  const fill=document.getElementById('pbFill');
+  const label=document.getElementById('pbLabel');
+  if(fill) fill.style.width=pct+'%';
+  if(label) label.textContent=`${answered.length} / ${allQ.length} вопросов`;
+}
+
+// ─────────────────────────────────────────────────
+// AUTOSAVE
+// ─────────────────────────────────────────────────
+function scheduleAutosave() {
+  clearTimeout(autosaveTimer);
+  autosaveTimer=setTimeout(doAutosave,800);
+}
+function doAutosave() {
+  if(!currentRID) return;
+  const existing=sGet('resp_'+currentRID)||{};
+  sSet('resp_'+currentRID,{...existing,answers,notes,timeGrid,savedAt:new Date().toISOString()});
+  const el=document.getElementById('pbSaved');
+  if(el){el.style.display='flex';setTimeout(()=>{el.style.display='none';},2000);}
+}
+
+// ─────────────────────────────────────────────────
+// SUBMIT — strict required check
+// ─────────────────────────────────────────────────
+function submitSurvey() {
+  // Only truly required questions that are NOT in a skipped filter state (or forced open)
+  const required = QUESTIONS.filter(q => {
+    if (!q.required) return false;
+    // If filtered and not forced open, skip check
+    if (q.filterBy && !forcedOpen[q.id]) {
+      const fval = answers[q.filterBy];
+      if (!fval || !(q.filterVals||[]).includes(fval)) return false;
+    }
+    return true;
+  });
+
+  const unanswered = required.filter(q => !isAnswered(q.id));
+
+  if (unanswered.length > 0) {
+    // Highlight all unanswered required
+    unanswered.forEach(q => {
+      const card = document.getElementById('card_'+q.id);
+      if (card) card.classList.add('unanswered-required');
+      const err = document.getElementById('err_'+q.id);
+      if (err) err.classList.add('show');
+    });
+    document.getElementById('unansweredWarn').style.display='block';
+    // Scroll to first
+    const first = document.getElementById('card_'+unanswered[0].id);
+    if (first) first.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+
+  document.getElementById('btnSubmit').disabled=true;
+  const existing=sGet('resp_'+currentRID)||{};
+  sSet('resp_'+currentRID,{...existing,answers,notes,timeGrid,
+    meta:{...existing.meta,submitted:true,submittedAt:new Date().toISOString()}});
+  // Update list
+  const list=sGet('respondents_list')||[];
+  const idx=list.findIndex(r=>r.id===currentRID);
+  if(idx>=0){list[idx].submitted=true;sSet('respondents_list',list);}
+
+  showThankYouDirect();
+}
+
+function showThankYouDirect() {
+  document.getElementById('surveyMain').style.display='none';
+  document.querySelector('.progress-bar-wrap').style.display='none';
+  document.querySelector('.site-header').style.display='none';
+  document.getElementById('thank-you').style.display='block';
+}
+
+// ─────────────────────────────────────────────────
+// RETURN TO SURVEY (from thank-you)
+// ─────────────────────────────────────────────────
+function returnToSurvey() {
+  // Unmark submitted so they can keep editing
+  const existing=sGet('resp_'+currentRID)||{};
+  if(existing.meta) existing.meta.submitted=false;
+  sSet('resp_'+currentRID,existing);
+  const list=sGet('respondents_list')||[];
+  const idx=list.findIndex(r=>r.id===currentRID);
+  if(idx>=0){list[idx].submitted=false;sSet('respondents_list',list);}
+  document.getElementById('btnSubmit').disabled=false;
+  document.getElementById('unansweredWarn').style.display='none';
+  document.getElementById('thank-you').style.display='none';
+  document.querySelector('.site-header').style.display='';
+  document.querySelector('.progress-bar-wrap').style.display='';
+  document.getElementById('surveyMain').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ─────────────────────────────────────────────────
+// ADMIN
+// ─────────────────────────────────────────────────
+function checkAdminKey() {
+  if (document.getElementById('adminKeyInput').value.trim()===ADMIN_KEY) {
+    document.getElementById('admin-login').style.display='none';
+    showAdmin();
+  } else {
+    document.getElementById('loginErr').style.display='block';
+  }
+}
+function adminLogout() {
+  document.getElementById('admin-view').style.display='none';
+  window.location.href=window.location.pathname;
+}
+function showAdmin() {
+  document.getElementById('admin-view').style.display='block';
+  // Set URL display
+  const base = window.location.href.split('?')[0];
+  document.getElementById('urlRespondent').textContent = base;
+  document.getElementById('urlAdmin').textContent = base + '?mode=admin&key='+ADMIN_KEY;
+  refreshAdmin();
+}
+function copyUrl(type) {
+  const el = document.getElementById(type==='admin'?'urlAdmin':'urlRespondent');
+  navigator.clipboard.writeText(el.textContent).then(()=>{
+    const btn = el.nextElementSibling;
+    const orig = btn.textContent;
+    btn.textContent='✓ Скопировано!';
+    setTimeout(()=>btn.textContent=orig,2000);
+  }).catch(()=>alert('Скопируйте вручную: ' + el.textContent));
+}
+
+function showAdminTab(e, name) {
+  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+function refreshAdmin() {
+  const list = sGet('respondents_list') || [];
+  const grid = document.getElementById('respGrid');
+  const noR  = document.getElementById('noRespondents');
+  if (list.length===0) { grid.innerHTML=''; noR.style.display='block'; return; }
+  noR.style.display='none';
+  grid.innerHTML='';
+
+  // Populate selects
+  ['rasciSelect','aiRespSelect'].forEach(sid=>{
+    const sel=document.getElementById(sid); if(!sel) return;
+    const cur=sel.value;
+    sel.innerHTML='<option value="">— выберите участника —</option>';
+    list.forEach(r=>sel.innerHTML+=`<option value="${r.id}"${r.id===cur?' selected':''}>${r.name}</option>`);
+  });
+  const cs=document.getElementById('compareSelect');
+  if(cs){cs.innerHTML='';
+    list.forEach(r=>{
+      const lbl=document.createElement('label');
+      lbl.style.cssText='display:flex;align-items:center;gap:8px;background:var(--lavender-2);border:1.5px solid var(--border-2);border-radius:8px;padding:9px 14px;cursor:pointer;font-size:13.5px;font-weight:500';
+      lbl.innerHTML=`<input type="checkbox" value="${r.id}" style="accent-color:var(--violet);width:15px;height:15px"> ${r.name}`;
+      cs.appendChild(lbl);
+    });
+  }
+
+  list.forEach(resp=>{
+    const data=sGet('resp_'+resp.id)||{};
+    const ans=data.answers||{};
+    const answeredCount=QUESTIONS.filter(q=>isAnsweredForAdmin(q,ans,data.timeGrid||{},data.notes||{})).length;
+    const pct=Math.round(answeredCount/QUESTIONS.length*100);
+    const submitted=data.meta&&data.meta.submitted;
+    const date=data.meta?new Date(data.meta.startedAt).toLocaleDateString('ru-RU'):'';
+    const card=document.createElement('div'); card.className='resp-card';
+    card.onclick=()=>showRespDetail(resp.id);
+    card.innerHTML=`<div class="resp-name">${resp.name}</div>
+      <div class="resp-meta">Начато: ${date}</div>
+      <div style="margin-top:14px">
+        <div class="resp-pct">${pct}%</div>
+        <div class="resp-bar"><div class="resp-bar-fill" style="width:${pct}%"></div></div>
+        <span class="resp-status ${submitted?'done':pct>0?'partial':'started'}">
+          ${submitted?'✓ Завершено':pct>0?'⏳ В процессе':'○ Не начато'}
+        </span>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function isAnsweredForAdmin(q, ans, tg, nt) {
+  if(q.type==='radio') return !!ans[q.id];
+  if(q.type==='checkbox') return Array.isArray(ans[q.id])&&ans[q.id].length>0;
+  if(q.type==='number-grid') return q.options.some(o=>(tg[q.id+'_'+o.val]||0)>0);
+  if(q.type==='textarea') return !!(nt[q.id]&&nt[q.id].trim().length>2);
+  return false;
+}
+
+function showRespDetail(rid) {
+  const data=sGet('resp_'+rid); if(!data) return;
+  const name=data.meta&&data.meta.name||rid;
+  const submitted=data.meta&&data.meta.submitted;
+  const ans=data.answers||{};
+  const nt=data.notes||{};
+  const tg=data.timeGrid||{};
+  document.getElementById('detailName').textContent=name;
+  document.getElementById('detailMeta').textContent=
+    submitted?'✓ Завершено '+new Date(data.meta.submittedAt).toLocaleString('ru-RU'):
+    '⏳ В процессе · '+( data.savedAt?new Date(data.savedAt).toLocaleString('ru-RU'):'нет сохранений');
+  let html='',curBlock=null;
+  QUESTIONS.forEach(q=>{
+    const bdef=BLOCKS.find(b=>b.id===q.block);
+    if(q.block!==curBlock){
+      curBlock=q.block;
+      html+=`<div style="margin-top:28px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--lavender)">
+        <span style="font-size:14px;font-weight:800;color:var(--purple)">${bdef?bdef.title:''}</span></div>`;
+    }
+    let ansDisplay='';
+    let rasciRole='—';
+    if(q.type==='radio'){
+      const v=ans[q.id];
+      const opt=v?q.options.find(o=>o.val===v):null;
+      ansDisplay=opt?opt.label:'<em class="empty">Нет ответа</em>';
+      if(v&&q.rasciSignal) rasciRole=q.rasciSignal[v]||'—';
+    } else if(q.type==='checkbox'){
+      const vv=ans[q.id];
+      if(Array.isArray(vv)&&vv.length>0){
+        const labels=vv.map(v=>{const o=q.options.find(o=>o.val===v);return o?`<li>${o.label}</li>`:''}).join('');
+        ansDisplay=`<ul style="padding-left:16px;margin:4px 0">${labels}</ul>`;
+        if(q.rasciSignal){
+          const roles=vv.map(v=>q.rasciSignal[v]).filter(r=>r&&r!=='—');
+          for(const p of['A','R','S','C','I']){if(roles.includes(p)){rasciRole=p;break;}}
+        }
+      } else ansDisplay='<em class="empty">Нет ответа</em>';
+    } else if(q.type==='number-grid'){
+      ansDisplay=q.options.map(opt=>{
+        const v=tg[q.id+'_'+opt.val]||0;
+        return `<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:13px;border-bottom:1px solid var(--lavender)"><span>${opt.label}</span><strong>${v}%</strong></div>`;
+      }).join('')||'<em class="empty">Нет данных</em>';
+    } else if(q.type==='textarea'){
+      ansDisplay=nt[q.id]?nt[q.id]:'<em class="empty">Нет ответа</em>';
+    }
+    const rClass=rasciRole!=='—'?'rasci-'+rasciRole:'rasci-none';
+    const rBadge=rasciRole!=='—'?`<span class="rasci-badge ${rClass}">${rasciRole}</span>`:'';
+    html+=`<div class="ans-block">
+      <div class="ans-block-head"><span class="ans-block-title">${q.id.toUpperCase().replace(/_/g,'.')}</span>${rBadge}</div>
+      <div class="ans-block-q">${q.text}</div>
+      <div class="ans-block-a"><div class="ans-val">${ansDisplay}</div>
+        ${nt[q.id]?`<div class="ans-note">💬 ${nt[q.id]}</div>`:''}
+      </div>
+      ${q.auditHint?`<div class="audit-hint"><strong>📋 Подсказка аудитора:</strong> ${q.auditHint}</div>`:''}
+    </div>`;
+  });
+  document.getElementById('detailContent').innerHTML=html;
+  document.getElementById('respListView').style.display='none';
+  document.getElementById('respDetailView').style.display='block';
+}
+function backToList(){
+  document.getElementById('respListView').style.display='block';
+  document.getElementById('respDetailView').style.display='none';
+}
+
+// RASCI
+function buildRasci(){
+  const rid=document.getElementById('rasciSelect').value;
+  const out=document.getElementById('rasciOutput');
+  if(!rid){out.innerHTML='';return;}
+  const data=sGet('resp_'+rid);if(!data){out.innerHTML='<p>Нет данных</p>';return;}
+  const ans=data.answers||{};
+  const name=data.meta&&data.meta.name||rid;
+  const funcLabels={'B1':'Планирование закупок','B2A':'Подготовка договора (до)','B2B':'Сопровождение договора (после)','B3':'Заявки и бюджет','B4':'Исполнение и оплаты','B5':'Процессы и регламенты','B6':'Профиль взаимодействия'};
+  const blockRoles={};BLOCKS.forEach(b=>{blockRoles[b.id]={A:[],R:[],S:[],C:[],I:[]};});
+  QUESTIONS.forEach(q=>{
+    if(!q.rasciSignal) return;
+    let role='—';
+    if(q.type==='radio'){const v=ans[q.id];role=v?(q.rasciSignal[v]||'—'):'—';}
+    else if(q.type==='checkbox'){
+      const vv=ans[q.id];
+      if(Array.isArray(vv)&&vv.length>0){
+        const roles=vv.map(v=>q.rasciSignal[v]).filter(r=>r&&r!=='—');
+        for(const p of['A','R','S','C','I']){if(roles.includes(p)){role=p;break;}}
+      }
+    }
+    if(role!=='—'&&blockRoles[q.block]) blockRoles[q.block][role].push(q.text.substr(0,50)+'…');
+  });
+  const getSummary=bid=>{const br=blockRoles[bid];for(const p of['A','R','S','C','I']){if(br&&br[p]&&br[p].length>0)return p;}return'?';};
+  const roleDesc={A:'Accountable — конечная ответственность',R:'Responsible — выполняет работу',S:'Support — помогает исполнителю',C:'Consulted — привлекается как эксперт',I:'Informed — получает информацию','?':'Недостаточно данных'};
+  let html=`<div style="margin-bottom:12px;font-size:14px;font-weight:600">Участник: ${name}</div>
+    <table class="rasci-matrix"><thead><tr><th>Функция</th><th>Роль</th><th>Описание</th></tr></thead><tbody>`;
+  Object.entries(funcLabels).forEach(([bid,label])=>{
+    const role=getSummary(bid);
+    const badge=`<span class="rasci-badge rasci-${role!=='?'?role:'none'}">${role}</span>`;
+    html+=`<tr><td>${label}</td><td style="text-align:center">${badge}</td><td style="font-size:12.5px;color:var(--ink-2)">${roleDesc[role]||''}</td></tr>`;
+  });
+  html+=`</tbody></table>`;
+  out.innerHTML=html;
+}
+
+// COMPARISON
+function runComparison(){
+  const checked=document.querySelectorAll('#compareSelect input:checked');
+  if(checked.length<2){document.getElementById('compareOutput').innerHTML='<p style="color:#dc2626;font-size:13px">Выберите минимум двух участников</p>';return;}
+  const rids=Array.from(checked).map(c=>c.value);
+  const datasets=rids.map(rid=>{const d=sGet('resp_'+rid)||{};return{rid,name:d.meta&&d.meta.name||rid,data:d};});
+  const keyQids=QUESTIONS.filter(q=>q.required||q.rasciSignal).map(q=>q.id);
+  let html=`<h3 style="font-size:15px;font-weight:800;margin-bottom:14px">Сравнение: ${datasets.map(d=>d.name).join(' vs ')}</h3>
+    <table class="compare-table"><thead><tr><th>Вопрос</th>${datasets.map(d=>`<th>${d.name}</th>`).join('')}<th>Совпадение</th></tr></thead><tbody>`;
+  keyQids.forEach(qid=>{
+    const q=QUESTIONS.find(q=>q.id===qid);if(!q) return;
+    const getLabel=d=>{
+      if(!d||!d.data) return '—';
+      const ans=(d.data.answers)||{};
+      if(q.type==='radio'){const v=ans[qid];const o=v?q.options.find(o=>o.val===v):null;return o?o.label:'—';}
+      if(q.type==='checkbox'){const vv=ans[qid];if(!Array.isArray(vv)||!vv.length) return'—';return vv.map(v=>{const o=q.options.find(o=>o.val===v);return o?o.label:v;}).join(', ');}
+      return '—';
+    };
+    const labels=datasets.map(d=>getLabel(d));
+    const allSame=labels.every(l=>l===labels[0]);
+    const anyNo=labels.some(l=>l==='—');
+    const shortQ=q.text.length>80?q.text.substr(0,77)+'…':q.text;
+    html+=`<tr><td style="font-size:12px;color:var(--ink-2);max-width:200px">${q.id.toUpperCase().replace(/_/g,'.')} — ${shortQ}</td>
+      ${datasets.map((_,i)=>`<td style="font-size:13px">${labels[i]}</td>`).join('')}
+      <td>${anyNo?'':allSame?'<span class="compare-match">✓ Совп.</span>':'<span class="compare-diff">≠ Расх.</span>'}</td></tr>`;
+  });
+  html+=`</tbody></table>`;
+  document.getElementById('compareOutput').innerHTML=html;
+}
+
+// AI
+async function runAiAnalysis(mode){
+  const loading=document.getElementById('aiLoading');
+  const output=document.getElementById('aiOutput');
+  loading.style.display='flex'; output.style.display='none';
+  let prompt='';
+  if(mode==='single'){
+    const rid=document.getElementById('aiRespSelect').value;
+    if(!rid){loading.style.display='none';return;}
+    const data=sGet('resp_'+rid);if(!data){loading.style.display='none';return;}
+    const ans=data.answers||{};const nt=data.notes||{};
+    let summary=`Участник: ${data.meta&&data.meta.name||rid}\n\n`;
+    QUESTIONS.forEach(q=>{
+      if(q.type==='radio'){const v=ans[q.id];const o=v?q.options.find(o=>o.val===v):null;summary+=`${q.id}: ${o?o.label:'НЕТ ОТВЕТА'}\n`;}
+      else if(q.type==='checkbox'){const vv=ans[q.id];summary+=`${q.id}: ${Array.isArray(vv)&&vv.length?vv.map(v=>{const o=q.options.find(o=>o.val===v);return o?o.label:v;}).join('; '):'НЕТ ОТВЕТА'}\n`;}
+      if(nt[q.id]) summary+=`  Комментарий: ${nt[q.id]}\n`;
+    });
+    prompt=`Ты аудитор-консультант по организационным процессам (RASCI). Проанализируй ответы участника анкеты группы BCS-TD (Budget & Contracts Section TD) Kcell. Дай: 1) RASCI-вывод по блокам, 2) ключевые наблюдения, 3) противоречия, 4) 5–7 уточняющих вопросов для интервью, 5) предварительный вывод о соответствии функций Положению. Отвечай на русском.\n\nОТВЕТЫ:\n${summary}`;
+  } else {
+    const list=sGet('respondents_list')||[];if(!list.length){loading.style.display='none';return;}
+    let all='';
+    list.forEach(resp=>{
+      const d=sGet('resp_'+resp.id);if(!d||!d.answers) return;
+      all+=`\n--- ${resp.name} ---\n`;
+      QUESTIONS.forEach(q=>{
+        if(q.type==='radio'){const v=d.answers[q.id];const o=v?q.options.find(o=>o.val===v):null;if(o) all+=`${q.id}: ${o.label}\n`;}
+        else if(q.type==='checkbox'){const vv=d.answers[q.id];if(Array.isArray(vv)&&vv.length) all+=`${q.id}: ${vv.map(v=>{const o=q.options.find(o=>o.val===v);return o?o.label:v;}).join('; ')}\n`;}
+        if(d.notes&&d.notes[q.id]) all+=`  Комментарий: ${d.notes[q.id]}\n`;
+      });
+    });
+    prompt=`Ты аудитор-консультант по RASCI. Сводный анализ ответов группы BCS-TD Kcell: 1) где совпадают — устойчивые факты, 2) где расходятся — зоны неопределённости, 3) консолидированный RASCI, 4) 5–8 вопросов для разбора противоречий, 5) итоговое заключение. На русском языке.\n\nОТВЕТЫ ВСЕХ:\n${all}`;
+  }
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const data=await r.json();
+    const text=data.content&&data.content[0]?data.content[0].text:'Ошибка';
+    const fmt=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/^(#{1,3}\s+.+)$/gm,s=>`<div style="font-size:15px;font-weight:700;color:var(--purple);margin:16px 0 6px">${s.replace(/^#+\s/,'')}</div>`).replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>');
+    output.innerHTML=`<p>${fmt}</p>`; output.style.display='block';
+  }catch(e){output.innerHTML=`<p style="color:#dc2626">Ошибка API: ${e.message}</p>`;output.style.display='block';}
+  loading.style.display='none';
+}
+</script>
+</body>
+</html>
