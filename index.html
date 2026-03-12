@@ -1295,6 +1295,83 @@ function runComparison(){
   document.getElementById('compareOutput').innerHTML=html;
 }
 
+// LOCAL AI ANALYSIS — no API needed
+function generateLocalAnalysis(list){
+  const roleDesc={A:'Accountable (конечная ответственность)',R:'Responsible (выполняет работу)',S:'Support (помогает)',C:'Consulted (консультирует)',I:'Informed (информируется)'};
+  const funcLabels={B1:'Планирование закупок',B2A:'Подготовка договора (до подписания)',B2B:'Сопровождение договора (после подписания)',B3:'Заявки и бюджетный контроль',B4:'Исполнение договоров и оплаты',B5:'Процессы и регламенты',B6:'Профиль взаимодействия'};
+
+  let out='═══════════════════════════════════════════\n';
+  out+='   АВТОМАТИЧЕСКИЙ RASCI-АНАЛИЗ · BCS-TD\n';
+  out+='═══════════════════════════════════════════\n\n';
+
+  // Per respondent
+  list.forEach(resp=>{
+    const d=sGet('resp_'+resp.id)||{};
+    const ans=d.answers||{};
+    out+=`▶ УЧАСТНИК: ${resp.name}\n${'─'.repeat(50)}\n`;
+    Object.entries(funcLabels).forEach(([bid,label])=>{
+      const bQs=QUESTIONS.filter(q=>q.block===bid&&q.rasciSignal);
+      let role='?';
+      for(const p of['A','R','S','C','I']){
+        const found=bQs.some(q=>{
+          if(q.type==='radio') return q.rasciSignal[ans[q.id]]===p;
+          if(q.type==='checkbox'&&Array.isArray(ans[q.id])) return ans[q.id].some(v=>q.rasciSignal[v]===p);
+          return false;
+        });
+        if(found){role=p;break;}
+      }
+      out+=`  ${label}: ${role!=='?'?roleDesc[role]:'Недостаточно данных'}\n`;
+    });
+    out+='\n';
+  });
+
+  // Contradictions
+  if(list.length>1){
+    out+='═══════════════════════════════════════════\n';
+    out+='   СРАВНЕНИЕ И РАСХОЖДЕНИЯ\n';
+    out+='═══════════════════════════════════════════\n\n';
+    Object.entries(funcLabels).forEach(([bid,label])=>{
+      const roles=list.map(resp=>{
+        const ans=(sGet('resp_'+resp.id)||{}).answers||{};
+        const bQs=QUESTIONS.filter(q=>q.block===bid&&q.rasciSignal);
+        for(const p of['A','R','S','C','I']){
+          if(bQs.some(q=>{
+            if(q.type==='radio') return q.rasciSignal[ans[q.id]]===p;
+            if(q.type==='checkbox'&&Array.isArray(ans[q.id])) return ans[q.id].some(v=>q.rasciSignal[v]===p);
+            return false;
+          })) return p;
+        }
+        return'?';
+      });
+      const unique=[...new Set(roles.filter(r=>r!=='?'))];
+      if(unique.length>1){
+        out+=`⚠ РАСХОЖДЕНИЕ — ${label}:\n`;
+        list.forEach((resp,i)=>out+=`  ${resp.name}: ${roles[i]!=='?'?roleDesc[roles[i]]:'нет данных'}\n`);
+        out+='\n';
+      }
+    });
+  }
+
+  // Recommendations
+  out+='═══════════════════════════════════════════\n';
+  out+='   РЕКОМЕНДУЕМЫЕ ВОПРОСЫ ДЛЯ ИНТЕРВЬЮ\n';
+  out+='═══════════════════════════════════════════\n\n';
+  const intQs=[
+    '1. Опишите типичный день — с чего начинаете и чем заканчиваете?',
+    '2. Какие задачи занимают больше всего времени и почему?',
+    '3. Когда что-то идёт не так — кто принимает финальное решение?',
+    '4. Есть ли задачи, которые формально ваши, но фактически делает кто-то другой?',
+    '5. Какие полномочия вам нужны, но которых сейчас нет?',
+    '6. Что изменилось бы если бы вашей группы не было?',
+    '7. Как бы вы описали роль вашей группы одной фразой?',
+  ];
+  intQs.forEach(q=>out+=q+'\n');
+
+  out+='\n═══════════════════════════════════════════\n';
+  out+=`Сформировано автоматически · ${new Date().toLocaleDateString('ru-RU')}\n`;
+  return out;
+}
+
 // EXPORT — rich multi-sheet Excel via SheetJS
 async function exportCSV(){
   const list=sGet('respondents_list')||[];
@@ -1356,24 +1433,35 @@ async function exportCSV(){
 
   // ── SHEET 2: RASCI matrix ──
   const funcLabels={B1:'Планирование закупок',B2A:'Подготовка договора (до)',B2B:'Сопровождение договора (после)',B3:'Заявки и бюджет',B4:'Исполнение и оплаты',B5:'Процессы и регламенты',B6:'Профиль взаимодействия'};
+
+  function getRoleForBlock(bid,ans){
+    const bQs=QUESTIONS.filter(q=>q.block===bid&&q.rasciSignal&&q.type!=='textarea'&&q.type!=='number-grid');
+    for(const p of['A','R','S','C','I']){
+      const found=bQs.some(q=>{
+        if(q.type==='radio') return ans[q.id]&&q.rasciSignal[ans[q.id]]===p;
+        if(q.type==='checkbox'&&Array.isArray(ans[q.id])) return ans[q.id].some(v=>q.rasciSignal[v]===p);
+        return false;
+      });
+      if(found) return p;
+    }
+    // If block has answered questions but no rasciSignal match — return R as default
+    const hasAny=QUESTIONS.filter(q=>q.block===bid&&q.type!=='textarea').some(q=>{
+      if(q.type==='radio') return !!ans[q.id];
+      if(q.type==='checkbox') return Array.isArray(ans[q.id])&&ans[q.id].length>0;
+      return false;
+    });
+    return hasAny?'R':'?';
+  }
+
   const rasciRows=[['Функция',...list.map(r=>r.name),'Расшифровка']];
   Object.entries(funcLabels).forEach(([bid,label])=>{
     const row=[label];
     list.forEach(resp=>{
-      const d=sGet('resp_'+resp.id)||{};const ans=d.answers||{};
-      let role='?';
-      const bQs=QUESTIONS.filter(q=>q.block===bid&&q.rasciSignal);
-      for(const p of['A','R','S','C','I']){
-        const found=bQs.some(q=>{
-          if(q.type==='radio') return q.rasciSignal[ans[q.id]]===p;
-          if(q.type==='checkbox'&&Array.isArray(ans[q.id])) return ans[q.id].some(v=>q.rasciSignal[v]===p);
-          return false;
-        });
-        if(found){role=p;break;}
-      }
-      row.push(role);
+      const d=sGet('resp_'+resp.id)||{};
+      row.push(getRoleForBlock(bid,d.answers||{}));
     });
-    row.push({A:'Accountable — конечная ответственность',R:'Responsible — выполняет работу',S:'Support — помогает',C:'Consulted — консультирует',I:'Informed — информируется','?':'Нет данных'}[row[1]]||'');
+    const firstRole=row[1];
+    row.push({A:'Accountable — конечная ответственность',R:'Responsible — выполняет работу',S:'Support — помогает',C:'Consulted — консультирует',I:'Informed — информируется','?':'Нет данных'}[firstRole]||'');
     rasciRows.push(row);
   });
   const ws2=XLSX.utils.aoa_to_sheet(rasciRows);
@@ -1397,31 +1485,45 @@ async function exportCSV(){
   ws3['!cols']=[{wch:50},...list.map(()=>({wch:25})),{wch:15}];
   XLSX.utils.book_append_sheet(wb,ws3,'Сравнение');
 
-  // ── SHEET 4: AI Analysis via Claude API ──
-  let aiText='ИИ-анализ недоступен (нет подключения к API)';
-  try{
-    let allSummary='';
-    list.forEach(resp=>{
-      const d=sGet('resp_'+resp.id)||{};const ans=d.answers||{};const nt=d.notes||{};
-      allSummary+=`\n--- ${resp.name} ---\n`;
-      QUESTIONS.forEach(q=>{
-        if(q.type==='radio'){const v=ans[q.id];const o=v?q.options.find(o=>o.val===v):null;if(o) allSummary+=`${q.id}: ${o.label}\n`;}
-        else if(q.type==='checkbox'){const vv=ans[q.id];if(Array.isArray(vv)&&vv.length) allSummary+=`${q.id}: ${vv.map(v=>{const o=q.options.find(o=>o.val===v);return o?o.label:v;}).join('; ')}\n`;}
-        if(nt[q.id]) allSummary+=`  Комментарий: ${nt[q.id]}\n`;
-      });
-    });
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`Ты аудитор-консультант RASCI. Сводный анализ группы BCS-TD Kcell. Дай: 1) RASCI по блокам, 2) совпадения и расхождения, 3) зоны неопределённости, 4) 5-8 вопросов для интервью, 5) итоговое заключение. На русском.\n\n${allSummary}`}]})});
-    const data=await r.json();
-    if(data.content&&data.content[0]) aiText=data.content[0].text;
-  }catch(e){aiText='ИИ-анализ: '+e.message;}
-
-  // Split AI text into rows
-  const aiRows=[['ИИ-анализ и выводы (автоматически)'],[''],
+  // ── SHEET 4: Local AI Analysis ──
+  const aiText=generateLocalAnalysis(list);
+  const aiRows=[
+    ['RASCI-АНАЛИЗ · BCS-TD · KCELL'],
+    [''],
     ...aiText.split('\n').map(line=>[line])
   ];
   const ws4=XLSX.utils.aoa_to_sheet(aiRows);
-  ws4['!cols']=[{wch:120}];
+  ws4['!cols']=[{wch:100}];
+  // Style header
+  if(!ws4['!rows']) ws4['!rows']=[];
+  ws4['!rows'][0]={hpt:24};
+  applyStyle(ws4,'A1',{font:{bold:true,sz:14,color:{rgb:'4C1D95'}},fill:{fgColor:{rgb:'EDE9FE'}}});
   XLSX.utils.book_append_sheet(wb,ws4,'ИИ-анализ');
+
+  // Helper: apply style to cell
+  function applyStyle(ws,addr,style){
+    if(!ws[addr]) ws[addr]={t:'s',v:ws[addr]?ws[addr].v:''};
+    ws[addr].s=style;
+  }
+  const headerStyle={font:{bold:true,color:{rgb:'FFFFFF'},sz:11},fill:{fgColor:{rgb:'4C1D95'}},alignment:{horizontal:'center',wrapText:true}};
+  const subHeaderStyle={font:{bold:true,color:{rgb:'4C1D95'},sz:10},fill:{fgColor:{rgb:'EDE9FE'}}};
+  const nameStyle={font:{bold:true,sz:11},fill:{fgColor:{rgb:'F5F3FF'}}};
+
+  // Style Sheet 1 header row
+  ['A','B','C','D','E','F','G'].forEach(col=>applyStyle(ws1,col+'1',headerStyle));
+
+  // Style Sheet 2
+  const s2cols=['A','B','C',...list.map((_,i)=>String.fromCharCode(66+i))];
+  s2cols.forEach(col=>applyStyle(ws2,col+'1',headerStyle));
+  for(let r=2;r<=Object.keys(funcLabels).length+1;r++){
+    applyStyle(ws2,'A'+r,subHeaderStyle);
+  }
+
+  // Style Sheet 3
+  cmpHeader.forEach((_,i)=>{
+    const col=String.fromCharCode(65+i);
+    applyStyle(ws3,col+'1',headerStyle);
+  });
 
   XLSX.writeFile(wb,'survey_results_'+new Date().toISOString().slice(0,10)+'.xlsx');
   if(msg){msg.textContent='✓ Excel файл скачан!';msg.style.color='var(--green-m)';setTimeout(()=>msg.style.display='none',4000);}
