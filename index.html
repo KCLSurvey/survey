@@ -56,7 +56,6 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-siz
 .opt input[type=radio],.opt input[type=checkbox]{width:16px;height:16px;accent-color:var(--violet);margin-top:2px;flex-shrink:0;cursor:pointer}
 .opt:has(input:checked){background:var(--lavender);border-color:var(--violet)}
 .opt-text{font-size:13.5px;color:var(--ink);line-height:1.5}
-/* TIME GRID */
 .time-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 20px 18px}
 .time-row{display:flex;align-items:center;gap:10px}
 .time-label{font-size:13px;color:var(--ink-2);flex:1}
@@ -73,18 +72,15 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-siz
 .time-other-warn{font-size:12px;color:var(--red-m);margin-top:4px;display:none}
 .time-warn{margin:0 20px 12px;background:var(--amber-l);border-left:4px solid var(--amber-m);border-radius:0 6px 6px 0;padding:8px 13px;font-size:12.5px;color:var(--amber);display:none}
 .time-warn.show{display:block}
-/* NOTES */
 .q-note{padding:0 20px 18px}
 .note-label{font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);margin-bottom:6px;display:block}
 .note-ta{width:100%;min-height:64px;border:1.5px solid var(--border);border-radius:8px;padding:9px 13px;font-family:var(--sans);font-size:13.5px;color:var(--ink);background:var(--surface);resize:vertical;outline:none;transition:border-color .15s}
 .note-ta:focus{border-color:var(--violet);background:#fff}
-/* SUBMIT */
 .submit-area{margin-top:48px}
 .submit-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .btn-submit{background:linear-gradient(135deg,var(--purple),var(--accent));color:#fff;border:none;padding:15px 48px;border-radius:10px;font-family:var(--sans);font-size:15.5px;font-weight:700;cursor:pointer;letter-spacing:-.01em;box-shadow:0 4px 20px rgba(76,29,149,.3);transition:transform .15s,box-shadow .15s}
 .btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(76,29,149,.4)}
 .submit-note{font-size:12px;color:var(--ink-3);margin-top:10px}
-/* Soft warning — unanswered optional */
 .soft-warn{margin-top:14px;padding:12px 16px;background:var(--amber-l);border:1.5px solid var(--amber-m);border-radius:10px;display:none}
 .soft-warn.show{display:block}
 .soft-warn-title{font-size:13.5px;font-weight:700;color:var(--amber);margin-bottom:6px}
@@ -92,7 +88,6 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-siz
 .btn-go-first{background:none;border:1.5px solid var(--amber-m);color:var(--amber);padding:7px 16px;border-radius:7px;font-family:var(--sans);font-size:12.5px;font-weight:700;cursor:pointer;margin-top:10px;transition:all .15s}
 .btn-go-first:hover{background:var(--amber-m);color:#fff}
 .btn-submit-anyway{background:none;border:none;color:var(--ink-3);font-size:12px;cursor:pointer;text-decoration:underline;margin-top:6px;display:block;font-family:var(--sans)}
-/* THANK YOU */
 #thank-you{display:none;text-align:center;padding:80px 40px;max-width:600px;margin:0 auto}
 .ty-icon{font-size:64px;margin-bottom:24px}
 .ty-title{font-size:28px;font-weight:800;color:var(--purple);margin-bottom:16px;letter-spacing:-.02em}
@@ -100,7 +95,6 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-siz
 .ty-badge{margin:28px auto;display:inline-block;background:linear-gradient(135deg,var(--lavender),#fff);border:2px solid var(--border-2);border-radius:var(--r);padding:20px 32px;font-size:15px;font-weight:600;color:var(--purple);line-height:1.7;max-width:440px}
 .btn-back-survey{margin-top:24px;background:none;border:2px solid var(--violet);color:var(--violet);padding:12px 32px;border-radius:10px;font-family:var(--sans);font-size:15px;font-weight:700;cursor:pointer;transition:all .15s}
 .btn-back-survey:hover{background:var(--violet);color:#fff}
-/* NAME ENTRY */
 #name-entry{display:none;text-align:center;padding:80px 40px}
 .name-box{max-width:440px;margin:0 auto;background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:40px;box-shadow:var(--shadow-lg)}
 .name-icon{font-size:44px;margin-bottom:16px}
@@ -110,7 +104,6 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-siz
 .name-input:focus{border-color:var(--violet)}
 .name-btn{width:100%;margin-top:4px;background:var(--violet);color:#fff;border:none;padding:13px;border-radius:8px;font-family:var(--sans);font-size:15px;font-weight:700;cursor:pointer;transition:all .15s}
 .name-btn:hover{background:var(--purple)}
-/* SWITCH PARTICIPANT MODAL */
 #switch-modal{display:none;position:fixed;inset:0;background:rgba(15,12,26,.5);z-index:1000;align-items:center;justify-content:center;padding:20px}
 #switch-modal.show{display:flex}
 .switch-box{background:var(--card);border-radius:16px;padding:36px;max-width:420px;width:100%;box-shadow:var(--shadow-lg)}
@@ -129,7 +122,6 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-siz
 .existing-item:hover{border-color:var(--violet);background:var(--lavender)}
 .existing-name{font-size:13.5px;font-weight:600;color:var(--ink)}
 .existing-meta{font-size:11px;color:var(--ink-3);font-family:var(--mono)}
-/* ADMIN LOGIN */
 #admin-login{display:none;text-align:center;padding:80px 40px}
 .login-box{max-width:420px;margin:0 auto;background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:40px;box-shadow:var(--shadow-lg)}
 .login-title{font-size:22px;font-weight:800;color:var(--purple);margin-bottom:8px}
@@ -138,7 +130,6 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-siz
 .login-input:focus{border-color:var(--violet)}
 .login-btn{width:100%;background:var(--violet);color:#fff;border:none;padding:13px;border-radius:8px;font-family:var(--sans);font-size:15px;font-weight:700;cursor:pointer}
 .login-err{color:#dc2626;font-size:13px;margin-top:10px;display:none}
-/* ADMIN VIEW */
 #admin-view{display:none}
 .admin-header{background:linear-gradient(135deg,#0f172a,#1e1b4b);color:#fff;padding:32px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
 .admin-title{font-size:22px;font-weight:800;letter-spacing:-.02em}
@@ -211,10 +202,12 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-siz
   <div class="switch-box">
     <div style="font-size:36px;margin-bottom:12px">👤</div>
     <div class="switch-title">Войти как другой участник</div>
-    <div class="switch-sub">Введите имя и нажмите «Начать» — ваши ответы сохранятся отдельно</div>
+    <div class="switch-sub">Введите имя, PIN-код и нажмите «Начать» — ваши ответы сохранятся отдельно</div>
     <input type="text" class="switch-input" id="switchNameInput" placeholder="Имя Фамилия" maxlength="80"
+      onkeydown="if(event.key==='Enter')document.getElementById('switchPinInput').focus()">
+    <input type="password" class="switch-input" id="switchPinInput" placeholder="Придумайте PIN-код" maxlength="20"
       onkeydown="if(event.key==='Enter')switchUser()">
-    <div class="switch-err" id="switchErr">Пожалуйста, введите имя</div>
+    <div class="switch-err" id="switchErr">Пожалуйста, введите имя и PIN-код</div>
     <button class="switch-btn" onclick="switchUser()">→ Начать заполнение</button>
     <div class="switch-divider">— или выберите из существующих —</div>
     <div class="existing-list" id="existingList"></div>
@@ -227,10 +220,12 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-siz
   <div class="name-box">
     <div class="name-icon">👋</div>
     <div class="name-title">Добро пожаловать</div>
-    <div class="name-sub">Пожалуйста, укажите ваше имя и фамилию</div>
+    <div class="name-sub">Укажите имя и придумайте PIN-код для защиты ваших ответов</div>
     <input type="text" class="name-input" id="nameInput" placeholder="Имя Фамилия" maxlength="80"
+      onkeydown="if(event.key==='Enter')document.getElementById('pinInput').focus()">
+    <input type="password" class="name-input" id="pinInput" placeholder="Придумайте PIN-код (цифры или буквы)" maxlength="20"
       onkeydown="if(event.key==='Enter')startSurvey()">
-    <div id="nameErr" style="color:#dc2626;font-size:13px;margin-top:4px;display:none">Пожалуйста, введите ваше имя</div>
+    <div id="nameErr" style="color:#dc2626;font-size:13px;margin-top:4px;display:none">Пожалуйста, введите имя и PIN-код</div>
     <button class="name-btn" onclick="startSurvey()">Начать заполнение →</button>
   </div>
 </div>
@@ -299,7 +294,6 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-siz
         <button class="btn-submit" id="btnSubmit" onclick="submitSurvey()">Завершить анкету</button>
       </div>
       <div class="submit-note">После нажатия ваши ответы будут отправлены</div>
-      <!-- SOFT WARNING — non-blocking -->
       <div class="soft-warn" id="softWarn">
         <div class="soft-warn-title" id="softWarnTitle"></div>
         <div class="soft-warn-body" id="softWarnBody"></div>
@@ -419,15 +413,12 @@ const ADMIN_KEY='KCELL2025';
 const STORE_PREFIX='wms2_';
 let autosaveTimer=null,currentRID=null;
 let answers={},notes={},timeGrid={};
-// track unanswered soft list for navigation
-let softUnansweredList=[];
-let softNavIndex=0;
+let softUnansweredList=[],softNavIndex=0;
 
 const MEM={};
 function sGet(k){try{const v=localStorage.getItem(STORE_PREFIX+k);return v?JSON.parse(v):null;}catch{return MEM[k]!==undefined?MEM[k]:null;}}
 function sSet(k,v){try{localStorage.setItem(STORE_PREFIX+k,JSON.stringify(v));}catch{MEM[k]=v;}}
 
-// ─── BLOCKS ───
 const BLOCKS=[
   {id:'B0',num:'0',title:'Общий профиль группы',desc:''},
   {id:'B1',num:'1',title:'Планирование и консолидация потребностей в закупках',desc:''},
@@ -439,7 +430,10 @@ const BLOCKS=[
   {id:'B6',num:'6',title:'Общий профиль взаимодействия',desc:''},
 ];
 
-// ─── QUESTIONS ───
+// RASCI-логика по стандарту:
+// q0_1, q0_2, q0_3 — дескриптивные, RASCI не применяется (ресурсный профиль)
+// q0_4 — capability: SAP edit = R (операционная роль), просмотр = C, нет систем = I
+// q6_3 — открытый текст, RASCI не применяется
 const QUESTIONS=[
 {id:'q0_1',block:'B0',text:'Сколько человек в вашей группе, включая вас?',type:'radio',required:false,
   auditHint:'Масштаб группы влияет на оценку реалистичности заявленного функционала.',
@@ -450,7 +444,13 @@ const QUESTIONS=[
 {id:'q0_3',block:'B0',text:'Как распределяется рабочее время группы за типичную неделю? (итого должно быть 100%)',type:'number-grid',required:false,
   auditHint:'>40% на работу с документами = pre-processing layer (R). >40% на координацию = ближе к S.',
   options:[{val:'docs',label:'Работа с документами'},{val:'status',label:'Контроль статусов'},{val:'reports',label:'Отчётность'},{val:'internal',label:'Переписка внутри компании'},{val:'vendors',label:'Переписка с поставщиками'},{val:'sap',label:'Работа в SAP'},{val:'other',label:'Другое (укажите ниже)'}]},
+// q0_4: SAP edit = R (создаёт/редактирует документы — операционная роль по процессу);
+// SAP view only = C (консультируется с данными, не исполнитель);
+// ИСЭЗ/СЭД = R (загрузка в систему — исполнение процесса);
+// нет систем = I (информируется, не участвует операционно)
 {id:'q0_4',block:'B0',text:'Какими системами вы пользуетесь в работе?',type:'checkbox',required:false,
+  rasciSignal:{a:'C',b:'R',c:'R',d:'R',e:'C',f:'C',g:'I'},
+  auditHint:'SAP edit (b) и ИСЭЗ/СЭД (c,d) = R — операционный исполнитель. SAP просмотр (a) = C. Нет систем (g) = I.',
   options:[{val:'a',label:'SAP — просматриваю данные'},{val:'b',label:'SAP — создаю или редактирую документы'},{val:'c',label:'ИСЭЗ (портал Самрук)'},{val:'d',label:'Электронный документооборот (СЭД)'},{val:'e',label:'Excel / общие папки'},{val:'f',label:'Другие системы'},{val:'g',label:'Специализированных систем не использую'}]},
 // B1
 {id:'q1_1',block:'B1',text:'Как формируется информация о планируемых закупках?',type:'radio',required:false,
@@ -462,14 +462,21 @@ const QUESTIONS=[
 {id:'q1_3',block:'B1',text:'Если позиция плана отстаёт — как развивается ситуация?',type:'radio',required:false,
   rasciSignal:{a:'R',b:'S',c:'C',d:'I',e:'—'},
   options:[{val:'a',label:'Мы первыми замечаем и сами принимаем меры'},{val:'b',label:'Замечаем и сообщаем руководителю'},{val:'c',label:'Нам сообщает ДЦЗ — мы начинаем помогать'},{val:'d',label:'Нам сообщает руководство — мы выясняем ситуацию'},{val:'e',label:'Контроль сроков плана закупок не входит в нашу работу'}]},
+// q1_4: готовим сводку сами (a,b,c) = R (исполнитель отчётности);
+// сводку делает ДЦЗ/БК (d) = I (информируется); нет отчётности (e) = I
 {id:'q1_4',block:'B1',text:'Как часто готовите сводную информацию о статусе плана закупок?',type:'radio',required:false,
+  rasciSignal:{a:'R',b:'R',c:'R',d:'I',e:'I'},
   options:[{val:'a',label:'Еженедельно'},{val:'b',label:'Ежемесячно'},{val:'c',label:'По запросу'},{val:'d',label:'Такую сводку готовит ДЦЗ или Бюджетный Контроль'},{val:'e',label:'Такой отчётности нет'}]},
 {id:'q1_5',block:'B1',text:'Если план закупок не исполнен — к кому обращается руководство?',type:'radio',required:false,
   rasciSignal:{a:'A',b:'—',c:'—',d:'A',e:'—'},
   auditHint:'ПРЯМОЙ МАРКЕР Accountable.',
   options:[{val:'a',label:'К нам — мы отвечаем за выполнение плана'},{val:'b',label:'К ДЦЗ'},{val:'c',label:'К ВЗ'},{val:'d',label:'К нам и ДЦЗ совместно'},{val:'e',label:'По-разному'}]},
 // B2A
+// q2a_1: работаете с типами договоров = R (вы исполнитель по этим типам);
+// затрудняетесь = C (консультируетесь, не ведёте самостоятельно)
 {id:'q2a_1',block:'B2A',text:'Какие типы договоров сопровождает ваша группа?',type:'checkbox',required:false,
+  rasciSignal:{a:'R',b:'R',c:'R',d:'R',e:'R',f:'C'},
+  auditHint:'Типы договоров = периметр R. Затрудняется = C (не является исполнителем).',
   options:[{val:'a',label:'Открытые тендеры (ОТ) — через ИСЭЗ'},{val:'b',label:'Договоры из одного источника (ОИ)'},{val:'c',label:'Договоры особого порядка'},{val:'d',label:'Рамочные договоры на строительство и монтаж'},{val:'e',label:'Со всеми типами одинаково'},{val:'f',label:'Затрудняюсь классифицировать'}]},
 {id:'q2a_2',block:'B2A',text:'По ОТ — что делает ваша группа до подписания?',type:'checkbox',required:false,
   rasciSignal:{a:'R',b:'R',c:'R',d:'R',e:'C',f:'—'},
@@ -510,6 +517,7 @@ const QUESTIONS=[
   options:[{val:'a',label:'К нам'},{val:'b',label:'К ДЦЗ'},{val:'c',label:'К юристам'},{val:'d',label:'К ВЗ'},{val:'e',label:'Зависит от причины'}]},
 // B3
 {id:'q3_filter',block:'B3',text:'Работает ли группа с заказами по рамочным договорам?',type:'radio',required:false,isFilter:true,
+  rasciSignal:{yes:'R',partial:'S',no:'—'},
   auditHint:'Фильтр. Если "Нет" — вопросы B3 пропускаются.',
   options:[{val:'yes',label:'Да — значительная часть нашей работы'},{val:'partial',label:'Да — но лишь иногда'},{val:'no',label:'Нет — этим занимается другое подразделение'}]},
 {id:'q3_1',block:'B3',text:'По рамочным договорам — что делает группа на этапе формирования заказа?',type:'checkbox',required:false,filterBy:'q3_filter',filterVals:['yes','partial'],
@@ -556,13 +564,14 @@ const QUESTIONS=[
 {id:'q5_3',block:'B5',text:'При системной проблеме с ДЦЗ, ССП или бухгалтерией — участвуете в решении?',type:'radio',required:false,
   rasciSignal:{a:'R',b:'C',c:'—',d:'—'},
   options:[{val:'a',label:'Да — сами инициируем обсуждение'},{val:'b',label:'Да — нас привлекают как одну из сторон'},{val:'c',label:'Нет — решают руководители'},{val:'d',label:'Нет — не наша зона'}]},
-// B6 — добавлен rasciSignal для корректного определения роли
+// B6
 {id:'q6_1',block:'B6',text:'По каким вопросам к группе чаще всего обращаются другие подразделения?',type:'checkbox',required:false,
   rasciSignal:{a:'R',b:'R',c:'R',d:'R',e:'R',f:'I'},
   options:[{val:'a',label:'Узнать статус заявки или договора'},{val:'b',label:'Проверить наличие бюджета'},{val:'c',label:'Узнать какие документы нужны'},{val:'d',label:'Получить помощь с оформлением'},{val:'e',label:'Разъяснение как работает процесс'},{val:'f',label:'К нам обращаются редко — сами инициируем'}]},
 {id:'q6_2',block:'B6',text:'Какие задачи занимают наибольшую часть времени? (не более трёх)',type:'checkbox',required:false,maxChoices:3,
   rasciSignal:{a:'R',b:'R',c:'R',d:'R',e:'R',f:'R',g:'S'},
   options:[{val:'a',label:'Сопровождение заявок на закупку (PR, PO)'},{val:'b',label:'Работа с договорами'},{val:'c',label:'Работа с документами по выполненным работам'},{val:'d',label:'Контроль бюджета и отчётность'},{val:'e',label:'Коммуникация с поставщиками'},{val:'f',label:'Подготовка сводных отчётов'},{val:'g',label:'Взаимодействие с ДЦЗ, ССП, БК'}]},
+// q6_3: открытый текст — RASCI не применяется по стандарту (качественные данные)
 {id:'q6_3',block:'B6',text:'Есть ли задачи в которых не хватает полномочий или информации?',type:'textarea',required:false,
   noteLabel:'Ответьте если есть что сказать (необязательно)'},
 ];
@@ -602,12 +611,13 @@ function showSurvey(){
 
 function startSurvey(){
   const name=document.getElementById('nameInput').value.trim();
-  if(!name){document.getElementById('nameErr').style.display='block';return;}
+  const pin=(document.getElementById('pinInput')||{}).value||'';
+  if(!name||!pin.trim()){document.getElementById('nameErr').style.display='block';return;}
   document.getElementById('nameErr').style.display='none';
   const rid='r_'+Date.now()+'_'+Math.random().toString(36).substr(2,6);
   currentRID=rid;
   sSet('current_rid',rid);
-  sSet('resp_'+rid,{meta:{name,startedAt:new Date().toISOString(),submitted:false},answers:{},notes:{},timeGrid:{}});
+  sSet('resp_'+rid,{meta:{name,pin:pin.trim(),startedAt:new Date().toISOString(),submitted:false},answers:{},notes:{},timeGrid:{}});
   const list=sGet('respondents_list')||[];
   list.push({id:rid,name,startedAt:new Date().toISOString()});
   sSet('respondents_list',list);
@@ -615,7 +625,7 @@ function startSurvey(){
   showSurvey();updateProgress();
 }
 
-// ─── SWITCH MODAL (задача 5) ───
+// ─── SWITCH MODAL ───
 function openSwitchModal(){
   const el=document.getElementById('existingList');
   el.innerHTML='';
@@ -626,38 +636,37 @@ function openSwitchModal(){
     list.forEach(r=>{
       const d=sGet('resp_'+r.id)||{};
       const pct=Math.round(QUESTIONS.filter(q=>isAnsweredForAdmin(q,d.answers||{},d.timeGrid||{},d.notes||{})).length/QUESTIONS.length*100);
+      // FIX1: читаем submitted из обоих источников
+      const submittedFlag=!!(r.submitted||(d.meta&&d.meta.submitted));
       const item=document.createElement('div');item.className='existing-item';
-      item.innerHTML=`<div><div class="existing-name">${r.name}</div><div class="existing-meta">${pct}% · ${d.meta&&d.meta.submitted?'✓ Завершено':'⏳ В процессе'}</div></div>
+      item.innerHTML=`<div><div class="existing-name">${r.name}</div><div class="existing-meta">${pct}% · ${submittedFlag?'✓ Завершено':'⏳ В процессе'}</div></div>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--violet)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>`;
       item.onclick=()=>switchToExisting(r.id);
       el.appendChild(item);
     });
   }
   document.getElementById('switchNameInput').value='';
+  document.getElementById('switchPinInput').value='';
   document.getElementById('switchErr').style.display='none';
   document.getElementById('switch-modal').classList.add('show');
 }
 
-function closeSwitchModal(){
-  document.getElementById('switch-modal').classList.remove('show');
-}
+function closeSwitchModal(){document.getElementById('switch-modal').classList.remove('show');}
 
 function switchUser(){
   const name=document.getElementById('switchNameInput').value.trim();
-  if(!name){document.getElementById('switchErr').style.display='block';return;}
+  const pin=(document.getElementById('switchPinInput')||{}).value||'';
+  if(!name||!pin.trim()){document.getElementById('switchErr').style.display='block';return;}
   document.getElementById('switchErr').style.display='none';
-  // Save current answers
   doAutosave();
-  // Create new respondent
   const rid='r_'+Date.now()+'_'+Math.random().toString(36).substr(2,6);
   currentRID=rid;answers={};notes={};timeGrid={};
   sSet('current_rid',rid);
-  sSet('resp_'+rid,{meta:{name,startedAt:new Date().toISOString(),submitted:false},answers:{},notes:{},timeGrid:{}});
+  sSet('resp_'+rid,{meta:{name,pin:pin.trim(),startedAt:new Date().toISOString(),submitted:false},answers:{},notes:{},timeGrid:{}});
   const list=sGet('respondents_list')||[];
   list.push({id:rid,name,startedAt:new Date().toISOString()});
   sSet('respondents_list',list);
   closeSwitchModal();
-  // Reset and rebuild
   document.getElementById('questionsContainer').innerHTML='';
   document.getElementById('softWarn').classList.remove('show');
   document.getElementById('btnSubmit').disabled=false;
@@ -666,18 +675,23 @@ function switchUser(){
 }
 
 function switchToExisting(rid){
+  const saved=sGet('resp_'+rid);
+  const storedPin=saved&&saved.meta&&saved.meta.pin;
+  if(storedPin){
+    const entered=prompt('Введите PIN-код участника «'+(saved.meta.name||'')+'»:');
+    if(!entered||entered.trim()!==storedPin){
+      alert('Неверный PIN-код. Доступ запрещён.');return;
+    }
+  }
   doAutosave();
   currentRID=rid;
-  const saved=sGet('resp_'+rid);
   if(saved){answers=saved.answers||{};notes=saved.notes||{};timeGrid=saved.timeGrid||{};}
   sSet('current_rid',rid);
   closeSwitchModal();
   document.getElementById('questionsContainer').innerHTML='';
   document.getElementById('softWarn').classList.remove('show');
   document.getElementById('btnSubmit').disabled=false;
-  if(saved&&saved.meta&&saved.meta.submitted){
-    showThankYouDirect();return;
-  }
+  if(saved&&saved.meta&&saved.meta.submitted){showThankYouDirect();return;}
   showSurvey();restoreAnswers();updateProgress();
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -721,7 +735,6 @@ function buildCard(q){
   }
 
   if(q.type==='number-grid'){
-    // FIX 3: контроль минимума 100% + поле "другое"
     const grid=document.createElement('div');grid.className='time-grid';
     q.options.forEach(opt=>{
       const row=document.createElement('div');row.className='time-row';
@@ -738,7 +751,6 @@ function buildCard(q){
       <span id="totalHint_${q.id}" style="font-size:12px;color:var(--amber);display:none">← укажите ровно 100%</span>`;
     grid.appendChild(tot);
     div.appendChild(grid);
-    // "Другое" field — visible only when 'other' > 0
     const otherWrap=document.createElement('div');otherWrap.className='time-other-wrap';otherWrap.id='otherWrap_'+q.id;otherWrap.style.display='none';
     otherWrap.innerHTML=`<span class="time-other-label">Что именно входит в «Другое»? (обязательно)</span>
       <textarea class="time-other-input" id="otherDesc_${q.id}" maxlength="200" rows="2" placeholder="Опишите что составляет эту долю времени..." oninput="handleOtherDesc('${q.id}',this.value)"></textarea>
@@ -773,7 +785,6 @@ function buildCard(q){
 const forcedOpen={};
 function toggleFilteredQ(qid){forcedOpen[qid]=true;const fb=document.getElementById('fbanner_'+qid);if(fb)fb.style.display='none';}
 
-// ─── ANSWER HANDLERS ───
 function handleAnswer(q,val,inp){
   if(q.type==='radio') answers[q.id]=val;
   else if(q.type==='checkbox'){
@@ -799,12 +810,8 @@ function handleTimeInput(qid,field,val){
   let tot=0;q.options.forEach(o=>{tot+=timeGrid[qid+'_'+o.val]||0;});
   const el=document.getElementById('total_'+qid);
   const hint=document.getElementById('totalHint_'+qid);
-  if(el){
-    el.textContent=tot+'%';
-    el.className='time-total'+(tot===100?' ok':tot>100?' over':tot>0?' under':'');
-  }
+  if(el){el.textContent=tot+'%';el.className='time-total'+(tot===100?' ok':tot>100?' over':tot>0?' under':'');}
   if(hint) hint.style.display=(tot>0&&tot!==100)?'inline':'none';
-  // Show/hide "Другое" description field
   const otherVal=timeGrid[qid+'_other']||0;
   const otherWrap=document.getElementById('otherWrap_'+qid);
   if(otherWrap) otherWrap.style.display=(field==='other'?(parseInt(val)||0):otherVal)>0?'block':'none';
@@ -822,15 +829,11 @@ function isAnswered(qid){
   const q=QUESTIONS.find(q=>q.id===qid);if(!q) return false;
   if(q.type==='radio') return !!answers[qid];
   if(q.type==='checkbox') return Array.isArray(answers[qid])&&answers[qid].length>0;
-  if(q.type==='number-grid'){
-    const tot=q.options.reduce((s,o)=>s+(timeGrid[qid+'_'+o.val]||0),0);
-    return tot===100;
-  }
+  if(q.type==='number-grid'){const tot=q.options.reduce((s,o)=>s+(timeGrid[qid+'_'+o.val]||0),0);return tot===100;}
   if(q.type==='textarea') return !!(notes[qid]&&notes[qid].trim().length>2);
   return false;
 }
 
-// ─── FILTERS ───
 function applyFilters(){
   QUESTIONS.filter(q=>q.isFilter).forEach(fq=>{
     const fval=answers[fq.id];
@@ -843,69 +846,42 @@ function applyFilters(){
       const shouldShow=!fval||(q.filterVals||[]).includes(fval);
       if(!shouldShow&&!forcedOpen[q.id]){
         card.classList.add('skipped-by-filter');
-        if(fb){
-          const opt=fq.options.find(o=>o.val===fval);
-          document.getElementById('fbText_'+q.id).textContent=`Пропущен, т.к. ответ: «${opt?opt.label:fval}».`;
-          fb.style.display='flex';
-        }
+        if(fb){const opt=fq.options.find(o=>o.val===fval);document.getElementById('fbText_'+q.id).textContent=`Пропущен, т.к. ответ: «${opt?opt.label:fval}».`;fb.style.display='flex';}
       } else {
         card.classList.remove('skipped-by-filter');
         if(fb&&!forcedOpen[q.id]) fb.style.display='none';
       }
     });
-    if(bdef){
-      const sfn=document.getElementById('sfn_'+bdef.id);
-      if(sfn){
-        const isSkipped=fval==='no';
-        sfn.classList.toggle('show',isSkipped);
-      }
-    }
+    if(bdef){const sfn=document.getElementById('sfn_'+bdef.id);if(sfn){sfn.classList.toggle('show',fval==='no');}}
   });
 }
 
-// ─── RESTORE ───
 function restoreAnswers(){
   QUESTIONS.forEach(q=>{
-    if(q.type==='radio'&&answers[q.id]){
-      const inp=document.getElementById(`opt_${q.id}_${answers[q.id]}`);
-      if(inp) inp.checked=true;markAnswered(q.id);
-    } else if(q.type==='checkbox'&&Array.isArray(answers[q.id])){
-      answers[q.id].forEach(v=>{const inp=document.getElementById(`opt_${q.id}_${v}`);if(inp) inp.checked=true;});
-      markAnswered(q.id);
-    } else if(q.type==='number-grid'){
+    if(q.type==='radio'&&answers[q.id]){const inp=document.getElementById(`opt_${q.id}_${answers[q.id]}`);if(inp) inp.checked=true;markAnswered(q.id);}
+    else if(q.type==='checkbox'&&Array.isArray(answers[q.id])){answers[q.id].forEach(v=>{const inp=document.getElementById(`opt_${q.id}_${v}`);if(inp) inp.checked=true;});markAnswered(q.id);}
+    else if(q.type==='number-grid'){
       let tot=0;
-      q.options.forEach(opt=>{
-        const v=timeGrid[q.id+'_'+opt.val];
-        if(v){const inp=document.getElementById(`tg_${q.id}_${opt.val}`);if(inp) inp.value=v;tot+=v;}
-      });
+      q.options.forEach(opt=>{const v=timeGrid[q.id+'_'+opt.val];if(v){const inp=document.getElementById(`tg_${q.id}_${opt.val}`);if(inp) inp.value=v;tot+=v;}});
       const el=document.getElementById('total_'+q.id);
       if(el){el.textContent=tot+'%';el.className='time-total'+(tot===100?' ok':tot>0?' under':'');}
-      // Restore other field
       const otherVal=timeGrid[q.id+'_other']||0;
       const otherWrap=document.getElementById('otherWrap_'+q.id);
-      if(otherWrap&&otherVal>0){
-        otherWrap.style.display='block';
-        const otherTa=document.getElementById('otherDesc_'+q.id);
-        if(otherTa&&notes[q.id+'_other']) otherTa.value=notes[q.id+'_other'];
-      }
+      if(otherWrap&&otherVal>0){otherWrap.style.display='block';const otherTa=document.getElementById('otherDesc_'+q.id);if(otherTa&&notes[q.id+'_other']) otherTa.value=notes[q.id+'_other'];}
     }
-    const ta=document.getElementById('nota_'+q.id);
-    if(ta&&notes[q.id]) ta.value=notes[q.id];
+    const ta=document.getElementById('nota_'+q.id);if(ta&&notes[q.id]) ta.value=notes[q.id];
   });
   applyFilters();
 }
 
-// ─── PROGRESS ───
 function updateProgress(){
-  const allQ=QUESTIONS;
-  const answered=allQ.filter(q=>isAnswered(q.id));
-  const pct=allQ.length>0?Math.round(answered.length/allQ.length*100):0;
+  const answered=QUESTIONS.filter(q=>isAnswered(q.id));
+  const pct=QUESTIONS.length>0?Math.round(answered.length/QUESTIONS.length*100):0;
   const fill=document.getElementById('pbFill'),label=document.getElementById('pbLabel');
   if(fill) fill.style.width=pct+'%';
-  if(label) label.textContent=`${answered.length} / ${allQ.length} вопросов`;
+  if(label) label.textContent=`${answered.length} / ${QUESTIONS.length} вопросов`;
 }
 
-// ─── AUTOSAVE ───
 function scheduleAutosave(){clearTimeout(autosaveTimer);autosaveTimer=setTimeout(doAutosave,800);}
 function doAutosave(){
   if(!currentRID) return;
@@ -915,61 +891,41 @@ function doAutosave(){
   if(el){el.style.display='flex';setTimeout(()=>{el.style.display='none';},2000);}
 }
 
-// ─── SUBMIT (задача 2 — мягкий варнинг) ───
 function submitSurvey(){
-  // Validate q0_3 total = 100 if any entered
   const tq=QUESTIONS.find(q=>q.id==='q0_3');
   const tot=tq.options.reduce((s,o)=>s+(timeGrid['q0_3_'+o.val]||0),0);
   const otherVal=timeGrid['q0_3_other']||0;
   const otherDesc=(notes['q0_3_other']||'').trim();
   if(tot>0&&tot!==100){
-    const card=document.getElementById('card_q0_3');
-    if(card){card.scrollIntoView({behavior:'smooth',block:'center'});}
-    const hint=document.getElementById('totalHint_q0_3');
-    if(hint){hint.style.display='inline';hint.textContent='← необходимо ровно 100%, сейчас '+tot+'%';}
+    const card=document.getElementById('card_q0_3');if(card) card.scrollIntoView({behavior:'smooth',block:'center'});
+    const hint=document.getElementById('totalHint_q0_3');if(hint){hint.style.display='inline';hint.textContent='← необходимо ровно 100%, сейчас '+tot+'%';}
     return;
   }
   if(otherVal>0&&otherDesc.length===0){
-    const wrap=document.getElementById('otherWrap_q0_3');
-    const warn=document.getElementById('otherWarn_q0_3');
-    if(warn) warn.style.display='block';
-    if(wrap) wrap.scrollIntoView({behavior:'smooth',block:'center'});
+    const warn=document.getElementById('otherWarn_q0_3');if(warn) warn.style.display='block';
+    const wrap=document.getElementById('otherWrap_q0_3');if(wrap) wrap.scrollIntoView({behavior:'smooth',block:'center'});
     return;
   }
-
-  // Find unanswered (soft — non-blocking)
   const unanswered=QUESTIONS.filter(q=>{
-    if(q.filterBy&&!forcedOpen[q.id]){
-      const fv=answers[q.filterBy];
-      if(!fv||!(q.filterVals||[]).includes(fv)) return false;
-    }
+    if(q.filterBy&&!forcedOpen[q.id]){const fv=answers[q.filterBy];if(!fv||!(q.filterVals||[]).includes(fv)) return false;}
     return !isAnswered(q.id);
   });
-
-  softUnansweredList=unanswered;
-  softNavIndex=0;
-
+  softUnansweredList=unanswered;softNavIndex=0;
   if(unanswered.length>0){
-    unanswered.forEach(q=>{
-      const card=document.getElementById('card_'+q.id);
-      if(card) card.classList.add('unanswered-soft');
-    });
+    unanswered.forEach(q=>{const card=document.getElementById('card_'+q.id);if(card) card.classList.add('unanswered-soft');});
     const sw=document.getElementById('softWarn');
     document.getElementById('softWarnTitle').textContent=`${unanswered.length} необязательных вопрос(а) остались без ответа`;
     document.getElementById('softWarnBody').textContent='Вы можете завершить анкету сейчас или вернуться и ответить на них.';
-    sw.classList.add('show');
-    sw.scrollIntoView({behavior:'smooth',block:'nearest'});
-    return; // не блокируем, но показываем предупреждение
+    sw.classList.add('show');sw.scrollIntoView({behavior:'smooth',block:'nearest'});
+    return;
   }
-
   doActualSubmit();
 }
 
 function goToFirstUnanswered(){
   if(!softUnansweredList.length) return;
   const q=softUnansweredList[softNavIndex]||softUnansweredList[0];
-  const card=document.getElementById('card_'+q.id);
-  if(card) card.scrollIntoView({behavior:'smooth',block:'center'});
+  const card=document.getElementById('card_'+q.id);if(card) card.scrollIntoView({behavior:'smooth',block:'center'});
   softNavIndex=(softNavIndex+1)%softUnansweredList.length;
   const btn=document.getElementById('btnGoFirst');
   if(btn&&softUnansweredList.length>1) btn.textContent=`Перейти к следующему (${softNavIndex+1}/${softUnansweredList.length}) →`;
@@ -982,6 +938,7 @@ function doActualSubmit(){
   document.getElementById('softWarn').classList.remove('show');
   const ex=sGet('resp_'+currentRID)||{};
   sSet('resp_'+currentRID,{...ex,answers,notes,timeGrid,meta:{...ex.meta,submitted:true,submittedAt:new Date().toISOString()}});
+  // FIX1: синхронизируем submitted в respondents_list
   const list=sGet('respondents_list')||[];
   const idx=list.findIndex(r=>r.id===currentRID);
   if(idx>=0){list[idx].submitted=true;sSet('respondents_list',list);}
@@ -1013,9 +970,8 @@ function returnToSurvey(){
 
 // ─── ADMIN ───
 function checkAdminKey(){
-  if(document.getElementById('adminKeyInput').value.trim()===ADMIN_KEY){
-    document.getElementById('admin-login').style.display='none';showAdmin();
-  } else document.getElementById('loginErr').style.display='block';
+  if(document.getElementById('adminKeyInput').value.trim()===ADMIN_KEY){document.getElementById('admin-login').style.display='none';showAdmin();}
+  else document.getElementById('loginErr').style.display='block';
 }
 function adminLogout(){document.getElementById('admin-view').style.display='none';window.location.href=window.location.pathname;}
 function showAdmin(){
@@ -1037,6 +993,7 @@ function showAdminTab(e,name){
   document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
   e.target.classList.add('active');document.getElementById('tab-'+name).classList.add('active');
 }
+
 function refreshAdmin(){
   const list=sGet('respondents_list')||[];
   const grid=document.getElementById('respGrid'),noR=document.getElementById('noRespondents');
@@ -1061,7 +1018,9 @@ function refreshAdmin(){
     const ans=data.answers||{};
     const answeredCount=QUESTIONS.filter(q=>isAnsweredForAdmin(q,ans,data.timeGrid||{},data.notes||{})).length;
     const pct=Math.round(answeredCount/QUESTIONS.length*100);
-    const submitted=data.meta&&data.meta.submitted;
+    // FIX1: читаем submitted из обоих источников
+    if(data.meta&&data.meta.submitted&&!resp.submitted){resp.submitted=true;}
+    const submitted=!!(resp.submitted||(data.meta&&data.meta.submitted));
     const date=data.meta?new Date(data.meta.startedAt).toLocaleDateString('ru-RU'):'';
     const card=document.createElement('div');card.className='resp-card';
     card.onclick=()=>showRespDetail(resp.id);
@@ -1113,8 +1072,13 @@ function showRespDetail(rid){
     } else if(q.type==='textarea'){
       ansDisplay=nt[q.id]||'<em style="color:var(--ink-3)">Нет ответа</em>';
     }
-    const rClass=rasciRole!=='—'?'rasci-'+rasciRole:'rasci-none';
-    const rBadge=rasciRole!=='—'?`<span class="rasci-badge ${rClass}">${rasciRole}</span>`:'';
+    // FIX2: бейдж показываем если есть rasciSignal — всегда, с ? если нет ответа
+    let rBadge='';
+    if(q.rasciSignal){
+      const rClass=rasciRole!=='—'?'rasci-'+rasciRole:'rasci-none';
+      const rLabel=rasciRole!=='—'?rasciRole:'?';
+      rBadge=`<span class="rasci-badge ${rClass}">${rLabel}</span>`;
+    }
     html+=`<div class="ans-block">
       <div class="ans-block-head"><span class="ans-block-title">${q.id.toUpperCase().replace(/_/g,'.')}</span>${rBadge}</div>
       <div class="ans-block-q">${q.text}</div>
@@ -1132,7 +1096,6 @@ function backToList(){
   document.getElementById('respDetailView').style.display='none';
 }
 
-// ─── RASCI (FIX 4: B6 теперь имеет rasciSignal) ───
 function getRoleForBlock(bid,ans){
   const bQs=QUESTIONS.filter(q=>q.block===bid&&q.rasciSignal&&q.type!=='textarea'&&q.type!=='number-grid');
   for(const p of['A','R','S','C','I']){
@@ -1192,27 +1155,23 @@ function runComparison(){
   document.getElementById('compareOutput').innerHTML=html;
 }
 
-// ─── EXPORT FIX (задача 3 — убрал тяжёлый generateLocalAnalysis из основного потока) ───
 async function exportCSV(){
   const list=sGet('respondents_list')||[];
   if(!list.length){alert('Нет данных для экспорта');return;}
   const msg=document.getElementById('exportMsg');
   if(msg){msg.textContent='⏳ Загружаем библиотеку...';msg.style.display='block';msg.style.color='var(--ink-3)';}
-
   try{
     await loadSheetJS();
     if(msg) msg.textContent='⏳ Формируем листы...';
-
     const wb=window.XLSX.utils.book_new();
     const rasciLabels={A:'Accountable',R:'Responsible',S:'Support',C:'Consulted',I:'Informed'};
-
-    // SHEET 1
     const s1=[];
     const hdr={'Участник':'','Дата':'','Завершено':'','Блок':'','Вопрос ID':'','Вопрос':'','Ответ':'','Комментарий':'','RASCI роль':'','RASCI расшифровка':''};
     list.forEach(resp=>{
       const d=sGet('resp_'+resp.id)||{};
       const ans=d.answers||{},nt=d.notes||{},tg=d.timeGrid||{};
-      s1.push({'Участник':resp.name,'Дата':new Date(resp.startedAt).toLocaleDateString('ru-RU'),'Завершено':d.meta&&d.meta.submitted?'Да':'Нет','Блок':'','Вопрос ID':'','Вопрос':'','Ответ':'','Комментарий':'','RASCI роль':'','RASCI расшифровка':''});
+      const submitted=!!(resp.submitted||(d.meta&&d.meta.submitted));
+      s1.push({'Участник':resp.name,'Дата':new Date(resp.startedAt).toLocaleDateString('ru-RU'),'Завершено':submitted?'Да':'Нет','Блок':'','Вопрос ID':'','Вопрос':'','Ответ':'','Комментарий':'','RASCI роль':'','RASCI расшифровка':''});
       QUESTIONS.forEach(q=>{
         let val='';
         if(q.type==='radio'){const v=ans[q.id];const o=v?q.options.find(o=>o.val===v):null;val=o?o.label:'';}
@@ -1234,8 +1193,6 @@ async function exportCSV(){
     const ws1=window.XLSX.utils.json_to_sheet(s1);
     ws1['!cols']=[{wch:20},{wch:12},{wch:10},{wch:28},{wch:14},{wch:50},{wch:40},{wch:25},{wch:10},{wch:18}];
     window.XLSX.utils.book_append_sheet(wb,ws1,'Ответы участников');
-
-    // SHEET 2 — RASCI matrix
     const funcLabels={B1:'Планирование закупок',B2A:'Подготовка договора (до)',B2B:'Сопровождение договора (после)',B3:'Заявки и бюджет',B4:'Исполнение и оплаты',B5:'Процессы и регламенты',B6:'Профиль взаимодействия'};
     const s2=[['Функция',...list.map(r=>r.name),'Расшифровка']];
     const rDesc={A:'Accountable — конечная ответственность',R:'Responsible — выполняет работу',S:'Support — помогает',C:'Consulted — консультирует',I:'Informed — информируется','?':'Нет данных'};
@@ -1247,8 +1204,6 @@ async function exportCSV(){
     const ws2=window.XLSX.utils.aoa_to_sheet(s2);
     ws2['!cols']=[{wch:35},...list.map(()=>({wch:18})),{wch:40}];
     window.XLSX.utils.book_append_sheet(wb,ws2,'RASCI матрица');
-
-    // SHEET 3 — Comparison
     const cmpHdr=['Вопрос',...list.map(r=>r.name),'Совпадение'];
     const s3=[cmpHdr];
     QUESTIONS.filter(q=>q.rasciSignal).forEach(q=>{
@@ -1264,19 +1219,14 @@ async function exportCSV(){
     const ws3=window.XLSX.utils.aoa_to_sheet(s3);
     ws3['!cols']=[{wch:50},...list.map(()=>({wch:25})),{wch:15}];
     window.XLSX.utils.book_append_sheet(wb,ws3,'Сравнение');
-
-    // SHEET 4 — lightweight analysis (no loops per-respondent-per-question heavy calls)
     if(msg) msg.textContent='⏳ Формируем анализ...';
     const s4=buildLightAnalysis(list,funcLabels,rDesc);
     const ws4=window.XLSX.utils.aoa_to_sheet(s4);
     ws4['!cols']=[{wch:50},{wch:12},{wch:40},{wch:70}];
     window.XLSX.utils.book_append_sheet(wb,ws4,'Анализ');
-
     window.XLSX.writeFile(wb,'survey_'+new Date().toISOString().slice(0,10)+'.xlsx');
     if(msg){msg.textContent='✓ Файл скачан!';msg.style.color='var(--green-m)';setTimeout(()=>msg.style.display='none',4000);}
-  } catch(e){
-    if(msg){msg.textContent='Ошибка: '+e.message;msg.style.color='var(--red-m)';}
-  }
+  }catch(e){if(msg){msg.textContent='Ошибка: '+e.message;msg.style.color='var(--red-m)';}}
 }
 
 function loadSheetJS(){
@@ -1289,7 +1239,6 @@ function loadSheetJS(){
   });
 }
 
-// Light analysis — no heavy per-respondent inner loops
 function buildLightAnalysis(list,funcLabels,rDesc){
   const rows=[];
   rows.push(['RASCI-АНАЛИЗ · BCS-TD · KCELL · '+new Date().toLocaleDateString('ru-RU')]);
