@@ -419,16 +419,15 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-siz
         <h3>📥 Экспорт данных</h3>
         <p>Скачайте ответы всех участников в формате CSV — открывается в Excel.</p>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn-ai" onclick="exportCSV()">⬇️ Скачать CSV (Excel)</button>
-          <button class="btn-ai" onclick="exportJSON()" style="background:linear-gradient(135deg,#065f46,#059669)">⬇️ Скачать JSON</button>
+          <button class="btn-ai" onclick="exportCSV()">⬇️ Скачать Excel (4 листа)</button>
         </div>
-        <div id="exportMsg" style="margin-top:14px;font-size:13px;color:var(--green-m);display:none">✓ Файл скачан!</div>
+        <div id="exportMsg" style="margin-top:14px;font-size:13px;display:none"></div>
         <div style="margin-top:20px;background:var(--lavender-2);border-radius:8px;padding:16px;font-size:13px;color:var(--ink-2);line-height:1.7">
-          <strong>Как открыть CSV в Excel:</strong><br>
-          1. Скачайте файл → откройте Excel<br>
-          2. Файл → Открыть → выберите скачанный файл<br>
-          3. В мастере импорта выберите разделитель <strong>«Запятая»</strong><br>
-          4. Готово — все ответы в таблице
+          <strong>Что внутри Excel файла:</strong><br>
+          📋 <strong>Лист 1</strong> — Все ответы участников с RASCI по каждому вопросу<br>
+          📊 <strong>Лист 2</strong> — RASCI матрица по блокам (все участники)<br>
+          ⚖️ <strong>Лист 3</strong> — Сравнение ответов участников<br>
+          🤖 <strong>Лист 4</strong> — ИИ-анализ и выводы (генерируется автоматически)
         </div>
       </div>
     </div>
@@ -1028,7 +1027,6 @@ function showThankYouDirect() {
 // RETURN TO SURVEY (from thank-you)
 // ─────────────────────────────────────────────────
 function returnToSurvey() {
-  // Unmark submitted so they can keep editing
   const existing=sGet('resp_'+currentRID)||{};
   if(existing.meta) existing.meta.submitted=false;
   sSet('resp_'+currentRID,existing);
@@ -1041,7 +1039,35 @@ function returnToSurvey() {
   document.querySelector('.site-header').style.display='';
   document.querySelector('.progress-bar-wrap').style.display='';
   document.getElementById('surveyMain').style.display='block';
-  window.scrollTo({top:0,behavior:'smooth'});
+  // Rebuild and restore so all questions are visible
+  buildQuestionnaire();
+  restoreAnswers();
+  updateProgress();
+  // Highlight unanswered required questions
+  const required=QUESTIONS.filter(q=>{
+    if(!q.required) return false;
+    if(q.filterBy&&!forcedOpen[q.id]){
+      const fv=answers[q.filterBy];
+      if(!fv||!(q.filterVals||[]).includes(fv)) return false;
+    }
+    return true;
+  });
+  const unanswered=required.filter(q=>!isAnswered(q.id));
+  if(unanswered.length>0){
+    unanswered.forEach(q=>{
+      const card=document.getElementById('card_'+q.id);
+      if(card) card.classList.add('unanswered-required');
+      const err=document.getElementById('err_'+q.id);
+      if(err) err.classList.add('show');
+    });
+    document.getElementById('unansweredWarn').style.display='block';
+    setTimeout(()=>{
+      const first=document.getElementById('card_'+unanswered[0].id);
+      if(first) first.scrollIntoView({behavior:'smooth',block:'center'});
+    },300);
+  } else {
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
 }
 
 // ─────────────────────────────────────────────────
@@ -1269,39 +1295,136 @@ function runComparison(){
   document.getElementById('compareOutput').innerHTML=html;
 }
 
-// EXPORT
-function exportCSV(){
+// EXPORT — rich multi-sheet Excel via SheetJS
+async function exportCSV(){
   const list=sGet('respondents_list')||[];
   if(!list.length){alert('Нет данных для экспорта');return;}
-  const qIds=QUESTIONS.map(q=>q.id);
-  const header=['Имя','Дата начала','Завершено',...qIds].join(',');
-  const rows=list.map(resp=>{
-    const d=sGet('resp_'+resp.id)||{};
-    const ans=d.answers||{};const nt=d.notes||{};
-    const getVal=q=>{
-      if(q.type==='radio'){const v=ans[q.id];const o=v?q.options.find(o=>o.val===v):null;return o?`"${o.label.replace(/"/g,"'")}"`:'';}
-      if(q.type==='checkbox'){const vv=ans[q.id];return Array.isArray(vv)&&vv.length?`"${vv.map(v=>{const o=q.options.find(o=>o.val===v);return o?o.label:v;}).join('; ').replace(/"/g,"'")}"`:''}
-      if(q.type==='textarea') return nt[q.id]?`"${nt[q.id].replace(/"/g,"'")}"`:''
-      return '';
-    };
-    return[`"${resp.name}"`,`"${new Date(resp.startedAt).toLocaleDateString('ru-RU')}"`,d.meta&&d.meta.submitted?'Да':'Нет',...QUESTIONS.map(q=>getVal(q))].join(',');
+
+  const msg=document.getElementById('exportMsg');
+  if(msg){msg.textContent='⏳ Формируем файл...';msg.style.display='block';msg.style.color='var(--ink-3)';}
+
+  // Load SheetJS
+  await new Promise((res,rej)=>{
+    if(window.XLSX){res();return;}
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload=res;s.onerror=rej;document.head.appendChild(s);
   });
-  const csv='\uFEFF'+[header,...rows].join('\n');
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download='survey_results_'+new Date().toISOString().slice(0,10)+'.csv';
-  a.click();
-  const m=document.getElementById('exportMsg');if(m){m.style.display='block';setTimeout(()=>m.style.display='none',3000);}
-}
-function exportJSON(){
-  const list=sGet('respondents_list')||[];
-  if(!list.length){alert('Нет данных для экспорта');return;}
-  const data=list.map(resp=>({...resp,responses:sGet('resp_'+resp.id)||{}}));
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download='survey_results_'+new Date().toISOString().slice(0,10)+'.json';
-  a.click();
-  const m=document.getElementById('exportMsg');if(m){m.style.display='block';setTimeout(()=>m.style.display='none',3000);}
+
+  const wb=XLSX.utils.book_new();
+
+  // ── SHEET 1: Answers per respondent ──
+  const ansRows=[];
+  const rasciLabels={A:'Accountable',R:'Responsible',S:'Support',C:'Consulted',I:'Informed'};
+  list.forEach(resp=>{
+    const d=sGet('resp_'+resp.id)||{};
+    const ans=d.answers||{};const nt=d.notes||{};const tg=d.timeGrid||{};
+    ansRows.push({
+      '': '','Участник':resp.name,
+      'Дата':new Date(resp.startedAt).toLocaleDateString('ru-RU'),
+      'Завершено':d.meta&&d.meta.submitted?'Да':'Нет'
+    });
+    QUESTIONS.forEach(q=>{
+      let val='';
+      if(q.type==='radio'){const v=ans[q.id];const o=v?q.options.find(o=>o.val===v):null;val=o?o.label:'';}
+      else if(q.type==='checkbox'){const vv=ans[q.id];val=Array.isArray(vv)&&vv.length?vv.map(v=>{const o=q.options.find(o=>o.val===v);return o?o.label:v;}).join('; '):'';}
+      else if(q.type==='number-grid'){val=q.options.map(o=>`${o.label}: ${tg[q.id+'_'+o.val]||0}%`).join(' | ');}
+      else if(q.type==='textarea'){val=nt[q.id]||'';}
+      let rasci='';
+      if(q.rasciSignal){
+        if(q.type==='radio'&&ans[q.id]) rasci=q.rasciSignal[ans[q.id]]||'';
+        else if(q.type==='checkbox'&&Array.isArray(ans[q.id])){
+          const roles=ans[q.id].map(v=>q.rasciSignal[v]).filter(r=>r&&r!=='—');
+          for(const p of['A','R','S','C','I']){if(roles.includes(p)){rasci=p;break;}}
+        }
+      }
+      ansRows.push({
+        'Блок':BLOCKS.find(b=>b.id===q.block)?.title||q.block,
+        'Вопрос ID':q.id.toUpperCase().replace(/_/g,'.'),
+        'Вопрос':q.text,
+        'Ответ':val,
+        'Комментарий':nt[q.id]||'',
+        'RASCI роль':rasci,
+        'RASCI расшифровка':rasci?rasciLabels[rasci]||'':''
+      });
+    });
+    ansRows.push({'Блок':'','Вопрос ID':'','Вопрос':'','Ответ':'','Комментарий':'','RASCI роль':'','RASCI расшифровка':''});
+  });
+  const ws1=XLSX.utils.json_to_sheet(ansRows);
+  ws1['!cols']=[{wch:25},{wch:15},{wch:50},{wch:40},{wch:25},{wch:10},{wch:20}];
+  XLSX.utils.book_append_sheet(wb,ws1,'Ответы участников');
+
+  // ── SHEET 2: RASCI matrix ──
+  const funcLabels={B1:'Планирование закупок',B2A:'Подготовка договора (до)',B2B:'Сопровождение договора (после)',B3:'Заявки и бюджет',B4:'Исполнение и оплаты',B5:'Процессы и регламенты',B6:'Профиль взаимодействия'};
+  const rasciRows=[['Функция',...list.map(r=>r.name),'Расшифровка']];
+  Object.entries(funcLabels).forEach(([bid,label])=>{
+    const row=[label];
+    list.forEach(resp=>{
+      const d=sGet('resp_'+resp.id)||{};const ans=d.answers||{};
+      let role='?';
+      const bQs=QUESTIONS.filter(q=>q.block===bid&&q.rasciSignal);
+      for(const p of['A','R','S','C','I']){
+        const found=bQs.some(q=>{
+          if(q.type==='radio') return q.rasciSignal[ans[q.id]]===p;
+          if(q.type==='checkbox'&&Array.isArray(ans[q.id])) return ans[q.id].some(v=>q.rasciSignal[v]===p);
+          return false;
+        });
+        if(found){role=p;break;}
+      }
+      row.push(role);
+    });
+    row.push({A:'Accountable — конечная ответственность',R:'Responsible — выполняет работу',S:'Support — помогает',C:'Consulted — консультирует',I:'Informed — информируется','?':'Нет данных'}[row[1]]||'');
+    rasciRows.push(row);
+  });
+  const ws2=XLSX.utils.aoa_to_sheet(rasciRows);
+  ws2['!cols']=[{wch:35},...list.map(()=>({wch:20})),{wch:40}];
+  XLSX.utils.book_append_sheet(wb,ws2,'RASCI матрица');
+
+  // ── SHEET 3: Comparison ──
+  const cmpHeader=['Вопрос',...list.map(r=>r.name),'Совпадение'];
+  const cmpRows=[cmpHeader];
+  QUESTIONS.filter(q=>q.required||q.rasciSignal).forEach(q=>{
+    const getLabel=ans=>{
+      if(q.type==='radio'){const v=ans[q.id];const o=v?q.options.find(o=>o.val===v):null;return o?o.label:'—';}
+      if(q.type==='checkbox'){const vv=ans[q.id];return Array.isArray(vv)&&vv.length?vv.map(v=>{const o=q.options.find(o=>o.val===v);return o?o.label:v;}).join('; '):'—';}
+      return'—';
+    };
+    const labels=list.map(resp=>{const d=sGet('resp_'+resp.id)||{};return getLabel(d.answers||{});});
+    const allSame=labels.every(l=>l===labels[0])&&labels[0]!=='—';
+    cmpRows.push([q.text,...labels,allSame?'✓ Совпадают':'≠ Расходятся']);
+  });
+  const ws3=XLSX.utils.aoa_to_sheet(cmpRows);
+  ws3['!cols']=[{wch:50},...list.map(()=>({wch:25})),{wch:15}];
+  XLSX.utils.book_append_sheet(wb,ws3,'Сравнение');
+
+  // ── SHEET 4: AI Analysis via Claude API ──
+  let aiText='ИИ-анализ недоступен (нет подключения к API)';
+  try{
+    let allSummary='';
+    list.forEach(resp=>{
+      const d=sGet('resp_'+resp.id)||{};const ans=d.answers||{};const nt=d.notes||{};
+      allSummary+=`\n--- ${resp.name} ---\n`;
+      QUESTIONS.forEach(q=>{
+        if(q.type==='radio'){const v=ans[q.id];const o=v?q.options.find(o=>o.val===v):null;if(o) allSummary+=`${q.id}: ${o.label}\n`;}
+        else if(q.type==='checkbox'){const vv=ans[q.id];if(Array.isArray(vv)&&vv.length) allSummary+=`${q.id}: ${vv.map(v=>{const o=q.options.find(o=>o.val===v);return o?o.label:v;}).join('; ')}\n`;}
+        if(nt[q.id]) allSummary+=`  Комментарий: ${nt[q.id]}\n`;
+      });
+    });
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`Ты аудитор-консультант RASCI. Сводный анализ группы BCS-TD Kcell. Дай: 1) RASCI по блокам, 2) совпадения и расхождения, 3) зоны неопределённости, 4) 5-8 вопросов для интервью, 5) итоговое заключение. На русском.\n\n${allSummary}`}]})});
+    const data=await r.json();
+    if(data.content&&data.content[0]) aiText=data.content[0].text;
+  }catch(e){aiText='ИИ-анализ: '+e.message;}
+
+  // Split AI text into rows
+  const aiRows=[['ИИ-анализ и выводы (автоматически)'],[''],
+    ...aiText.split('\n').map(line=>[line])
+  ];
+  const ws4=XLSX.utils.aoa_to_sheet(aiRows);
+  ws4['!cols']=[{wch:120}];
+  XLSX.utils.book_append_sheet(wb,ws4,'ИИ-анализ');
+
+  XLSX.writeFile(wb,'survey_results_'+new Date().toISOString().slice(0,10)+'.xlsx');
+  if(msg){msg.textContent='✓ Excel файл скачан!';msg.style.color='var(--green-m)';setTimeout(()=>msg.style.display='none',4000);}
 }
 
 // AI (disabled on external hosting)
