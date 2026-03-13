@@ -1548,9 +1548,73 @@ async function exportCSV(){
     const ws4=window.XLSX.utils.aoa_to_sheet(s4);
     ws4['!cols']=[{wch:50},{wch:12},{wch:40},{wch:70}];
     window.XLSX.utils.book_append_sheet(wb,ws4,'Анализ');
+    // Лист 5 — данные для ИИ-анализа через claude.ai
+    const s5=buildClaudeUploadSheet(list,funcLabels);
+    const ws5=window.XLSX.utils.aoa_to_sheet(s5);
+    ws5['!cols']=[{wch:80}];
+    window.XLSX.utils.book_append_sheet(wb,ws5,'Для ИИ-анализа');
     window.XLSX.writeFile(wb,'survey_'+new Date().toISOString().slice(0,10)+'.xlsx');
     if(msg){msg.textContent='✓ Файл скачан!';msg.style.color='var(--green-m)';setTimeout(()=>msg.style.display='none',4000);}
   }catch(e){if(msg){msg.textContent='Ошибка: '+e.message;msg.style.color='var(--red-m)';}}
+}
+
+function buildClaudeUploadSheet(list,funcLabels){
+  const rows=[];
+  rows.push(['КАК ПОЛУЧИТЬ ИИ-АНАЛИЗ ЭТОГО ФАЙЛА']);
+  rows.push(['']);
+  rows.push(['ШАГ 1. Откройте claude.ai в браузере']);
+  rows.push(['ШАГ 2. Начните новый чат']);
+  rows.push(['ШАГ 3. Прикрепите этот Excel файл (кнопка скрепки)']);
+  rows.push(['ШАГ 4. Скопируйте и отправьте текст ниже:']);
+  rows.push(['']);
+  rows.push(['--- СКОПИРУЙТЕ ЭТОТ ЗАПРОС ---']);
+  rows.push(['']);
+  rows.push(['Это результаты RASCI-опросника группы поддержки (ГП) компании Kcell.']);
+  rows.push(['КОНТЕКСТ: ГП сейчас в Техническом департаменте, выполняет pre-processing.']);
+  rows.push(['Часть функций пересекается с ССП (Финансовый департамент).']);
+  rows.push(['Целевая модель — FPOC (Finance & Procurement Operations Center):']);
+  rows.push(['Команда A (бывшая ГП) — Business Operations Support (pre-processing)']);
+  rows.push(['Команда B (бывший ССП) — Transaction Processing & Control (post-processing)']);
+  rows.push(['Единый руководитель Head of FPOC → CFO']);
+  rows.push(['Источники: APQC PCF v7.3, Hackett 2023, Deloitte SSC 2023, BCG 2022']);
+  rows.push(['']);
+  rows.push(['ЗАДАНИЕ — анализ на русском языке:']);
+  rows.push(['1. ФАКТИЧЕСКИЙ ФУНКЦИОНАЛ ГП: чистый pre-processing / post-processing (передать ССП) / смешанные']);
+  rows.push(['2. ПЕРЕСЕЧЕНИЯ С ССП: дублирование и риски SoD (Separation of Duties)']);
+  rows.push(['3. РАСХОЖДЕНИЯ МЕЖДУ УЧАСТНИКАМИ: зоны неопределённости']);
+  rows.push(['4. ГОТОВНОСТЬ К ПЕРЕХОДУ В FPOC: по каждому блоку RASCI']);
+  rows.push(['5. РЕКОМЕНДАЦИИ: 5-7 конкретных действий для перехода']);
+  rows.push(['6. ВОПРОСЫ ДЛЯ ИНТЕРВЬЮ: 5 вопросов для уточнения спорных зон']);
+  rows.push(['Данные на листах: Ответы участников, RASCI матрица, Сравнение.']);
+  rows.push(['--- КОНЕЦ ЗАПРОСА ---']);
+  rows.push(['']);
+  rows.push(['RASCI РОЛИ ПО БЛОКАМ:']);
+  rows.push(['Участник',...Object.values(funcLabels)]);
+  list.forEach(resp=>{
+    const d=sGet('resp_'+resp.id)||{};
+    const ans=d.answers||{};
+    rows.push([resp.name,...Object.keys(funcLabels).map(bid=>getRoleForBlock(bid,ans))]);
+  });
+  rows.push(['']);
+  rows.push(['КЛЮЧЕВЫЕ ОТВЕТЫ (вопросы типа Accountable):']);
+  const keyQids=['q1_5','q2a_8','q2b_4','q2b_5','q3_6','q4_2','q4_4','q4_5','q5_1'];
+  list.forEach(resp=>{
+    const d=sGet('resp_'+resp.id)||{};
+    const ans=d.answers||{};
+    rows.push(['']);
+    rows.push(['Участник: '+resp.name]);
+    keyQids.forEach(qid=>{
+      const q=QUESTIONS.find(q=>q.id===qid);if(!q) return;
+      let val='нет ответа';
+      if(q.type==='radio'){const v=ans[qid];const o=v?q.options.find(o=>o.val===v):null;if(o) val=o.label;}
+      else if(q.type==='checkbox'){const vv=ans[qid];if(Array.isArray(vv)&&vv.length) val=vv.map(v=>{const o=q.options.find(o=>o.val===v);return o?o.label:v;}).join(', ');}
+      rows.push(['  '+q.id+': '+q.text]);
+      rows.push(['  -> '+val]);
+    });
+  });
+  rows.push(['']);
+  rows.push(['Сформировано: '+new Date().toLocaleString('ru-RU')]);
+  return rows;
 }
 
 function loadSheetJS(){
