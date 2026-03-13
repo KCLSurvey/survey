@@ -826,13 +826,21 @@ function loginSurvey(){
 function startSurvey(){
   const name=document.getElementById('nameInput').value.trim();
   const pin=(document.getElementById('pinInput')||{}).value||'';
-  if(!name||!pin.trim()){document.getElementById('nameErr').style.display='block';return;}
-  document.getElementById('nameErr').style.display='none';
+  const err=document.getElementById('nameErr');
+  if(!name||!pin.trim()){err.style.display='block';return;}
+  // проверяем дубликат по имени (без учёта регистра)
+  const list=sGet('respondents_list')||[];
+  const duplicate=list.find(r=>r.name.trim().toLowerCase()===name.toLowerCase());
+  if(duplicate){
+    err.textContent='Участник с таким именем уже зарегистрирован. Используйте вкладку «Войти».';
+    err.style.display='block';
+    return; // СТОП — в список не добавляем
+  }
+  err.style.display='none';
   const rid='r_'+Date.now()+'_'+Math.random().toString(36).substr(2,6);
   currentRID=rid;
   sSet('current_rid',rid);
   sSet('resp_'+rid,{meta:{name,pin:pin.trim(),startedAt:new Date().toISOString(),submitted:false},answers:{},notes:{},timeGrid:{}});
-  const list=sGet('respondents_list')||[];
   list.push({id:rid,name,startedAt:new Date().toISOString()});
   sSet('respondents_list',list);
   document.getElementById('name-entry').style.display='none';
@@ -1334,7 +1342,16 @@ function showAdminTab(e,name){
 }
 
 function refreshAdmin(){
-  const list=sGet('respondents_list')||[];
+  // дедупликация: если одно имя встречается дважды — оставляем первую запись, удаляем дубли
+  let rawList=sGet('respondents_list')||[];
+  const seen=new Set();
+  const deduped=rawList.filter(r=>{
+    const key=r.name.trim().toLowerCase();
+    if(seen.has(key)) return false;
+    seen.add(key);return true;
+  });
+  if(deduped.length!==rawList.length) sSet('respondents_list',deduped);
+  const list=deduped;
   const grid=document.getElementById('respGrid'),noR=document.getElementById('noRespondents');
   if(list.length===0){grid.innerHTML='';noR.style.display='block';return;}
   noR.style.display='none';grid.innerHTML='';
