@@ -295,15 +295,9 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-siz
 <div id="switch-modal">
   <div class="switch-box">
     <div style="font-size:36px;margin-bottom:12px">👤</div>
-    <div class="switch-title">Войти как другой участник</div>
-    <div class="switch-sub">Введите имя, PIN-код и нажмите «Начать» — ваши ответы сохранятся отдельно</div>
-    <input type="text" class="switch-input" id="switchNameInput" placeholder="Имя Фамилия" maxlength="80"
-      onkeydown="if(event.key==='Enter')document.getElementById('switchPinInput').focus()">
-    <input type="password" class="switch-input" id="switchPinInput" placeholder="Придумайте PIN-код" maxlength="20"
-      onkeydown="if(event.key==='Enter')switchUser()">
-    <div class="switch-err" id="switchErr">Пожалуйста, введите имя и PIN-код</div>
-    <button class="switch-btn" onclick="switchUser()">→ Начать заполнение</button>
-    <div class="switch-divider">— или выберите из существующих —</div>
+    <div class="switch-title">Войти как участник</div>
+    <div class="switch-sub">Выберите имя и введите PIN-код</div>
+    <div class="switch-err" id="switchErr" style="margin-bottom:8px"></div>
     <div class="existing-list" id="existingList"></div>
     <button class="switch-cancel" onclick="closeSwitchModal()">Отмена</button>
   </div>
@@ -314,13 +308,22 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-siz
   <div class="name-box">
     <div class="name-icon">👋</div>
     <div class="name-title">Добро пожаловать</div>
-    <div class="name-sub">Укажите имя и придумайте PIN-код для защиты ваших ответов</div>
+    <!-- Табы -->
+    <div style="display:flex;gap:0;margin-bottom:20px;border:1.5px solid var(--border);border-radius:8px;overflow:hidden">
+      <button id="tabReg" onclick="switchAuthTab('reg')" style="flex:1;padding:10px;border:none;background:var(--violet);color:#fff;font-family:var(--sans);font-size:13.5px;font-weight:700;cursor:pointer">Регистрация</button>
+      <button id="tabLogin" onclick="switchAuthTab('login')" style="flex:1;padding:10px;border:none;background:#fff;color:var(--ink-3);font-family:var(--sans);font-size:13.5px;font-weight:600;cursor:pointer">Войти</button>
+    </div>
+    <div id="authSubReg" style="font-size:13px;color:var(--ink-3);margin-bottom:16px">Новый участник — придумайте PIN для входа</div>
+    <div id="authSubLogin" style="font-size:13px;color:var(--ink-3);margin-bottom:16px;display:none">Уже заполняли — введите имя и PIN</div>
     <input type="text" class="name-input" id="nameInput" placeholder="Имя Фамилия" maxlength="80"
       onkeydown="if(event.key==='Enter')document.getElementById('pinInput').focus()">
-    <input type="password" class="name-input" id="pinInput" placeholder="Придумайте PIN-код (цифры или буквы)" maxlength="20"
-      onkeydown="if(event.key==='Enter')startSurvey()">
-    <div id="nameErr" style="color:#dc2626;font-size:13px;margin-top:4px;display:none">Пожалуйста, введите имя и PIN-код</div>
-    <button class="name-btn" onclick="startSurvey()">Начать заполнение →</button>
+    <input type="password" class="name-input" id="pinInput" placeholder="PIN-код" maxlength="20"
+      onkeydown="if(event.key==='Enter')handleAuthSubmit()">
+    <div id="nameErr" style="color:#dc2626;font-size:13px;margin-top:4px;display:none"></div>
+    <button class="name-btn" id="authBtn" onclick="handleAuthSubmit()">Зарегистрироваться →</button>
+    <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
+      <button onclick="document.getElementById('admin-login').style.display='block';document.getElementById('name-entry').style.display='none'" style="background:none;border:none;color:var(--ink-3);font-size:12px;cursor:pointer;font-family:var(--sans)">🔐 Войти как аудитор</button>
+    </div>
   </div>
 </div>
 
@@ -351,6 +354,7 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-siz
         <div class="meta-chip">⏱ Около 25–30 минут</div>
         <div class="meta-chip">🔒 Ответы конфиденциальны</div>
         <div class="meta-chip">💾 Сохраняется автоматически</div>
+        <div class="meta-chip" id="headerUserChip" style="background:rgba(255,255,255,0.18);border-color:rgba(255,255,255,0.35);display:none">👤 <span id="headerUserName"></span></div>
       </div>
     </div>
   </header>
@@ -364,6 +368,7 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-siz
         Сохранено
       </div>
       <button class="btn-switch-user" onclick="openSwitchModal()">👤 Войти как участник</button>
+      <button class="btn-switch-user" style="background:rgba(220,38,38,.1);border-color:#dc2626;color:#dc2626" onclick="document.getElementById('respondent-view').style.display='none';document.getElementById('admin-login').style.display='block'">🔐 Аудитор</button>
     </div>
   </div>
 
@@ -418,6 +423,7 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-siz
     </div>
     <div style="display:flex;gap:10px;align-items:center">
       <span class="admin-badge">АУДИТОР</span>
+      <button onclick="goToSurveyLogin()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#c4b5fd;padding:7px 14px;border-radius:7px;font-family:var(--sans);font-size:12.5px;cursor:pointer;font-weight:600">👤 К анкете</button>
       <button onclick="adminLogout()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#c4b5fd;padding:7px 14px;border-radius:7px;font-family:var(--sans);font-size:12.5px;cursor:pointer;font-weight:600">Выйти</button>
     </div>
   </div>
@@ -449,7 +455,10 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-siz
       <div id="respListView">
         <div class="flex-between" style="margin-bottom:20px">
           <h2 style="font-size:18px;font-weight:800;color:var(--ink)">Участники опроса</h2>
-          <button onclick="refreshAdmin()" style="background:var(--lavender);border:1.5px solid var(--border-2);color:var(--violet);padding:8px 16px;border-radius:8px;font-family:var(--sans);font-size:13px;cursor:pointer;font-weight:600">↻ Обновить</button>
+          <div style="display:flex;gap:8px">
+            <button onclick="fixSubmittedStatuses()" style="background:#d1fae5;border:1.5px solid #059669;color:#065f46;padding:8px 16px;border-radius:8px;font-family:var(--sans);font-size:13px;cursor:pointer;font-weight:600">🔧 Исправить статусы</button>
+            <button onclick="refreshAdmin()" style="background:var(--lavender);border:1.5px solid var(--border-2);color:var(--violet);padding:8px 16px;border-radius:8px;font-family:var(--sans);font-size:13px;cursor:pointer;font-weight:600">↻ Обновить</button>
+          </div>
         </div>
         <div class="resp-grid" id="respGrid"></div>
         <div id="noRespondents" style="text-align:center;padding:60px;color:var(--ink-3);display:none">
@@ -486,16 +495,43 @@ body{font-family:var(--sans);background:var(--surface);color:var(--ink);font-siz
       <div id="rasciOutput"></div>
     </div>
     <div class="admin-panel" id="tab-analysis">
+      <div class="ai-section" style="margin-bottom:20px">
+        <h3>🔑 API-ключ для ИИ-анализа</h3>
+        <p>Нужен для генерации выводов и рекомендаций. Сохраняется в браузере.</p>
+        <div style="background:var(--lavender-2);border:1.5px solid var(--border-2);border-radius:10px;padding:16px;margin-bottom:14px;font-size:13px;color:var(--ink-2);line-height:1.8">
+          <strong>Где взять ключ:</strong><br>
+          1. Зайдите на <strong>console.anthropic.com</strong><br>
+          2. Войдите или зарегистрируйтесь (бесплатно)<br>
+          3. Слева → <strong>API Keys</strong> → <strong>Create Key</strong><br>
+          4. Скопируйте ключ (начинается с <code style="background:#ede9fe;padding:1px 5px;border-radius:3px">sk-ant-</code>) и вставьте ниже
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." maxlength="200"
+            style="flex:1;min-width:200px;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-family:var(--mono);font-size:13px;outline:none;transition:border-color .15s"
+            onfocus="this.style.borderColor='var(--violet)'" onblur="this.style.borderColor='var(--border)'"
+            onkeydown="if(event.key==='Enter')saveApiKey()">
+          <button onclick="saveApiKey()" style="background:var(--violet);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">Сохранить</button>
+          <button onclick="clearApiKey()" style="background:none;border:1.5px solid var(--border);color:var(--ink-3);padding:10px 16px;border-radius:8px;font-family:var(--sans);font-size:13px;cursor:pointer;white-space:nowrap">Удалить</button>
+        </div>
+        <div id="apiKeyStatus" style="margin-top:10px;font-size:13px"></div>
+      </div>
+      <div class="ai-section" style="margin-bottom:20px">
+        <h3>🤖 ИИ-анализ ответов</h3>
+        <p>Claude проанализирует ответы всех участников и сформирует выводы по RASCI, расхождениям и рекомендации.</p>
+        <button class="btn-ai" onclick="runAiAnalysis()" id="btnAiAnalysis">▶ Запустить ИИ-анализ</button>
+        <div id="aiAnalysisStatus" style="margin-top:10px;font-size:13px;color:var(--ink-3);display:none"></div>
+        <div id="aiAnalysisOutput" style="margin-top:16px;background:var(--lavender-2);border:1.5px solid var(--border-2);border-radius:10px;padding:20px;font-size:13.5px;color:var(--ink);line-height:1.8;display:none;white-space:pre-wrap"></div>
+      </div>
       <div class="ai-section">
         <h3>📥 Экспорт данных</h3>
-        <p>Скачайте ответы всех участников в формате Excel (4 листа).</p>
+        <p>Скачайте ответы всех участников в формате Excel (4 листа). Если ИИ-анализ запущен — он попадёт в Лист 4.</p>
         <button class="btn-ai" onclick="exportCSV()">⬇️ Скачать Excel (4 листа)</button>
         <div id="exportMsg" style="margin-top:14px;font-size:13px;display:none"></div>
         <div style="margin-top:20px;background:var(--lavender-2);border-radius:8px;padding:16px;font-size:13px;color:var(--ink-2);line-height:1.7">
           📋 <strong>Лист 1</strong> — Все ответы с RASCI<br>
           📊 <strong>Лист 2</strong> — RASCI матрица по блокам<br>
           ⚖️ <strong>Лист 3</strong> — Сравнение участников<br>
-          🤖 <strong>Лист 4</strong> — Анализ и выводы
+          🤖 <strong>Лист 4</strong> — ИИ-анализ и выводы
         </div>
       </div>
     </div>
@@ -688,11 +724,21 @@ window.addEventListener('DOMContentLoaded',()=>{
         document.getElementById('respondent-view').style.display='block';
         showThankYouDirect();return;
       }
-      showSurvey();restoreAnswers();updateProgress();return;
+      showSurvey();restoreAnswers();updateProgress();updateHeaderUser();return;
     }
   }
   document.getElementById('name-entry').style.display='block';
 });
+
+function updateHeaderUser(){
+  const chip=document.getElementById('headerUserChip');
+  const nameEl=document.getElementById('headerUserName');
+  if(!chip||!nameEl) return;
+  const data=currentRID?sGet('resp_'+currentRID):null;
+  const name=data&&data.meta&&data.meta.name;
+  if(name){nameEl.textContent=name;chip.style.display='flex';}
+  else chip.style.display='none';
+}
 
 function showSurvey(){
   document.getElementById('respondent-view').style.display='block';
@@ -701,6 +747,56 @@ function showSurvey(){
   document.querySelector('.site-header').style.display='';
   document.querySelector('.progress-bar-wrap').style.display='';
   if(!document.getElementById('questionsContainer').children.length) buildQuestionnaire();
+}
+
+let authMode='reg'; // 'reg' или 'login'
+
+function switchAuthTab(mode){
+  authMode=mode;
+  const isReg=mode==='reg';
+  document.getElementById('tabReg').style.background=isReg?'var(--violet)':'#fff';
+  document.getElementById('tabReg').style.color=isReg?'#fff':'var(--ink-3)';
+  document.getElementById('tabLogin').style.background=isReg?'#fff':'var(--violet)';
+  document.getElementById('tabLogin').style.color=isReg?'var(--ink-3)':'#fff';
+  document.getElementById('authSubReg').style.display=isReg?'block':'none';
+  document.getElementById('authSubLogin').style.display=isReg?'none':'block';
+  document.getElementById('authBtn').textContent=isReg?'Зарегистрироваться →':'Войти →';
+  document.getElementById('nameErr').style.display='none';
+}
+
+function handleAuthSubmit(){
+  if(authMode==='reg') startSurvey();
+  else loginSurvey();
+}
+
+function loginSurvey(){
+  const name=document.getElementById('nameInput').value.trim();
+  const pin=(document.getElementById('pinInput')||{}).value||'';
+  const err=document.getElementById('nameErr');
+  if(!name||!pin.trim()){err.textContent='Введите имя и PIN-код';err.style.display='block';return;}
+  const list=sGet('respondents_list')||[];
+  // ищем по имени (без учёта регистра)
+  const matches=list.filter(r=>r.name.trim().toLowerCase()===name.toLowerCase());
+  if(!matches.length){err.textContent='Участник с таким именем не найден. Используйте Регистрацию.';err.style.display='block';return;}
+  // проверяем PIN
+  let found=null;
+  for(const r of matches){
+    const data=sGet('resp_'+r.id)||{};
+    if(data.meta&&data.meta.pin&&data.meta.pin===pin.trim()){found=r;break;}
+  }
+  if(!found){err.textContent='Неверный PIN-код.';err.style.display='block';return;}
+  err.style.display='none';
+  // входим без создания нового участника
+  currentRID=found.id;
+  const saved=sGet('resp_'+found.id);
+  if(saved){answers=saved.answers||{};notes=saved.notes||{};timeGrid=saved.timeGrid||{};}
+  sSet('current_rid',found.id);
+  document.getElementById('name-entry').style.display='none';
+  if(saved&&saved.meta&&saved.meta.submitted){
+    document.getElementById('respondent-view').style.display='block';
+    showThankYouDirect();return;
+  }
+  showSurvey();restoreAnswers();updateProgress();updateHeaderUser();
 }
 
 function startSurvey(){
@@ -716,7 +812,7 @@ function startSurvey(){
   list.push({id:rid,name,startedAt:new Date().toISOString()});
   sSet('respondents_list',list);
   document.getElementById('name-entry').style.display='none';
-  showSurvey();updateProgress();
+  showSurvey();updateProgress();updateHeaderUser();
 }
 
 // ─── SWITCH MODAL ───
@@ -730,27 +826,69 @@ function openSwitchModal(){
     list.forEach(r=>{
       const d=sGet('resp_'+r.id)||{};
       const pct=Math.round(QUESTIONS.filter(q=>isAnsweredForAdmin(q,d.answers||{},d.timeGrid||{},d.notes||{})).length/QUESTIONS.length*100);
-      // FIX1: читаем submitted из обоих источников
       const submittedFlag=!!(r.submitted||(d.meta&&d.meta.submitted));
-      const item=document.createElement('div');item.className='existing-item';
-      item.innerHTML=`<div><div class="existing-name">${r.name}</div><div class="existing-meta">${pct}% · ${submittedFlag?'✓ Завершено':'⏳ В процессе'}</div></div>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--violet)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>`;
-      item.onclick=()=>switchToExisting(r.id);
+      const item=document.createElement('div');
+      item.style.cssText='background:var(--lavender-2);border:1.5px solid var(--border-2);border-radius:10px;padding:10px 12px;margin-bottom:8px;transition:border-color .15s';
+      item.innerHTML=`
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div>
+            <div style="font-size:13.5px;font-weight:700;color:var(--ink)">${r.name}</div>
+            <div style="font-size:11px;color:var(--ink-3);font-family:var(--mono)">${pct}% · ${submittedFlag?'✓ Завершено':'⏳ В процессе'}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="password" maxlength="20" placeholder="PIN-код"
+            id="pin_modal_${r.id}"
+            style="flex:1;border:1.5px solid var(--border);border-radius:7px;padding:7px 11px;font-family:var(--sans);font-size:13px;outline:none;background:#fff"
+            onkeydown="if(event.key==='Enter')confirmSwitchPin('${r.id}')">
+          <button onclick="confirmSwitchPin('${r.id}')"
+            style="width:36px;height:36px;min-width:36px;background:var(--violet);border:none;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s"
+            onmouseover="this.style.background='var(--purple)'" onmouseout="this.style.background='var(--violet)'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>`;
       el.appendChild(item);
     });
   }
-  document.getElementById('switchNameInput').value='';
-  document.getElementById('switchPinInput').value='';
   document.getElementById('switchErr').style.display='none';
+  document.getElementById('switchErr').textContent='';
   document.getElementById('switch-modal').classList.add('show');
 }
 
 function closeSwitchModal(){document.getElementById('switch-modal').classList.remove('show');}
 
+function confirmSwitchPin(rid){
+  const inp=document.getElementById('pin_modal_'+rid);
+  const errEl=document.getElementById('switchErr');
+  if(!inp) return;
+  const entered=(inp.value||'').trim();
+  if(!entered){
+    inp.style.borderColor='#dc2626';
+    errEl.textContent='Введите PIN-код';errEl.style.display='block';return;
+  }
+  const saved=sGet('resp_'+rid)||{};
+  const storedPin=saved.meta&&saved.meta.pin;
+  if(storedPin&&entered!==storedPin){
+    inp.style.borderColor='#dc2626';
+    errEl.textContent='Неверный PIN-код';errEl.style.display='block';return;
+  }
+  inp.style.borderColor='';
+  errEl.style.display='none';
+  switchToExisting(rid);
+}
+
 function switchUser(){
+  const pinInput=document.getElementById('switchPinInput');
+  const existingRid=pinInput.dataset.existingRid||'';
+  // если выбрали из списка — входим в существующего
+  if(existingRid){
+    switchToExisting(existingRid);
+    return;
+  }
+  // иначе — новый участник
   const name=document.getElementById('switchNameInput').value.trim();
-  const pin=(document.getElementById('switchPinInput')||{}).value||'';
-  if(!name||!pin.trim()){document.getElementById('switchErr').style.display='block';return;}
+  const pin=pinInput.value||'';
+  if(!name||!pin.trim()){document.getElementById('switchErr').textContent='Введите имя и PIN-код';document.getElementById('switchErr').style.display='block';return;}
   document.getElementById('switchErr').style.display='none';
   doAutosave();
   const rid='r_'+Date.now()+'_'+Math.random().toString(36).substr(2,6);
@@ -770,13 +908,6 @@ function switchUser(){
 
 function switchToExisting(rid){
   const saved=sGet('resp_'+rid);
-  const storedPin=saved&&saved.meta&&saved.meta.pin;
-  if(storedPin){
-    const entered=prompt('Введите PIN-код участника «'+(saved.meta.name||'')+'»:');
-    if(!entered||entered.trim()!==storedPin){
-      alert('Неверный PIN-код. Доступ запрещён.');return;
-    }
-  }
   doAutosave();
   currentRID=rid;
   if(saved){answers=saved.answers||{};notes=saved.notes||{};timeGrid=saved.timeGrid||{};}
@@ -786,7 +917,7 @@ function switchToExisting(rid){
   document.getElementById('softWarn').classList.remove('show');
   document.getElementById('btnSubmit').disabled=false;
   if(saved&&saved.meta&&saved.meta.submitted){showThankYouDirect();return;}
-  showSurvey();restoreAnswers();updateProgress();
+  showSurvey();restoreAnswers();updateProgress();updateHeaderUser();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -1031,8 +1162,9 @@ function doActualSubmit(){
   document.getElementById('btnSubmit').disabled=true;
   document.getElementById('softWarn').classList.remove('show');
   const ex=sGet('resp_'+currentRID)||{};
-  sSet('resp_'+currentRID,{...ex,answers,notes,timeGrid,meta:{...ex.meta,submitted:true,submittedAt:new Date().toISOString()}});
-  // FIX1: синхронизируем submitted в respondents_list
+  const updatedMeta=Object.assign({},ex.meta||{},{submitted:true,submittedAt:new Date().toISOString()});
+  sSet('resp_'+currentRID,{...ex,answers,notes,timeGrid,meta:updatedMeta});
+  // синхронизируем submitted в respondents_list
   const list=sGet('respondents_list')||[];
   const idx=list.findIndex(r=>r.id===currentRID);
   if(idx>=0){list[idx].submitted=true;sSet('respondents_list',list);}
@@ -1063,17 +1195,105 @@ function returnToSurvey(){
 }
 
 // ─── ADMIN ───
+// §F28b — исправить статусы: читает из meta И принудительно ставит по 100%
+function fixSubmittedStatuses(){
+  const list=sGet('respondents_list')||[];
+  let fixed=0;
+  list.forEach(resp=>{
+    const data=sGet('resp_'+resp.id)||{};
+    const ans=data.answers||{},tg=data.timeGrid||{},nt=data.notes||{};
+    const metaSubmitted=!!(data.meta&&data.meta.submitted);
+    const answeredCount=QUESTIONS.filter(q=>isAnsweredForAdmin(q,ans,tg,nt)).length;
+    const pct=Math.round(answeredCount/QUESTIONS.length*100);
+    // ставим submitted если meta говорит true ИЛИ если 100% ответов
+    if((metaSubmitted||pct===100)&&!resp.submitted){
+      resp.submitted=true;
+      // записываем в meta тоже
+      if(!metaSubmitted){
+        const ex=sGet('resp_'+resp.id)||{};
+        ex.meta=Object.assign({},ex.meta||{},{submitted:true,submittedAt:new Date().toISOString()});
+        sSet('resp_'+resp.id,ex);
+      }
+      fixed++;
+    }
+  });
+  sSet('respondents_list',list);
+  refreshAdmin();
+  if(fixed>0) alert(`✓ Исправлено ${fixed} участник(а) — теперь отображаются как «Завершено».`);
+  else alert('Статусы уже актуальны. Если всё ещё "В процессе" — участник не нажимал "Завершить" и не достиг 100%.');
+}
+
 function checkAdminKey(){
   if(document.getElementById('adminKeyInput').value.trim()===ADMIN_KEY){document.getElementById('admin-login').style.display='none';showAdmin();}
   else document.getElementById('loginErr').style.display='block';
 }
+function deleteRespondent(rid, btn){
+  // confirm() не работает в песочнице — показываем inline подтверждение
+  const card=btn.closest('.resp-card');
+  if(!card) return;
+  // если уже показан — выполняем удаление
+  if(card.dataset.confirmDelete==='1'){
+    sSet('resp_'+rid, null);
+    MEM['resp_'+rid]=null;
+    const list=(sGet('respondents_list')||[]).filter(r=>r.id!==rid);
+    sSet('respondents_list', list);
+    if(sGet('current_rid')===rid) sSet('current_rid', null);
+    card.remove();
+    const grid=document.getElementById('respGrid');
+    if(grid&&grid.querySelectorAll('.resp-card').length===0){
+      document.getElementById('noRespondents').style.display='block';
+    }
+    return;
+  }
+  // первое нажатие — показываем подтверждение
+  card.dataset.confirmDelete='1';
+  btn.textContent='Удалить?';
+  btn.style.background='#fee2e2';
+  btn.style.color='#dc2626';
+  btn.style.fontSize='11px';
+  btn.style.padding='3px 7px';
+  btn.style.border='1.5px solid #dc2626';
+  btn.style.borderRadius='6px';
+  btn.style.right='8px';
+  btn.style.top='8px';
+  // отмена через 3 сек
+  setTimeout(()=>{
+    if(card.dataset.confirmDelete==='1'){
+      card.dataset.confirmDelete='';
+      btn.textContent='✕';
+      btn.style.background='none';
+      btn.style.color='#ccc';
+      btn.style.fontSize='16px';
+      btn.style.padding='2px 6px';
+      btn.style.border='none';
+    }
+  },3000);
+}
+
+function goToSurveyLogin(){
+  document.getElementById('admin-view').style.display='none';
+  document.getElementById('name-entry').style.display='block';
+}
+
 function adminLogout(){document.getElementById('admin-view').style.display='none';window.location.href=window.location.pathname;}
 function showAdmin(){
   document.getElementById('admin-view').style.display='block';
-  const base=window.location.href.split('?')[0];
-  document.getElementById('urlRespondent').textContent=base;
-  document.getElementById('urlAdmin').textContent=base+'?mode=admin&key='+ADMIN_KEY;
+  const href=window.location.href;
+  const isSrcdoc=href.startsWith('about:')||href.startsWith('blob:')||href.trim()==='';
+  if(isSrcdoc){
+    document.getElementById('urlRespondent').textContent='⚠ Откройте файл в браузере напрямую (не через артефакт)';
+    document.getElementById('urlAdmin').textContent='⚠ Откройте файл в браузере напрямую (не через артефакт)';
+    document.getElementById('urlRespondent').style.color='#d97706';
+    document.getElementById('urlAdmin').style.color='#d97706';
+  } else {
+    const base=href.split('?')[0];
+    document.getElementById('urlRespondent').textContent=base;
+    document.getElementById('urlAdmin').textContent=base+'?mode=admin&key='+ADMIN_KEY;
+    document.getElementById('urlRespondent').style.color='';
+    document.getElementById('urlAdmin').style.color='';
+  }
   refreshAdmin();
+  checkApiKeyOnLoad();
 }
 function copyUrl(type){
   const el=document.getElementById(type==='admin'?'urlAdmin':'urlRespondent');
@@ -1112,13 +1332,23 @@ function refreshAdmin(){
     const ans=data.answers||{};
     const answeredCount=QUESTIONS.filter(q=>isAnsweredForAdmin(q,ans,data.timeGrid||{},data.notes||{})).length;
     const pct=Math.round(answeredCount/QUESTIONS.length*100);
-    // FIX1: читаем submitted из обоих источников
-    if(data.meta&&data.meta.submitted&&!resp.submitted){resp.submitted=true;}
-    const submitted=!!(resp.submitted||(data.meta&&data.meta.submitted));
+    // читаем submitted из обоих источников и синхронизируем
+    const submittedFromMeta=!!(data.meta&&data.meta.submitted);
+    const submittedFromList=!!resp.submitted;
+    if(submittedFromMeta&&!submittedFromList){
+      resp.submitted=true;
+      // записываем обратно в list чтобы синхронизировать
+      const fullList=sGet('respondents_list')||[];
+      const li=fullList.findIndex(r=>r.id===resp.id);
+      if(li>=0){fullList[li].submitted=true;sSet('respondents_list',fullList);}
+    }
+    const submitted=submittedFromMeta||submittedFromList;
     const date=data.meta?new Date(data.meta.startedAt).toLocaleDateString('ru-RU'):'';
     const card=document.createElement('div');card.className='resp-card';
     card.onclick=()=>showRespDetail(resp.id);
-    card.innerHTML=`<div class="resp-name">${resp.name}</div>
+    card.style.position='relative';
+    card.innerHTML=`<button onclick="event.stopPropagation();deleteRespondent('${resp.id}',this)" style="position:absolute;top:10px;right:10px;background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;line-height:1;padding:2px 6px;border-radius:4px;transition:all .15s" onmouseover="this.style.background='#fee2e2';this.style.color='#dc2626'" onmouseout="this.style.background='none';this.style.color='#ccc'">✕</button>
+    <div class="resp-name">${resp.name}</div>
       <div class="resp-meta">Начато: ${date}</div>
       <div style="margin-top:14px"><div class="resp-pct">${pct}%</div>
       <div class="resp-bar"><div class="resp-bar-fill" style="width:${pct}%"></div></div>
@@ -1333,10 +1563,200 @@ function loadSheetJS(){
   });
 }
 
+// ─── API KEY ───
+function saveApiKey(){
+  const val=(document.getElementById('apiKeyInput').value||'').trim();
+  if(!val||!val.startsWith('sk-')){
+    showApiKeyStatus('❌ Неверный формат. Ключ должен начинаться с sk-ant-','#dc2626');return;
+  }
+  sSet('anthropic_api_key',val);
+  document.getElementById('apiKeyInput').value='';
+  showApiKeyStatus('✅ Ключ сохранён','var(--green-m)');
+}
+function clearApiKey(){
+  sSet('anthropic_api_key',null);
+  document.getElementById('apiKeyInput').value='';
+  showApiKeyStatus('🗑 Ключ удалён','var(--ink-3)');
+  document.getElementById('aiAnalysisOutput').style.display='none';
+}
+function showApiKeyStatus(msg,color){
+  const el=document.getElementById('apiKeyStatus');
+  el.textContent=msg;el.style.color=color;el.style.display='block';
+  setTimeout(()=>el.style.display='none',4000);
+}
+function checkApiKeyOnLoad(){
+  const key=sGet('anthropic_api_key');
+  const el=document.getElementById('apiKeyStatus');
+  if(key&&el){el.textContent='✅ Ключ сохранён в браузере';el.style.color='var(--green-m)';el.style.display='block';}
+}
+
+// ─── AI ANALYSIS ───
+let lastAiAnalysisText='';
+
+async function runAiAnalysis(){
+  const list=sGet('respondents_list')||[];
+  if(!list.length){alert('Нет данных участников для анализа');return;}
+
+  // определяем источник API
+  const isSrcdoc=window.location.href.startsWith('about:')||window.location.href.startsWith('blob:');
+  const storedKey=sGet('anthropic_api_key');
+  if(!isSrcdoc&&!storedKey){
+    alert('Введите API-ключ выше чтобы использовать ИИ-анализ на GitHub Pages');return;
+  }
+
+  const btn=document.getElementById('btnAiAnalysis');
+  const status=document.getElementById('aiAnalysisStatus');
+  const output=document.getElementById('aiAnalysisOutput');
+  btn.disabled=true;btn.textContent='⏳ Анализирую...';
+  status.textContent='Отправляю данные в Claude...';status.style.display='block';
+  output.style.display='none';
+
+  // собираем данные по всем участникам
+  const funcLabels={B1:'Планирование закупок',B2A:'Подготовка договора (до)',B2B:'Сопровождение договора (после)',B3:'Заявки и бюджет',B4:'Исполнение и оплаты',B5:'Процессы и регламенты',B6:'Профиль взаимодействия'};
+  const rDesc={A:'Accountable',R:'Responsible',S:'Support',C:'Consulted',I:'Informed'};
+
+  let allSummaries='';
+  list.forEach(resp=>{
+    const d=sGet('resp_'+resp.id)||{};
+    const ans=d.answers||{};
+    allSummaries+=`\n--- Участник: ${resp.name} ---\n`;
+    QUESTIONS.forEach(q=>{
+      if(q.type==='textarea') return;
+      let val='';
+      if(q.type==='radio'){const v=ans[q.id];const o=v?q.options.find(o=>o.val===v):null;val=o?o.label:'нет ответа';}
+      else if(q.type==='checkbox'){const vv=ans[q.id];val=Array.isArray(vv)&&vv.length?vv.map(v=>{const o=q.options.find(o=>o.val===v);return o?o.label:v;}).join(', '):'нет ответа';}
+      else if(q.type==='number-grid'){val=q.options.map(o=>`${o.label}:${(d.timeGrid||{})[q.id+'_'+o.val]||0}%`).join(', ');}
+      let rasci='';
+      if(q.rasciSignal){
+        if(q.type==='radio'&&ans[q.id]) rasci=' → RASCI: '+(q.rasciSignal[ans[q.id]]||'?');
+        else if(q.type==='checkbox'&&Array.isArray(ans[q.id])){
+          const roles=ans[q.id].map(v=>q.rasciSignal[v]).filter(r=>r&&r!=='—');
+          for(const p of['A','R','S','C','I']){if(roles.includes(p)){rasci=' → RASCI: '+p;break;}}
+        }
+      }
+      allSummaries+=`${q.id}: ${val}${rasci}\n`;
+    });
+    allSummaries+=`\nРоли по блокам: `+Object.keys(funcLabels).map(bid=>`${bid}=${getRoleForBlock(bid,ans)}`).join(', ')+'\n';
+  });
+
+  const prompt=`Ты — старший консультант по организационному дизайну (уровень McKinsey/Deloitte). Анализируешь RASCI-опросник сотрудников группы поддержки (ГП) компании Kcell (Казахстан).
+
+═══════════════════════════════════════════════
+КОНТЕКСТ И ЗАДАЧА ОПРОСНИКА
+═══════════════════════════════════════════════
+Группа поддержки (ГП) сейчас находится в Техническом департаменте. Она выполняет PRE-PROCESSING функции (сбор, верификация документов, формирование PR, контроль бюджетных остатков, координация с ДЦЗ). Однако часть функций у ГП — это POST-PROCESSING (работа с АВР, финальными документами, отслеживание оплат), которые пересекаются с функциями группы ССП из Финансового департамента.
+
+ЦЕЛЬ ОПРОСНИКА — три задачи:
+1. Зафиксировать реальный функционал ГП (не по положению, а как есть на практике)
+2. Выявить пересечения функций ГП и ССП — где дублирование, конфликт интересов (SoD)
+3. Определить какие функции ГП — чистый pre-processing, а какие нужно передать в ССП или исключить
+
+ЦЕЛЕВАЯ МОДЕЛЬ — Finance & Procurement Operations Center (FPOC):
+Источники: APQC PCF v7.3, COSO ICIF, IIA Three Lines Model 2020, Hackett Group 2023, Deloitte SSC 2023, McKinsey 2023, BCG 2022
+
+Команда A — Business Operations Support (бывшая ГП, расширяется на ВСЕ подразделения):
+- Единая точка приёма потребностей от всех ВЗ
+- Сбор, очистка и первичная верификация документов
+- Коммуникация с поставщиками по ошибкам
+- Формирование PR для всех департаментов
+- Операционный мониторинг бюджетных остатков всех депто
+- Контроль договорного цикла: сроки, пролонгации
+- Координация старта закупочных процедур с ДЦЗ
+- Отслеживание статуса АВР и финальных документов
+- Передача верифицированного пакета в Команду B
+
+Команда B — Transaction Processing & Control (бывший ССП, без изменений):
+- НСИ / Мастер-данные: контрагенты, номенклатура, реквизиты
+- ВМД: карточки договоров в SAP, финансовые параметры
+- Регистрация и сопровождение PO в системе
+- Трёхстороннее сопоставление: договор / PO / инвойс / АВР
+- Независимая верификация финансового обязательства (SoD)
+- Управление очередью платежей и SLA
+- Контроль предоплат и авансов
+- Реестр договоров и контроль финансовых условий
+- Подготовка аудиторской документации
+
+Что меняется при переходе на FPOC:
+- Руководство: 2 разных → 1 Head of FPOC → CFO
+- Охват ГП: только 3 подразделения → все подразделения компании
+- Подчинение: Технический директор → CFO (через Head of FPOC)
+- Стандарт работы: разные для ГП и ССП → единый стандарт и SLA
+- Конфликт интересов: ГП служит своему техдепту → нейтральная сервисная функция
+
+Принцип "Hub with Teams" — стандарт зрелых SSC. 74% SSC мирового уровня используют единую структуру. BCG 2022: объединение pre/post processing снижает затраты на 25–35%.
+
+═══════════════════════════════════════════════
+ОТВЕТЫ УЧАСТНИКОВ ОПРОСНИКА
+═══════════════════════════════════════════════
+${allSummaries}
+
+═══════════════════════════════════════════════
+ЗАДАНИЕ ДЛЯ АНАЛИЗА
+═══════════════════════════════════════════════
+Выполни структурированный анализ на русском языке:
+
+1. ФАКТИЧЕСКИЙ ФУНКЦИОНАЛ ГП
+На основе ответов — что реально делает группа. Раздели на:
+• Чистый pre-processing (остаётся в Команде A / FPOC)
+• Post-processing функции (пересекаются с ССП — нужно передать в Команду B)
+• Смешанные / спорные функции
+
+2. ПЕРЕСЕЧЕНИЯ С ССП (конфликты и дублирование)
+Где конкретно функции ГП накладываются на функции ССП. Укажи риски SoD (Separation of Duties).
+
+3. РАСХОЖДЕНИЯ МЕЖДУ УЧАСТНИКАМИ
+Где ответы разных участников противоречат друг другу — это зоны неопределённости внутри группы.
+
+4. ГОТОВНОСТЬ К ПЕРЕХОДУ В FPOC
+Оцени по каждому блоку RASCI: насколько текущий функционал ГП соответствует роли Команды A в целевой модели FPOC. Что нужно изменить.
+
+5. РЕКОМЕНДАЦИИ (5–7 конкретных пунктов)
+Что сделать для успешного перехода: что передать, что оставить, что формализовать.
+
+6. ВОПРОСЫ ДЛЯ ИНТЕРВЬЮ
+5 вопросов для уточнения спорных зон перед финальным решением по структуре.
+
+Формат: структурированный текст с заголовками. Язык: профессиональный, конкретный, без воды.`;
+
+  try{
+    const headers={'Content-Type':'application/json'};
+    if(!isSrcdoc&&storedKey) headers['x-api-key']=storedKey;
+    const response=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers,
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:2000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data=await response.json();
+    if(data.error){throw new Error(data.error.message||'Ошибка API');}
+    const text=data.content&&data.content[0]?data.content[0].text:'Нет ответа';
+    lastAiAnalysisText=text;
+    output.textContent=text;
+    output.style.display='block';
+    status.textContent='✅ Анализ готов. При экспорте в Excel он попадёт в Лист 4.';
+    status.style.color='var(--green-m)';
+  }catch(e){
+    status.textContent='❌ Ошибка: '+e.message;
+    status.style.color='#dc2626';
+  }
+  btn.disabled=false;btn.textContent='▶ Запустить ИИ-анализ';
+}
+
 function buildLightAnalysis(list,funcLabels,rDesc){
   const rows=[];
   rows.push(['RASCI-АНАЛИЗ · BCS-TD · KCELL · '+new Date().toLocaleDateString('ru-RU')]);
   rows.push(['']);
+  if(lastAiAnalysisText){
+    rows.push(['🤖 ИИ-АНАЛИЗ (Claude)']);
+    rows.push(['']);
+    lastAiAnalysisText.split('\n').forEach(line=>rows.push([line]));
+    rows.push(['']);
+    rows.push(['─────────────────────────────────────']);
+    rows.push(['']);
+  }
   rows.push(['1. СВОДНАЯ RASCI ПО УЧАСТНИКАМ']);
   rows.push(['Участник','B1 Закупки','B2A Договор(до)','B2B Договор(после)','B3 Бюджет','B4 Оплаты','B5 Процессы','B6 Взаимодействие']);
   list.forEach(resp=>{
