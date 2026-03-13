@@ -730,8 +730,10 @@ window.addEventListener('DOMContentLoaded',()=>{
     if(key===ADMIN_KEY){showAdmin();return;}
     document.getElementById('admin-login').style.display='block';return;
   }
+  // если в URL есть ?fresh=1 или ?login=1 — всегда показываем экран входа
+  const forceFresh=p.get('fresh')||p.get('login');
   const rid=sGet('current_rid');
-  if(rid){
+  if(rid&&!forceFresh){
     currentRID=rid;
     const saved=sGet('resp_'+rid);
     if(saved){
@@ -743,7 +745,12 @@ window.addEventListener('DOMContentLoaded',()=>{
       showSurvey();restoreAnswers();updateProgress();updateHeaderUser();return;
     }
   }
+  // показываем экран входа; если был current_rid — предзаполняем вкладку «Войти»
   document.getElementById('name-entry').style.display='block';
+  if(rid&&forceFresh){
+    // переключаем на вкладку «Войти» автоматически
+    switchAuthTab('login');
+  }
 });
 
 function updateHeaderUser(){
@@ -1319,7 +1326,7 @@ function showAdmin(){
     document.getElementById('urlAdmin').style.color='#d97706';
   } else {
     const base=href.split('?')[0];
-    document.getElementById('urlRespondent').textContent=base;
+    document.getElementById('urlRespondent').textContent=base+'?fresh=1';
     document.getElementById('urlAdmin').textContent=base+'?mode=admin&key='+ADMIN_KEY;
     document.getElementById('urlRespondent').style.color='';
     document.getElementById('urlAdmin').style.color='';
