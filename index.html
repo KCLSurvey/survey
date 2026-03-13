@@ -798,7 +798,15 @@ function loginSurvey(){
   let found=null;
   for(const r of matches){
     const data=sGet('resp_'+r.id)||{};
-    if(data.meta&&data.meta.pin&&data.meta.pin===pin.trim()){found=r;break;}
+    // если PIN сохранён — сравниваем; если PIN отсутствует в записи — пускаем по любому PIN (старые записи)
+    if(data.meta){
+      if(data.meta.pin){
+        if(data.meta.pin===pin.trim()){found=r;break;}
+      } else {
+        // PIN не был сохранён при регистрации — принимаем любой непустой PIN
+        found=r;break;
+      }
+    }
   }
   if(!found){err.textContent='Неверный PIN-код.';err.style.display='block';return;}
   err.style.display='none';
