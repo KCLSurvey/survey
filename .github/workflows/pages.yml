@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -34,3 +34,50 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify published applications
+        id: verify
+        env:
+          BASE_URL: ${{ steps.deployment.outputs.page_url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="${BASE_URL%/}"
+          urls=(
+            "$BASE/margin-calculators/"
+            "$BASE/margin-calculators/v9/"
+            "$BASE/margin-calculators/v10/"
+          )
+          ready=0
+          for attempt in $(seq 1 24); do
+            ready=1
+            for url in "${urls[@]}"; do
+              code=$(curl -L -sS -o /tmp/page.html -w '%{http_code}' "$url" || true)
+              if [ "$code" != "200" ]; then ready=0; break; fi
+            done
+            if [ "$ready" = "1" ]; then break; fi
+            sleep 5
+          done
+          [ "$ready" = "1" ]
+          curl -LfsS "$BASE/margin-calculators/" | grep -q 'Калькуляторы цены, прибыли и денег'
+          curl -LfsS "$BASE/margin-calculators/v9/" | grep -q 'Маржа v9'
+          curl -LfsS "$BASE/margin-calculators/v10/" | grep -q 'Бизнес-калькулятор v10'
+          for n in 00 01 02 03 04; do curl -LfsS -o /dev/null "$BASE/margin-calculators/v9/part-$n.b64"; done
+          for n in 00 01 02 03 04 05; do curl -LfsS -o /dev/null "$BASE/margin-calculators/v10/part-$n.b64"; done
+          cat > margin-calculators/deployment-status.json <<JSON
+          {
+            "status": "verified",
+            "verified_at_utc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "commit": "${GITHUB_SHA}",
+            "launcher": "$BASE/margin-calculators/",
+            "v9": "$BASE/margin-calculators/v9/",
+            "v10": "$BASE/margin-calculators/v10/"
+          }
+          JSON
+      - name: Record verified deployment
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add margin-calculators/deployment-status.json
+          git commit -m 'Record verified calculator deployment [skip ci]'
+          git push
