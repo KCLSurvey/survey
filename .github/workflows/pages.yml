@@ -46,6 +46,9 @@ jobs:
             "$BASE/margin-calculators/"
             "$BASE/margin-calculators/v9/"
             "$BASE/margin-calculators/v10/"
+            "$BASE/margin-calculators/v9-1/"
+            "$BASE/margin-calculators/v10-1/"
+            "$BASE/margin-calculators/ai-proxy/setup.html"
           )
           ready=0
           for attempt in $(seq 1 24); do
@@ -61,8 +64,22 @@ jobs:
           curl -LfsS "$BASE/margin-calculators/" | grep -q 'Калькуляторы цены, прибыли и денег'
           curl -LfsS "$BASE/margin-calculators/v9/" | grep -q 'Маржа v9'
           curl -LfsS "$BASE/margin-calculators/v10/" | grep -q 'Бизнес-калькулятор v10'
+          curl -LfsS "$BASE/margin-calculators/v9-1/" | grep -q 'Загрузка v9.1'
+          curl -LfsS "$BASE/margin-calculators/v10-1/" | grep -q 'Загрузка v10.1'
+          curl -LfsS "$BASE/margin-calculators/ai-proxy/setup.html" | grep -q 'Подключение AI к v9.1 и v10.1'
           for n in 00 01 02 03 04; do curl -LfsS -o /dev/null "$BASE/margin-calculators/v9/part-$n.b64"; done
           for n in 00 01 02 03 04 05; do curl -LfsS -o /dev/null "$BASE/margin-calculators/v10/part-$n.b64"; done
+          : > /tmp/v91-patch.js
+          for n in 1 2 3; do curl -LfsS "$BASE/margin-calculators/v9-1/patch-$n.txt" >> /tmp/v91-patch.js; done
+          curl -LfsS "$BASE/margin-calculators/v10-1/patch.js" -o /tmp/v101-patch.js
+          curl -LfsS "$BASE/margin-calculators/ai-proxy/calculator_ai_proxy_v2.js" -o /tmp/calculator-ai-proxy.js
+          node --check /tmp/v91-patch.js
+          node --check /tmp/v101-patch.js
+          node --check /tmp/calculator-ai-proxy.js
+          grep -q 'v91-scroll-top' /tmp/v91-patch.js
+          grep -q 'v91-shares' /tmp/v91-patch.js
+          grep -q 'Резерв, остающийся в бизнесе' /tmp/v91-patch.js
+          grep -q 'v101Conclusion' /tmp/v101-patch.js
           cat > margin-calculators/deployment-status.json <<JSON
           {
             "status": "verified",
@@ -70,7 +87,10 @@ jobs:
             "commit": "${GITHUB_SHA}",
             "launcher": "$BASE/margin-calculators/",
             "v9": "$BASE/margin-calculators/v9/",
-            "v10": "$BASE/margin-calculators/v10/"
+            "v10": "$BASE/margin-calculators/v10/",
+            "v9_1": "$BASE/margin-calculators/v9-1/",
+            "v10_1": "$BASE/margin-calculators/v10-1/",
+            "ai_setup": "$BASE/margin-calculators/ai-proxy/setup.html"
           }
           JSON
       - name: Record verified deployment
