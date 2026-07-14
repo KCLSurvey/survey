@@ -21,6 +21,8 @@ jobs:
           const p='tools/extract_calculator_sources.js';
           let s=fs.readFileSync(p,'utf8');
           s=s.replace("function v9Expense(overrides={}){return Object.assign({en:true,name:'Test',applies:'all',mode:'period'","function v9Expense(overrides={}){return Object.assign({en:true,name:'Test',applies:'all',mode:'annual'");
+          s=s.replaceAll("treat:'contraRevenue',mode:'period'","treat:'contraRevenue',mode:'annual'");
+          s=s.replaceAll("treat:'cogs',mode:'period'","treat:'cogs',mode:'annual'");
           s=s.replace("const d=r.expenseDetails.find(z=>z.id==='sales_team');approx(d.pnl,x[0],0.02,vatTreatment+' pnl');approx(d.cash,x[1],0.02,vatTreatment+' cash');approx(d.recoverableVat,x[2],0.02,vatTreatment+' vat')","const ds=r.expenseDetails.filter(z=>z.id==='sales_team');approx(ds.reduce((a,z)=>a+z.pnl,0),x[0],0.02,vatTreatment+' pnl');approx(ds.reduce((a,z)=>a+z.cash,0),x[1],0.02,vatTreatment+' cash');approx(ds.reduce((a,z)=>a+z.recoverableVat,0),x[2],0.02,vatTreatment+' vat')");
           fs.writeFileSync(p,s);
           NODE
