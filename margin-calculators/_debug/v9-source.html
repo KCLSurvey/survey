@@ -1,0 +1,2001 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5" />
+  <meta name="theme-color" content="#2563eb" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Маржа v9" />
+  <title>Калькулятор прибыли, денежных средств, каналов продаж, P&L и КПН</title>
+  
+  <style>
+    :root{
+      --bg:#f7f7f3; --card:#ffffff; --ink:#1d1d1f; --muted:#6b7280; --line:#d9d9d2;
+      --accent:#2563eb; --accent-soft:#dbeafe; --good:#166534; --bad:#b91c1c; --warn:#a16207;
+      --soft:#fbfbf8; --shadow:0 8px 24px rgba(0,0,0,.06); --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);font-family:Inter,Arial,sans-serif;color:var(--ink);line-height:1.35}
+    header{padding:28px 28px 14px;max-width:1900px;margin:auto}
+    h1{font-size:26px;margin:0 0 8px;font-weight:780;letter-spacing:-.02em}
+    h2{font-size:15px;text-transform:uppercase;letter-spacing:.08em;color:#444;margin:4px 0 14px}
+    h3{font-size:15px;margin:0 0 10px;color:#111}
+    .sub{color:var(--muted);font-size:14px;max-width:1300px}
+    main{max-width:1900px;margin:0 auto 40px;padding:0 28px 28px;display:grid;gap:16px}
+    .grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;min-width:0}
+    .span-12{grid-column:span 12}.span-8{grid-column:span 8}.span-6{grid-column:span 6}.span-5{grid-column:span 5}.span-4{grid-column:span 4}.span-3{grid-column:span 3}
+    .control{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+    .control-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    input,select,button,textarea{font:inherit}
+    input[type=number],input[type=text],select,textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff;color:var(--ink)}
+    input[type=range]{width:100%;accent-color:var(--accent)}
+    button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 12px;cursor:pointer}
+    button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+    button:hover{filter:brightness(.98)}
+    .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .note,.formula,.warn-note,.good-note{font-size:13px;border-radius:12px;padding:10px 12px;margin-top:10px}
+    .note{background:var(--soft);border:1px solid var(--line);color:#444}
+    .formula{background:#f3f4f6;border:1px solid #e5e7eb;color:#374151}
+    .warn-note{background:#fff7ed;border:1px solid #fed7aa;color:#7c2d12}
+    .good-note{background:#f0fdf4;border:1px solid #bbf7d0;color:#14532d}
+    .kpi-section{margin-bottom:14px}.kpi-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#555;margin:0 0 8px}
+    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+    .kpi{border:1px solid var(--line);border-radius:14px;padding:13px;background:var(--soft);min-height:92px;min-width:0;overflow-wrap:anywhere}
+    .kpi .name{font-size:12px;color:var(--muted);margin-bottom:6px}.kpi .val{font-size:19px;font-weight:780;letter-spacing:-.02em;overflow-wrap:anywhere}.kpi .small{font-size:11px;color:var(--muted);margin-top:5px}
+    .kpi.good .val,.positive{color:var(--good)}.kpi.bad .val,.negative{color:var(--bad)}.kpi.warn .val{color:var(--warn)}
+    .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px;background:#fff}
+    table{width:100%;border-collapse:collapse;font-size:13px;min-width:680px}
+    th,td{border-bottom:1px solid #eee;padding:8px 9px;text-align:right;vertical-align:middle;white-space:nowrap}
+    th:first-child,td:first-child{text-align:left}
+    th{background:#fafafa;color:#555;font-weight:700;position:sticky;top:0;z-index:1}
+    tr:last-child td{border-bottom:0}.subtotal-row td{font-weight:800;background:#fafafa}.memo-row td{color:#555;background:#fcfcfc}
+    .small-table{min-width:720px}.param-table{min-width:1380px}.param-table input,.param-table select{font-size:12px;padding:6px}.param-name{min-width:230px}.wide-select{min-width:145px}
+    .mixbar{height:16px;border-radius:999px;background:#e5e7eb;overflow:hidden;display:flex;margin-top:12px}
+    .mixbar div{height:100%}.bar-dtc{background:#2563eb}.bar-retail{background:#16a34a}.bar-partner{background:#f59e0b}
+    .mini{font-size:12px;color:var(--muted);margin-top:8px}.legend{display:flex;gap:10px;flex-wrap:wrap}.legend span{font-size:12px;color:#555}.dot{display:inline-block;width:10px;height:10px;border-radius:99px;margin-right:5px;vertical-align:-1px}
+    textarea{min-height:120px;resize:vertical}.chat-log{height:260px;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px}.chat-msg{padding:9px 10px;border-radius:12px;margin:8px 0;font-size:13px}.chat-user{background:#eff6ff;margin-left:24px}.chat-bot{background:#f8fafc;margin-right:24px;border:1px solid #e5e7eb}.chat-input{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}
+    @media(max-width:1200px){.grid{grid-template-columns:1fr}.span-12,.span-8,.span-6,.span-5,.span-4,.span-3{grid-column:span 1}.control,.control-3{grid-template-columns:1fr}}
+  
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior-y:none}
+body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+button,input,select,textarea{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.table-wrap{-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.ios-install-bar{position:fixed;left:10px;right:10px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:120;background:rgba(255,255,255,.96);backdrop-filter:blur(18px);border:1px solid #cbd5e1;border-radius:15px;box-shadow:0 14px 35px rgba(15,23,42,.18);padding:10px 42px 10px 12px;display:flex;align-items:center;gap:10px}
+.ios-install-bar[hidden]{display:none!important}.ios-install-bar div{flex:1;min-width:0}.ios-install-bar b{display:block;font-size:12px}.ios-install-bar span{display:block;font-size:10.5px;color:#64748b;margin-top:2px}.ios-install-bar button{min-height:38px;padding:7px 10px;font-size:11px;font-weight:750}.ios-install-close{position:absolute;right:6px;top:4px;border:0!important;background:transparent!important;font-size:20px!important;padding:4px!important;min-height:32px!important}
+.ios-install-sheet{position:fixed;inset:0;z-index:200}.ios-install-sheet[hidden]{display:none!important}.ios-sheet-backdrop{position:absolute;inset:0;background:rgba(15,23,42,.36)}.ios-sheet-card{position:absolute;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));background:#fff;border-radius:20px;padding:10px 18px 18px;box-shadow:0 24px 60px rgba(15,23,42,.3)}.ios-sheet-handle{width:38px;height:5px;border-radius:99px;background:#d1d5db;margin:0 auto 12px}.ios-sheet-card h3{font-size:18px;margin:0 0 10px}.ios-sheet-card ol{margin:0;padding-left:22px}.ios-sheet-card li{margin:9px 0;font-size:14px;line-height:1.4}.ios-sheet-card p{font-size:12px;color:#64748b}.ios-sheet-done{width:100%;min-height:46px;border-radius:12px;background:#183153!important;color:#fff!important;border:0!important;font-weight:800}
+@media(max-width:760px){
+  input,select,textarea{font-size:16px!important}
+  button,.file-label{min-height:44px}
+  body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+  .card{border-radius:14px;box-shadow:0 5px 16px rgba(15,23,42,.06)}
+  .table-wrap{max-width:100%;border-radius:10px}
+}
+@media(display-mode:standalone){.ios-install-bar{display:none!important}}
+
+.mobile-dock{display:none}
+@media(max-width:760px){
+  header{padding:calc(12px + env(safe-area-inset-top)) 10px 8px}header h1{font-size:20px;line-height:1.15}.sub{font-size:12px}
+  main{padding:0 8px 20px;gap:10px}.grid{gap:10px}.card{padding:12px}
+  #desktop_tabs{display:none!important}
+  .control,.control-3{gap:8px;margin-bottom:8px}
+  .kpi-grid{grid-template-columns:1fr 1fr;gap:8px}.kpi{padding:10px;min-height:82px}.kpi .val{font-size:17px}
+  .btns{gap:6px}.btns button{flex:1 1 46%}
+  .mobile-dock{display:grid;grid-template-columns:1fr 1fr 72px;position:fixed;left:8px;right:8px;bottom:calc(6px + env(safe-area-inset-bottom));z-index:90;background:rgba(255,255,255,.96);backdrop-filter:blur(18px);border:1px solid #cbd5e1;border-radius:16px;padding:5px;box-shadow:0 14px 35px rgba(15,23,42,.2);gap:4px}
+  .mobile-dock button{border:0;background:transparent;min-height:48px;border-radius:11px;font-size:11px;font-weight:750;color:#64748b;padding:4px}.mobile-dock button.active{background:#dbeafe;color:#1d4ed8}.mobile-dock .top-btn{font-size:17px}
+  #multi-view{padding:0 8px 28px!important}.table-wrap{max-height:65vh!important}
+  #multi_table th:first-child,#multi_table td:first-child{position:sticky;left:0;z-index:3;background:#fff}
+  #multi_table th:nth-child(2),#multi_table td:nth-child(2){position:sticky;left:36px;z-index:3;background:#fff;box-shadow:3px 0 5px rgba(15,23,42,.05)}
+  .chat-input{grid-template-columns:1fr}.chat-input button{width:100%}
+}
+
+</style>
+
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+<meta name="color-scheme" content="light">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+
+</head>
+<body>
+<header>
+  <h1>Калькулятор маржи, трёх каналов, P&L, КПН и денег собственника</h1>
+  <div class="sub">Версия v9.0: P&L, денежный результат собственника и портфель до 30 SKU из CSV/XLSX. Полностью оффлайн. Расходы можно назначать всем, выбранным или исключённым SKU.</div>
+</header>
+
+<!-- Modern clean tabs (2025-2026 UI trend: minimal, high-contrast active state, clear separation) -->
+<div id="desktop_tabs" style="max-width:1900px;margin:0 auto 8px;padding:0 28px;display:flex;gap:8px;border-bottom:1px solid #e5e7eb;flex-wrap:wrap;align-items:center;">
+  <button onclick="switchView('single')" id="tab-single"
+          style="padding:11px 20px;border:none;background:#fff;color:#111;font-weight:600;border-bottom:3px solid #2563eb;cursor:pointer;font-size:14.5px;white-space:nowrap;">📊 Анализ одной позиции</button>
+  <button onclick="switchView('multi')" id="tab-multi"
+          style="padding:11px 20px;border:none;background:#fff;color:#555;font-weight:500;border-bottom:3px solid transparent;cursor:pointer;font-size:14.5px;white-space:nowrap;">📦 Портфель позиций (до 30, CSV/XLSX)</button>
+  <div style="flex:1; min-width:60px;"></div>
+
+  <!-- PWA Install Button -->
+  <button id="install-btn"
+          onclick="installPWA()"
+          style="display:none; padding:7px 13px; border-radius:999px; border:1px solid #2563eb; background:#fff; color:#2563eb; font-size:12.5px; font-weight:600; cursor:pointer; white-space:nowrap; align-items:center; gap:5px;">
+    ⬇️ Установить приложение
+  </button>
+
+  <div style="align-self:center;font-size:11px;color:#6b7280;padding-right:4px;white-space:nowrap;">Оффлайн • данные только у вас</div>
+</div>
+
+<div id="single-view">
+<main>
+  <section class="grid">
+    <div class="card span-3">
+      <h2>1. Цена, НДС, себестоимость</h2>
+      <div class="control">
+        <div><label>РРЦ / цена на полке</label><input id="rrp" type="number" value="550000" step="1000" min="0"><input id="rrp_range" type="range" value="550000" min="0" max="5000000" step="1000"></div>
+        <div><label>Режим РРЦ</label><select id="rrp_mode"><option value="gross" selected>с НДС</option><option value="net">без НДС</option></select></div>
+      </div>
+      <div class="control">
+        <div><label>Артикул / SKU текущей позиции</label><input id="single_sku" type="text" value="" placeholder="например, HRTN7489DFBBKCS"></div>
+        <div><label>Целевая Gross Margin, %</label><input id="single_target_margin" type="number" value="35" step="0.5" min="0" max="90"><input id="single_target_margin_range" type="range" value="35" min="0" max="90" step="0.5"></div>
+      </div>
+      <div class="control">
+        <div><label>Себестоимость / COGS</label><input id="cogs" type="number" value="280000" step="1000" min="0"><input id="cogs_range" type="range" value="280000" min="0" max="1500000" step="1000"></div>
+        <div><label>Режим COGS</label><select id="cogs_mode"><option value="net" selected>без НДС</option><option value="gross">с НДС</option></select></div>
+      </div>
+      <div class="control">
+        <div><label>НДС, %</label><input id="vat" type="number" value="12" step="0.1" min="0" max="30"><input id="vat_range" type="range" value="12" min="0" max="30" step="0.1"></div>
+        <div><label>Входящий НДС по COGS</label><select id="vat_recoverable"><option value="yes" selected>зачётный</option><option value="no">невозмещаемый</option></select></div>
+      </div>
+      <div class="control">
+        <div><label>КПН / налог на прибыль, %</label><input id="income_tax" type="number" value="20" step="0.1" min="0" max="50"><input id="income_tax_range" type="range" value="20" min="0" max="50" step="0.1"></div>
+        <div><label>Показатель управленческой маржи</label><select id="margin_basis"><option value="ifrs" selected>IFRS / gross margin</option><option value="cash_gross">Cash view: с НДС / с НДС</option><option value="net_revenue_cogs_gross">Revenue без НДС / COGS с НДС</option><option value="markup_on_cogs">Markup: GP / COGS</option></select></div>
+      </div>
+      <div class="good-note">Если COGS 280 000 ₸ уже включает все расходы, относимые к себестоимости, не добавляйте эти же расходы в разделе 4 как COGS повторно.</div>
+    </div>
+
+    <div class="card span-3">
+      <h2>2. Каналы продаж</h2>
+      <div class="control">
+        <div><label>Продаж всего, шт/год</label><input id="units_total" type="number" value="100" step="1" min="0"><input id="units_total_range" type="range" value="100" min="0" max="10000" step="1"></div>
+        <div><label>Скидка DTC от РРЦ, %</label><input id="dtc_discount" type="number" value="0" step="0.1" min="0" max="80"><input id="dtc_discount_range" type="range" value="0" min="0" max="80" step="0.1"></div>
+      </div>
+      <div class="control-3">
+        <div><label>Доля/вес DTC, %</label><input id="share_dtc" type="number" value="50" step="1" min="0" max="100"><input id="share_dtc_range" type="range" value="50" min="0" max="100" step="1"></div>
+        <div><label>Доля/вес сетей, %</label><input id="share_retail" type="number" value="50" step="1" min="0" max="100"><input id="share_retail_range" type="range" value="50" min="0" max="100" step="1"></div>
+        <div><label>Доля/вес др. партнёров, %</label><input id="share_partner" type="number" value="0" step="1" min="0" max="100"><input id="share_partner_range" type="range" value="0" min="0" max="100" step="1"></div>
+      </div>
+      <div class="control">
+        <div><label>Комиссия / маржа сети от РРЦ, %</label><input id="retail_commission" type="number" value="25" step="0.1" min="0" max="50"><input id="retail_commission_range" type="range" value="25" min="0" max="50" step="0.1"></div>
+        <div><label>Комиссия партнёров от РРЦ, %</label><input id="partner_commission" type="number" value="15" step="0.1" min="0" max="50"><input id="partner_commission_range" type="range" value="15" min="0" max="50" step="0.1"></div>
+      </div>
+      <div class="note">DTC = прямые продажи без комиссии посредника. Сети и партнёры получают свою комиссию/маржу от РРЦ: sell-in = РРЦ × (1 − комиссия канала). Если сумма долей не равна 100%, модель нормализует их до 100% и показывает фактический mix ниже.</div>
+    </div>
+
+    <div class="card span-6">
+      <h2>3. Итоговые KPI</h2>
+      <div id="kpi_groups"></div>
+      <div class="formula" id="quick_formula"></div>
+      <div id="model_warnings"></div>
+      <div class="btns">
+        <button class="primary" onclick="recalc()">Пересчитать</button>
+        <button onclick="saveScenario()">Сохранить</button>
+        <button onclick="loadScenario()">Загрузить</button>
+        <button onclick="copyKPI()">Скопировать KPI</button>
+        <button onclick="exportCSV()">Экспорт CSV</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="card span-8">
+      <h2>4. Гибкие параметры затрат, скидок и коммерческих условий</h2>
+      <div class="warn-note">Строки раздела 4 добавляются поверх раздела 1. В колонке «Канал» можно выбрать один канал или комбинацию каналов без добавления новых строк. В колонке «КПН» задаётся, уменьшает ли строка налоговую базу.</div>
+      <div class="table-wrap" style="margin-top:12px">
+        <table class="param-table" id="params_table"><thead><tr><th>Статус</th><th>Параметр</th><th>Канал</th><th>SKU</th><th>Список SKU</th><th>Метод</th><th>Сумма</th><th>Слайдер суммы</th><th>%</th><th>Слайдер %</th><th>База %</th><th>P&L</th><th>НДС расхода</th><th>КПН</th><th></th></tr></thead><tbody></tbody></table>
+      </div>
+      <div class="btns"><button class="primary" onclick="addParam()">+ Добавить параметр</button><button onclick="resetDefaults()">Сбросить параметры</button></div>
+      <div id="expense_review_summary" class="note"></div>
+      <div class="formula">Статус «Учесть» включает расход; «Не применимо» подтверждает его отсутствие; «Проверить» оставляет контрольное предупреждение. В «НДС расхода» укажите, введена сумма без НДС либо с НДС и является ли НДС зачётным. SKU можно перечислять через запятую или точку с запятой. P&L: «Минус выручка» уменьшает Net revenue; «COGS» уменьшает Gross profit; «Variable selling» уменьшает Contribution margin; «Marketing» и «Fixed OPEX» уменьшают EBITDA; «D&A» уменьшает EBIT; «Finance» уменьшает PBT. Если КПН = «Выч.», расход уменьшает налоговую базу; если «Не выч.», он добавляется обратно при расчёте КПН.</div>
+    </div>
+
+    <div class="card span-4">
+      <h2>5. Расшифровка каналов</h2>
+      <div class="table-wrap" style="max-height:none">
+        <table class="small-table" id="channel_table"><thead><tr><th>Показатель</th><th>DTC</th><th>Сети</th><th>Др. партнёры</th><th>Итого</th></tr></thead><tbody></tbody></table>
+      </div>
+      <div class="mixbar"><div id="bar_dtc" class="bar-dtc"></div><div id="bar_retail" class="bar-retail"></div><div id="bar_partner" class="bar-partner"></div></div>
+      <div class="legend"><span><i class="dot" style="background:#2563eb"></i>DTC</span><span><i class="dot" style="background:#16a34a"></i>Сети</span><span><i class="dot" style="background:#f59e0b"></i>Партнёры</span></div>
+      <div class="mini" id="mix_note"></div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="card span-6">
+      <h2>6. P&L годовой</h2>
+      <div class="table-wrap" style="max-height:none"><table id="pl_table"><thead><tr><th>Статья</th><th>Сумма</th><th>% от Net revenue</th><th>на ед.</th></tr></thead><tbody></tbody></table></div>
+      <h3 style="margin-top:14px;">Расшифровка активных расходов</h3>
+      <div class="table-wrap" style="max-height:300px"><table id="expense_breakdown_table"><thead><tr><th>Расход</th><th>P&L</th><th>Сумма</th><th>на ед.</th><th>Зачётный НДС</th><th>КПН</th></tr></thead><tbody></tbody></table></div>
+    </div>
+    <div class="card span-6">
+      <h2>7. Сценарии чувствительности</h2>
+      <div class="table-wrap" style="max-height:none"><table id="scenario_table"><thead><tr><th>Сценарий</th><th>Gross margin</th><th>Markup</th><th>EBITDA</th><th>Net profit</th><th>Break-even, шт</th></tr></thead><tbody></tbody></table></div>
+      <div class="formula" id="breakeven_note"></div>
+    </div>
+  </section>
+
+
+  <section class="grid">
+    <div class="card span-12">
+      <h2>8. Денежные средства, доступные собственнику</h2>
+      <div class="control-3">
+        <div><label>Изменение запасов, ₸ (+ рост / − снижение)</label><input id="cash_inventory_increase" type="number" value="0" step="100000"></div>
+        <div><label>Изменение дебиторки, ₸ (+ рост / − снижение)</label><input id="cash_ar_increase" type="number" value="0" step="100000"></div>
+        <div><label>Изменение кредиторки, ₸ (+ рост / − снижение)</label><input id="cash_ap_increase" type="number" value="0" step="100000"></div>
+      </div>
+      <div class="control-3">
+        <div><label>CAPEX / покупка оборудования, ₸</label><input id="cash_capex" type="number" value="0" step="100000"></div>
+        <div><label>Погашение тела кредитов, ₸</label><input id="cash_loan_principal" type="number" value="0" step="100000"></div>
+        <div><label>Прочие денежные выплаты, ₸</label><input id="cash_other_outflows" type="number" value="0" step="100000"></div>
+      </div>
+      <div class="control-3">
+        <div><label>Резерв денег, остающийся в бизнесе, ₸</label><input id="cash_reserve" type="number" value="0" step="100000"></div>
+        <div><label>Налог/удержание при выводе собственнику, %</label><input id="owner_tax_rate" type="number" value="0" step="0.1" min="0" max="50"></div>
+        <div><label>Период расчёта</label><input type="text" value="тот же период, что объём и P&L" readonly></div>
+      </div>
+      <div id="cash_kpis" class="kpi-grid"></div>
+      <div class="formula">Доступно собственнику = Net profit + D&A − изменение запасов − изменение дебиторки + изменение кредиторки − CAPEX − тело кредита − прочие выплаты − резерв бизнеса − налог/удержание при выводе. Показатель не заменяет юридическое решение о дивидендах.</div>
+    </div>
+  </section>
+  <section class="grid">
+    <div class="card span-6">
+      <h2>9. Памятка по строкам P&L</h2>
+      <div class="note">
+        <b>Sell-out GSV на полке с НДС</b> — оборот по РРЦ на стороне клиента, memo-показатель.<br>
+        <b>Gross invoiced revenue с НДС</b> — сумма счёта/оплаты компании после комиссии канала или DTC-скидки.<br>
+        <b>Net revenue без НДС</b> — выручка без НДС после contra revenue / бонусов.<br>
+        <b>COGS</b> — себестоимость товара и дополнительные COGS-строки.<br>
+        <b>Net profit after tax</b> — итоговая чистая прибыль после КПН в модели.<br>
+        <b>Net profit / COGS</b> — чистая прибыль к себестоимости товара. Это не markup; markup = Gross profit / COGS.
+      </div>
+    </div>
+    <div class="card span-6">
+      <h2>10. Допущения / копирование</h2>
+      <textarea id="assumptions" readonly></textarea>
+      <div class="btns"><button onclick="copyAssumptions()">Скопировать допущения</button></div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="card span-12">
+      <h2>11. Встроенный аналитический чат по модели</h2>
+      <div class="chat-log" id="chat_log"><div class="chat-msg chat-bot">Задайте вопрос по текущей модели: например, «почему Net profit упал», «сколько дают партнёры», «какой Net profit / COGS по сетям», «что будет если комиссия сети выше».</div></div>
+      <div class="chat-input"><input id="chat_input" type="text" placeholder="Напишите вопрос по цифрам калькулятора"><button class="primary" onclick="askLocalChat()">Ответить</button></div>
+      <div class="mini">Это локальный помощник с правилами по текущей модели, не внешний ИИ API.</div>
+    </div>
+  </section>
+</main>
+</div>
+
+<!-- ==================== MULTI-POSITION PORTFOLIO VIEW ==================== -->
+<div id="multi-view" style="display:none; max-width:1900px; margin:0 auto; padding:0 28px 40px;">
+  <div style="background:#fff;border:1px solid #d9d9d2;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.06);padding:24px;margin-bottom:16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h2 style="margin:0 0 4px;font-size:19px;">Анализ портфеля позиций (до 30 наименований)</h2>
+        <div style="color:#6b7280;font-size:13px;">Загрузите CSV/XLSX → Получите Landed COGS, цены для целевой маржи, чистую прибыль и деньги собственника</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button onclick="downloadMultiTemplate()" style="padding:8px 14px;border-radius:10px;border:1px solid #d9d9d2;background:#fff;cursor:pointer;font-size:13px;">📥 Шаблон CSV</button>
+        <label style="padding:8px 14px;border-radius:10px;border:1px solid #2563eb;background:#2563eb;color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:13px;">
+          📤 Загрузить CSV / XLSX
+          <input type="file" id="multi_file" accept=".csv,.txt,.xlsx" style="display:none;" onchange="handleMultiFileUpload(event)">
+        </label>
+        <button onclick="clearMultiTable()" style="padding:8px 14px;border-radius:10px;border:1px solid #d9d9d2;background:#fff;cursor:pointer;font-size:13px;">🗑 Очистить</button>
+      </div>
+    </div>
+
+    <div id="multi_upload_zone" style="border:2px dashed #d9d9d2;border-radius:12px;padding:22px;text-align:left;margin-bottom:14px;background:#fafafa;display:block;">
+      <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;">
+        <div style="font-size:38px;line-height:1;">📦</div>
+        <div style="flex:1;min-width:300px;">
+          <div style="font-weight:700;margin-bottom:5px;">Загрузка портфеля из CSV или XLSX</div>
+          <div style="font-size:12px;color:#374151;margin-bottom:8px;">Кириллица поддерживается. Рекомендуемый формат — CSV UTF-8. Кнопка «Шаблон CSV» скачивает файл с BOM и строкой <b>sep=;</b>, чтобы Excel в Windows корректно показывал русский текст.</div>
+          <div style="font-size:12px;color:#6b7280;line-height:1.5;">
+            <b>Можно с заголовками:</b> Наименование; Артикул; Количество; Закупочная_цена_тенге; Целевая_маржа_процент; Ручной_uplift_процент.<br>
+            <b>Можно без заголовков:</b> 1) наименование, 2) артикул, 3) количество, 4) закупочная цена, 5) целевая маржа %.<br>
+            <b>Разделители:</b> точка с запятой, запятая или tab. <b>Числа:</b> 310 027.00, 310 027,00 или 310027. Максимум 30 строк.<br>
+            <b>XLSX:</b> читается напрямую из первого листа без внешнего сервера. Формулы берутся по сохранённым в файле значениям.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:10px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+      <div style="flex:1;min-width:200px;">
+        <label style="font-size:11px;color:#555;display:block;margin-bottom:3px;">Глобальная целевая Gross Margin текущего mix, %</label>
+        <input id="multi_target_margin" type="number" value="35" step="0.5" min="0" max="90" style="width:110px;padding:7px 9px;border-radius:9px;border:1px solid #d9d9d2;">
+      </div>
+      <div>
+        <button onclick="applyGlobalTargetToAll()" style="padding:9px 16px;border-radius:9px;border:1px solid #2563eb;background:#fff;color:#2563eb;cursor:pointer;font-size:13px;">Применить GM ко всем SKU</button>
+      </div>
+      <div>
+        <button onclick="syncFromSingleModel()" style="padding:9px 16px;border-radius:9px;background:#2563eb;color:#fff;border:none;cursor:pointer;font-size:13px;">🔄 Синхронизировать из основной модели</button>
+      </div>
+      <div style="font-size:11px;color:#6b7280;max-width:340px;">Синхронизация применяет НДС, режим COGS, комиссии, КПН, денежные корректировки и активные расходы с назначением по SKU.</div>
+    </div>
+    <div id="multi_warnings"></div>
+
+    <!-- Quick Demo Buttons for immediate testing of the multi tab -->
+    <div style="margin-bottom:14px; padding:10px 14px; background:#f8fafc; border:1px solid #e5e7eb; border-radius:10px;">
+      <div style="font-size:11px; color:#555; margin-bottom:6px; font-weight:600;">Быстрые демо-примеры (нажмите, чтобы сразу увидеть работу вкладки):</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button onclick="loadDemoMulti(2)" style="padding:6px 12px; font-size:12px; border-radius:8px; border:1px solid #d1d5db; background:#fff; cursor:pointer;">2 позиции (электроника)</button>
+        <button onclick="loadDemoMulti(3)" style="padding:6px 12px; font-size:12px; border-radius:8px; border:1px solid #d1d5db; background:#fff; cursor:pointer;">3 позиции (разные uplift)</button>
+        <button onclick="loadDemoMulti(4)" style="padding:6px 12px; font-size:12px; border-radius:8px; border:1px solid #d1d5db; background:#fff; cursor:pointer;">4 позиции (смешанный портфель)</button>
+        <button onclick="loadDemoMulti(6)" style="padding:6px 12px; font-size:12px; border-radius:8px; border:1px solid #d1d5db; background:#fff; cursor:pointer;">6 позиций (полный пример)</button>
+      </div>
+      <div style="font-size:10.5px; color:#6b7280; margin-top:5px;">После загрузки демо нажмите «Рассчитать цены» или «Синхронизировать», чтобы увидеть реальные цифры по вашей модели.</div>
+    </div>
+
+    <div class="table-wrap" style="max-height:480px;overflow:auto;border-radius:12px;">
+      <table id="multi_table" style="min-width:1780px;font-size:12.5px;">
+        <thead style="position:sticky;top:0;z-index:2;background:#f8f9fa;">
+          <tr>
+            <th style="width:36px;text-align:center;">#</th>
+            <th style="min-width:200px;text-align:left;">Наименование</th>
+            <th style="min-width:110px;">Артикул</th>
+            <th style="width:78px;">Кол-во</th>
+            <th style="width:118px;">Закупочная (₸)</th>
+            <th style="width:92px;">Ручной uplift %</th>
+            <th style="width:92px;">Итог. uplift %</th>
+            <th style="width:128px;background:#f0fdf4;">Landed COGS (₸)</th>
+            <th style="width:92px;">Target GM %</th>
+            <th style="width:128px;background:#eff6ff;">Рек. единая РРЦ с НДС</th>
+            <th style="width:128px;background:#fefce8;">Рек. sell-in сети с НДС</th>
+            <th style="width:98px;">GP / ед. (mix)</th>
+            <th style="width:110px;">Net profit / ед. (mix)</th>
+            <th style="width:120px;">Собственнику / ед. (mix)</th>
+            <th style="width:82px;">GM (mix)</th>
+            <th style="width:110px;text-align:center;">Детали / ×</th>
+          </tr>
+        </thead>
+        <tbody id="multi_tbody"></tbody>
+        <tfoot id="multi_tfoot" style="font-weight:700;background:#fafafa;position:sticky;bottom:0;"></tfoot>
+      </table>
+    </div>
+    <div id="multi_detail_panel" class="note" style="display:none;margin-top:10px;"></div>
+
+    <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center;">
+      <div style="font-size:11.5px;color:#6b7280;">
+        Редактируйте исходные данные напрямую. Итоговый uplift и Landed COGS рассчитываются из ручного uplift и активных COGS-расходов, назначенных SKU.
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="calculateMultiPrices()" style="padding:9px 16px;border-radius:9px;background:#2563eb;color:#fff;border:none;cursor:pointer;font-weight:600;font-size:13px;">⚡ Рассчитать / Обновить цены</button>
+        <button onclick="exportMultiToCSV()" style="padding:9px 14px;border-radius:9px;border:1px solid #d9d9d2;background:#fff;font-size:13px;">📤 Экспорт CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="note" style="max-width:100%;font-size:12px;">
+    <b>Логика:</b> Landed COGS включает базовую учётную себестоимость, ручной uplift и только активные расходы с P&L-классификацией COGS, применимые к конкретному SKU. Единая РРЦ и sell-in сети рассчитываются обратным способом так, чтобы Gross Margin текущего mix каналов без НДС совпала с Target GM. Остальные расходы, КПН и денежные корректировки отражаются отдельно в Net profit и сумме собственнику по текущему mix каналов. Общие годовые денежные корректировки распределяются между SKU пропорционально количеству единиц.
+  </div>
+</div>
+
+
+<div id="ios_install_bar" class="ios-install-bar" hidden>
+  <div><b>Установить как приложение</b><span>Будет открываться с экрана «Домой».</span></div>
+  <button type="button" onclick="showIosInstallGuide()">Как установить</button>
+  <button type="button" class="ios-install-close" onclick="dismissIosInstall()" aria-label="Закрыть">×</button>
+</div>
+<div id="ios_install_sheet" class="ios-install-sheet" hidden role="dialog" aria-modal="true" aria-label="Установка приложения">
+  <div class="ios-sheet-backdrop" onclick="hideIosInstallGuide()"></div>
+  <div class="ios-sheet-card">
+    <div class="ios-sheet-handle"></div>
+    <h3>Установка на iPhone</h3>
+    <ol>
+      <li>Откройте эту страницу в <b>Safari</b>. Если она открыта внутри ChatGPT, используйте «Поделиться» → «Открыть в Safari».</li>
+      <li>Нажмите кнопку <b>Поделиться</b> в Safari.</li>
+      <li>Выберите <b>На экран «Домой»</b>, затем <b>Добавить</b>.</li>
+    </ol>
+    <p>После установки калькулятор открывается как отдельное приложение и работает офлайн после первого успешного запуска.</p>
+    <button type="button" class="ios-sheet-done" onclick="hideIosInstallGuide()">Понятно</button>
+  </div>
+</div>
+
+<nav class="mobile-dock" aria-label="Навигация приложения"><button id="mobile_tab_single" class="active" onclick="switchView('single')">Одна позиция</button><button id="mobile_tab_multi" onclick="switchView('multi')">Портфель</button><button class="top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Наверх">↑</button></nav>
+
+<script>
+const fmt = new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0});
+const fmt1 = new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1});
+function money(v){return (isFinite(v)?fmt.format(Math.round(v)):'—')+' ₸'}
+function pct(v){return isFinite(v)?fmt1.format(v*100)+'%':'—'}
+function n(id){const el=document.getElementById(id); return el ? (parseFloat(el.value)||0) : 0}
+function s(id){const el=document.getElementById(id); return el ? el.value : ''}
+function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
+function safeDiv(a,b){return b ? a/b : 0}
+function escapeHtml(str){return String(str).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+
+const defaultParams = [
+  {en:false,name:'Складская логистика после прихода на склад',applies:'all',mode:'pct',amount:0,pct:3,base:'cogsAccounting',treat:'variableSelling',tax:'yes'},
+  {en:false,name:'Входящая логистика / доведение до состояния продажи',applies:'all',mode:'unit',amount:4500,pct:0,base:'cogsNet',treat:'cogs',tax:'yes'},
+  {en:false,name:'Таможня / пошлина / сертификация',applies:'all',mode:'pct',amount:0,pct:3,base:'cogsNet',treat:'cogs',tax:'yes'},
+  {en:false,name:'Резерв гарантии / возвратов',applies:'all',mode:'pct',amount:0,pct:2,base:'channelRevenueNet',treat:'variableSelling',tax:'yes'},
+  {en:false,name:'Эквайринг DTC',applies:'dtc',mode:'pct',amount:0,pct:2.2,base:'channelInvoiceGross',treat:'variableSelling',tax:'yes'},
+  {en:false,name:'Доставка последней мили DTC',applies:'dtc',mode:'unit',amount:3000,pct:0,base:'channelRevenueNet',treat:'variableSelling',tax:'yes'},
+  {en:false,name:'Бонус / ретро-бонус сети',applies:'retail',mode:'pct',amount:0,pct:3,base:'channelRevenueNet',treat:'contraRevenue',tax:'yes'},
+  {en:false,name:'Trade marketing сети',applies:'retail',mode:'pct',amount:0,pct:3,base:'rrpShelfNet',treat:'marketing',tax:'yes'},
+  {en:false,name:'Комиссия / бонус партнёрам сверх основной комиссии',applies:'partner',mode:'pct',amount:0,pct:2,base:'channelRevenueNet',treat:'contraRevenue',tax:'yes'},
+  {en:false,name:'Маркетинг performance/media',applies:'all',mode:'annual',amount:8000000,pct:0,base:'netRevenueBeforeContraTotal',treat:'marketing',tax:'yes'},
+  {en:false,name:'Команда продаж / коммерческий OPEX',applies:'all',mode:'annual',amount:6000000,pct:0,base:'netRevenueBeforeContraTotal',treat:'fixedOpex',tax:'yes'},
+  {en:false,name:'Админ/OPEX проекта',applies:'all',mode:'annual',amount:7500000,pct:0,base:'netRevenueBeforeContraTotal',treat:'fixedOpex',tax:'yes'},
+  {en:false,name:'Bad debt / просрочка / chargeback',applies:'all',mode:'pct',amount:0,pct:1,base:'channelRevenueNet',treat:'variableSelling',tax:'yes'},
+  {en:false,name:'Банковский процент / стоимость денег',applies:'all',mode:'pct',amount:0,pct:5,base:'cogsAccounting',treat:'finance',tax:'yes'},
+  {en:false,name:'Амортизация IT/оборудования',applies:'all',mode:'annual',amount:1000000,pct:0,base:'netRevenueBeforeContraTotal',treat:'depr',tax:'yes'}
+];
+let params = JSON.parse(JSON.stringify(defaultParams));
+let lastResult = null;
+
+const applyOptions = [
+  ['all','Прямые + сети + др.партнёры'],['dtc','Только DTC / прямые'],['retail','Только сети'],['partner','Только др.партнёры'],
+  ['dtc_retail','DTC + сети'],['dtc_partner','DTC + др.партнёры'],['retail_partner','Сети + др.партнёры']
+];
+const modeOptions = [['unit','₸/ед.'],['annual','₸/год'],['pct','% от базы'],['unit_pct','₸/ед. + %'],['annual_pct','₸/год + %']];
+const baseOptions = [
+  ['rrpShelfGross','РРЦ / полка с НДС'],['rrpShelfNet','РРЦ / полка без НДС'],
+  ['channelInvoiceGross','Цена канала / счёт с НДС'],['channelRevenueNet','Цена канала / revenue без НДС'],
+  ['sellOutGsvGrossTotal','Sell-out GSV total с НДС'],['grossInvoiceTotal','Gross invoice total с НДС'],
+  ['netRevenueBeforeContraTotal','Revenue до бонусов total'],['cogsAccounting','COGS учётная'],['cogsGross','COGS с НДС'],['cogsNet','COGS без НДС']
+];
+const treatOptions = [['contraRevenue','Минус выручка'],['cogs','COGS'],['variableSelling','Variable selling'],['marketing','Marketing'],['fixedOpex','Fixed OPEX'],['finance','Finance'],['depr','D&A']];
+const taxOptions = [['yes','Выч.'],['no','Не выч.']];
+
+function optHtml(options, selected){return options.map(([v,t])=>`<option value="${v}" ${v===selected?'selected':''}>${t}</option>`).join('')}
+function usesAmount(mode){return ['unit','annual','unit_pct','annual_pct'].includes(mode)}
+function usesPct(mode){return ['pct','unit_pct','annual_pct'].includes(mode)}
+function renderParams(){
+  const tb=document.querySelector('#params_table tbody'); tb.innerHTML='';
+  params.forEach((p,i)=>{
+    if(!p.tax) p.tax='yes';
+    const amountDisabled = usesAmount(p.mode) ? '' : 'disabled';
+    const pctDisabled = usesPct(p.mode) ? '' : 'disabled';
+    const baseDisabled = usesPct(p.mode) ? '' : 'disabled';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td><input type="checkbox" ${p.en?'checked':''} onchange="params[${i}].en=this.checked;recalc()"></td>
+      <td><input class="param-name" type="text" value="${escapeHtml(p.name)}" onchange="params[${i}].name=this.value;recalc()"></td>
+      <td><select onchange="params[${i}].applies=this.value;recalc()">${optHtml(applyOptions,p.applies)}</select></td>
+      <td><select onchange="params[${i}].mode=this.value;renderParams();recalc()">${optHtml(modeOptions,p.mode)}</select></td>
+      <td><input id="amount_${i}" type="number" value="${p.amount}" step="100" min="0" ${amountDisabled} oninput="updateParamAmount(${i},this.value)"></td>
+      <td><input id="amount_range_${i}" type="range" value="${p.amount}" min="0" max="50000000" step="100" ${amountDisabled} oninput="updateParamAmount(${i},this.value)"></td>
+      <td><input id="pct_${i}" type="number" value="${p.pct}" step="0.1" min="0" max="100" ${pctDisabled} oninput="updateParamPct(${i},this.value)"></td>
+      <td><input id="pct_range_${i}" type="range" value="${p.pct}" min="0" max="100" step="0.1" ${pctDisabled} oninput="updateParamPct(${i},this.value)"></td>
+      <td><select class="wide-select" ${baseDisabled} onchange="params[${i}].base=this.value;recalc()">${optHtml(baseOptions,p.base)}</select></td>
+      <td><select class="wide-select" onchange="params[${i}].treat=this.value;recalc()">${optHtml(treatOptions,p.treat)}</select></td>
+      <td><select onchange="params[${i}].tax=this.value;recalc()">${optHtml(taxOptions,p.tax)}</select></td>
+      <td><button onclick="removeParam(${i})">×</button></td>`;
+    tb.appendChild(tr);
+  });
+}
+function updateParamAmount(i,val){params[i].amount=parseFloat(val)||0; const a=document.getElementById('amount_'+i), r=document.getElementById('amount_range_'+i); if(a) a.value=params[i].amount; if(r) r.value=params[i].amount; recalc()}
+function updateParamPct(i,val){params[i].pct=parseFloat(val)||0; const a=document.getElementById('pct_'+i), r=document.getElementById('pct_range_'+i); if(a) a.value=params[i].pct; if(r) r.value=params[i].pct; recalc()}
+function addParam(){params.push({en:true,name:'Новый параметр',applies:'all',mode:'unit',amount:0,pct:0,base:'channelRevenueNet',treat:'variableSelling',tax:'yes'}); renderParams(); recalc()}
+function removeParam(i){params.splice(i,1); renderParams(); recalc()}
+function resetDefaults(){params=JSON.parse(JSON.stringify(defaultParams)); renderParams(); recalc()}
+
+function blankSums(){return {contraRevenue:0,cogs:0,variableSelling:0,marketing:0,fixedOpex:0,finance:0,depr:0,nonDeductible:0}}
+function getShares(){
+  const w={dtc:Math.max(0,n('share_dtc')),retail:Math.max(0,n('share_retail')),partner:Math.max(0,n('share_partner'))};
+  const total=w.dtc+w.retail+w.partner;
+  if(total<=0) return {dtc:1,retail:0,partner:0,totalWeight:0};
+  return {dtc:w.dtc/total,retail:w.retail/total,partner:w.partner/total,totalWeight:total};
+}
+function getCore(){
+  const vat=n('vat')/100;
+  const rrpVal=n('rrp');
+  const rrpShelfGross=s('rrp_mode')==='gross'?rrpVal:rrpVal*(1+vat);
+  const rrpShelfNet=s('rrp_mode')==='gross'?rrpVal/(1+vat):rrpVal;
+  const cogsVal=n('cogs');
+  const cogsGross=s('cogs_mode')==='gross'?cogsVal:cogsVal*(1+vat);
+  const cogsNet=s('cogs_mode')==='gross'?cogsVal/(1+vat):cogsVal;
+  const cogsAccounting=s('vat_recoverable')==='yes'?cogsNet:cogsGross;
+  const unitsTotal=n('units_total');
+  const shares=getShares();
+  const dtcDiscount=clamp(n('dtc_discount')/100,0,.95);
+  const retailCommission=clamp(n('retail_commission')/100,0,.95);
+  const partnerCommission=clamp(n('partner_commission')/100,0,.95);
+  function makeCh(key,name,share,commission,discount){
+    const units=unitsTotal*share;
+    const invoiceGross=rrpShelfGross*(1-commission)*(1-discount);
+    return {key,name,share,units,shelfGross:rrpShelfGross,invoiceGross,revenueNet:invoiceGross/(1+vat),commission,discount};
+  }
+  const channels={
+    dtc:makeCh('dtc','DTC / прямые',shares.dtc,0,dtcDiscount),
+    retail:makeCh('retail','Сети',shares.retail,retailCommission,0),
+    partner:makeCh('partner','Др. партнёры',shares.partner,partnerCommission,0)
+  };
+  return {vat,rrpShelfGross,rrpShelfNet,cogsGross,cogsNet,cogsAccounting,unitsTotal,shares,dtcDiscount,retailCommission,partnerCommission,incomeTax:clamp(n('income_tax')/100,0,1),channels};
+}
+function channelsForApply(applies, core){
+  const c=core.channels;
+  const map={all:['dtc','retail','partner'],dtc:['dtc'],retail:['retail'],partner:['partner'],dtc_retail:['dtc','retail'],dtc_partner:['dtc','partner'],retail_partner:['retail','partner']};
+  return (map[applies]||map.all).map(k=>c[k]);
+}
+function basePerUnit(base, ch, core, totalsPre){
+  switch(base){
+    case 'rrpShelfGross': return core.rrpShelfGross;
+    case 'rrpShelfNet': return core.rrpShelfNet;
+    case 'channelInvoiceGross': return ch.invoiceGross;
+    case 'channelRevenueNet': return ch.revenueNet;
+    case 'sellOutGsvGrossTotal': return core.unitsTotal?totalsPre.sellOutGsvGross/core.unitsTotal:0;
+    case 'grossInvoiceTotal': return core.unitsTotal?totalsPre.grossInvoiceRevenue/core.unitsTotal:0;
+    case 'netRevenueBeforeContraTotal': return core.unitsTotal?totalsPre.revenueBeforeContra/core.unitsTotal:0;
+    case 'cogsAccounting': return core.cogsAccounting;
+    case 'cogsGross': return core.cogsGross;
+    case 'cogsNet': return core.cogsNet;
+    default: return 0;
+  }
+}
+function calculate(){
+  const core=getCore();
+  const channels=Object.values(core.channels);
+  const byChannel={dtc:blankSums(),retail:blankSums(),partner:blankSums()};
+  const sums=blankSums();
+  const sellOutGsvGross=channels.reduce((a,c)=>a+c.shelfGross*c.units,0);
+  const grossInvoiceRevenue=channels.reduce((a,c)=>a+c.invoiceGross*c.units,0);
+  const revenueBeforeContra=channels.reduce((a,c)=>a+c.revenueNet*c.units,0);
+  const totalsPre={sellOutGsvGross,grossInvoiceRevenue,revenueBeforeContra};
+  const channelBridge=sellOutGsvGross-grossInvoiceRevenue;
+  const outputVat=grossInvoiceRevenue-revenueBeforeContra;
+
+  params.forEach(p=>{
+    if(!p.en) return;
+    const applicable=channelsForApply(p.applies,core);
+    const applicableUnits=applicable.reduce((a,c)=>a+c.units,0);
+    applicable.forEach(ch=>{
+      let v=0;
+      if(usesAmount(p.mode)){
+        if(p.mode==='unit' || p.mode==='unit_pct') v += (parseFloat(p.amount)||0)*ch.units;
+        if(p.mode==='annual' || p.mode==='annual_pct') v += (parseFloat(p.amount)||0) * (applicableUnits?ch.units/applicableUnits:0);
+      }
+      if(usesPct(p.mode)) v += ((parseFloat(p.pct)||0)/100) * basePerUnit(p.base,ch,core,totalsPre) * ch.units;
+      byChannel[ch.key][p.treat]+=v;
+      sums[p.treat]+=v;
+      if(p.tax==='no'){
+        byChannel[ch.key].nonDeductible += v;
+        sums.nonDeductible += v;
+      }
+    });
+  });
+
+  channels.forEach(ch=>{byChannel[ch.key].cogs += core.cogsAccounting*ch.units;});
+  const coreCogs=core.cogsAccounting*core.unitsTotal;
+  const cogsAddons=sums.cogs;
+  const totalCogs=coreCogs+cogsAddons;
+  const netRevenue=revenueBeforeContra-sums.contraRevenue;
+  const grossProfit=netRevenue-totalCogs;
+  const contribution=grossProfit-sums.variableSelling;
+  const ebitda=contribution-sums.marketing-sums.fixedOpex;
+  const ebit=ebitda-sums.depr;
+  const pbt=ebit-sums.finance;
+  const taxableIncome=pbt+sums.nonDeductible;
+  const incomeTaxExpense=Math.max(0,taxableIncome)*core.incomeTax;
+  const netProfit=pbt-incomeTaxExpense;
+
+  const channelResults={};
+  channels.forEach(ch=>{
+    const b=byChannel[ch.key];
+    const revenueBefore=ch.revenueNet*ch.units;
+    const netRev=revenueBefore-b.contraRevenue;
+    const gp=netRev-b.cogs;
+    const cont=gp-b.variableSelling;
+    const ebitdaCh=cont-b.marketing-b.fixedOpex;
+    const ebitCh=ebitdaCh-b.depr;
+    const pbtCh=ebitCh-b.finance;
+    const taxableCh=pbtCh+b.nonDeductible;
+    channelResults[ch.key]={...ch,sums:b,grossInvoiceRevenue:ch.invoiceGross*ch.units,revenueBeforeContra:revenueBefore,netRevenue:netRev,cogs:b.cogs,grossProfit:gp,contribution:cont,ebitda:ebitdaCh,ebit:ebitCh,pbt:pbtCh,taxableIncome:taxableCh,incomeTax:0,netProfit:pbtCh,grossMargin:safeDiv(gp,netRev),markup:safeDiv(gp,b.cogs),netProfitMargin:0,netProfitOnCogs:0};
+  });
+  const positiveTaxableSum=Object.values(channelResults).reduce((a,c)=>a+Math.max(0,c.taxableIncome),0);
+  Object.values(channelResults).forEach(c=>{
+    c.incomeTax=positiveTaxableSum?incomeTaxExpense*Math.max(0,c.taxableIncome)/positiveTaxableSum:0;
+    c.netProfit=c.pbt-c.incomeTax;
+    c.netProfitMargin=safeDiv(c.netProfit,c.netRevenue);
+    c.netProfitOnCogs=safeDiv(c.netProfit,c.cogs);
+  });
+
+  const grossMargin=safeDiv(grossProfit,netRevenue);
+  const markup=safeDiv(grossProfit,totalCogs);
+  const pbtMargin=safeDiv(pbt,netRevenue);
+  const netProfitMargin=safeDiv(netProfit,netRevenue);
+  const netProfitOnCogs=safeDiv(netProfit,totalCogs);
+  const basis=s('margin_basis');
+  let selectedMargin=grossMargin;
+  if(basis==='cash_gross') selectedMargin=safeDiv(grossInvoiceRevenue-core.cogsGross*core.unitsTotal,grossInvoiceRevenue);
+  if(basis==='net_revenue_cogs_gross') selectedMargin=safeDiv(netRevenue-core.cogsGross*core.unitsTotal,netRevenue);
+  if(basis==='markup_on_cogs') selectedMargin=markup;
+  const contributionPerUnit=safeDiv(contribution,core.unitsTotal);
+  const fixedForBE=sums.marketing+sums.fixedOpex+sums.finance+sums.depr;
+  const beUnits=contributionPerUnit>0?fixedForBE/contributionPerUnit:Infinity;
+  return {core,sellOutGsvGross,grossInvoiceRevenue,outputVat,channelBridge,revenueBeforeContra,netRevenue,sums,coreCogs,cogsAddons,totalCogs,grossProfit,contribution,ebitda,ebit,pbt,taxableIncome,incomeTaxExpense,netProfit,grossMargin,markup,pbtMargin,netProfitMargin,netProfitOnCogs,selectedMargin,beUnits,byChannel,channelResults};
+}
+function recalc(){const r=calculate(); lastResult=r; renderResults(r); return r}
+function kpiCard(name,val,cls='',small=''){return `<div class="kpi ${cls}"><div class="name">${name}</div><div class="val">${val}</div>${small?`<div class="small">${small}</div>`:''}</div>`}
+function buildKpiRows(r){return [
+  ['Sell-out GSV gross',r.sellOutGsvGross],['Gross invoiced revenue incl VAT',r.grossInvoiceRevenue],['Output VAT excluded',r.outputVat],['Net revenue',r.netRevenue],
+  ['COGS',r.totalCogs],['Gross profit',r.grossProfit],['Gross margin',r.grossMargin],['Markup',r.markup],['Contribution',r.contribution],['EBITDA',r.ebitda],['PBT',r.pbt],['Taxable income',r.taxableIncome],['Income tax',r.incomeTaxExpense],['Net profit',r.netProfit],['Net profit margin',r.netProfitMargin],['Net profit / COGS',r.netProfitOnCogs],['Break-even units',r.beUnits]
+]}
+function renderKpis(r){
+  const groups=[
+    ['Revenue / выручка',[['Net revenue',money(r.netRevenue),'','после бонусов, без НДС'],['Revenue / ед.',money(safeDiv(r.netRevenue,r.core.unitsTotal)),'','без НДС'],['Gross invoice с НДС',money(r.grossInvoiceRevenue),'','сумма счёта / оплаты'],['Sell-out GSV на полке',money(r.sellOutGsvGross),'','рыночный оборот, memo']]],
+    ['Gross economics',[['COGS total',money(r.totalCogs),'','база + доп. COGS'],['Gross profit',money(r.grossProfit),r.grossProfit>=0?'good':'bad','Net revenue − COGS'],['Gross margin / Net revenue',pct(r.grossMargin),r.grossMargin>=.3?'good':(r.grossMargin>=0?'warn':'bad'),'GP / Net revenue'],['Markup / COGS',pct(r.markup),r.markup>=.4?'good':(r.markup>=0?'warn':'bad'),'GP / COGS']]],
+    ['Operating / tax / net result',[['Contribution margin',money(r.contribution),r.contribution>=0?'good':'bad','после variable selling'],['EBITDA',money(r.ebitda),r.ebitda>=0?'good':'bad','до D&A'],['PBT',money(r.pbt),r.pbt>=0?'good':'bad','до КПН'],['Taxable income / база КПН',money(r.taxableIncome),r.taxableIncome>=0?'warn':'good','PBT + невыч. расходы'],['Income tax / КПН',money(r.incomeTaxExpense),'','ставка '+fmt1.format(r.core.incomeTax*100)+'%'],['Net profit after tax',money(r.netProfit),r.netProfit>=0?'good':'bad','чистая прибыль']]],
+    ['Return / окупаемость',[['PBT margin',pct(r.pbtMargin),r.pbtMargin>=0?'good':'bad','PBT / Net revenue'],['Net profit margin',pct(r.netProfitMargin),r.netProfitMargin>=0?'good':'bad','Net profit / Net revenue'],['Net profit / COGS',pct(r.netProfitOnCogs),r.netProfitOnCogs>=0?'good':'bad','чистый доход к себестоимости'],['Break-even',isFinite(r.beUnits)?fmt.format(Math.ceil(r.beUnits))+' шт':'нет',isFinite(r.beUnits)?'':'bad','по текущему mix']]]
+  ];
+  document.getElementById('kpi_groups').innerHTML=groups.map(([title,items])=>`<div class="kpi-section"><div class="kpi-title">${title}</div><div class="kpi-grid">${items.map(x=>kpiCard(x[0],x[1],x[2],x[3])).join('')}</div></div>`).join('');
+}
+function renderResults(r){
+  renderKpis(r);
+  document.getElementById('quick_formula').innerHTML=`Выбранная управленческая маржа: <b>${pct(r.selectedMargin)}</b><br>РРЦ: ${money(r.core.rrpShelfGross)} с НДС / ${money(r.core.rrpShelfNet)} без НДС. Учётная COGS: ${money(r.core.cogsAccounting)} на ед. Каналы: DTC ${pct(r.core.shares.dtc)}, сети ${pct(r.core.shares.retail)}, партнёры ${pct(r.core.shares.partner)}.`;
+  renderChannelTable(r); renderPL(r); renderScenarios(r); renderAssumptions(r);
+}
+function renderChannelTable(r){
+  const cr=r.channelResults;
+  const rows=[
+    ['Шт/год',cr.dtc.units,cr.retail.units,cr.partner.units,r.core.unitsTotal,'num'],
+    ['Sell-out / РРЦ на полке с НДС',cr.dtc.shelfGross,cr.retail.shelfGross,cr.partner.shelfGross,null,'money'],
+    ['Sell-in / счёт канала с НДС',cr.dtc.invoiceGross,cr.retail.invoiceGross,cr.partner.invoiceGross,null,'money'],
+    ['Revenue до бонусов без НДС / ед.',cr.dtc.revenueNet,cr.retail.revenueNet,cr.partner.revenueNet,null,'money'],
+    ['Минус выручка / бонусы',cr.dtc.sums.contraRevenue,cr.retail.sums.contraRevenue,cr.partner.sums.contraRevenue,r.sums.contraRevenue,'money'],
+    ['Net revenue',cr.dtc.netRevenue,cr.retail.netRevenue,cr.partner.netRevenue,r.netRevenue,'money'],
+    ['COGS всего',cr.dtc.cogs,cr.retail.cogs,cr.partner.cogs,r.totalCogs,'money'],
+    ['Gross profit',cr.dtc.grossProfit,cr.retail.grossProfit,cr.partner.grossProfit,r.grossProfit,'money'],
+    ['Gross margin',cr.dtc.grossMargin,cr.retail.grossMargin,cr.partner.grossMargin,r.grossMargin,'pct'],
+    ['Markup',cr.dtc.markup,cr.retail.markup,cr.partner.markup,r.markup,'pct'],
+    ['Variable selling',cr.dtc.sums.variableSelling,cr.retail.sums.variableSelling,cr.partner.sums.variableSelling,r.sums.variableSelling,'money'],
+    ['PBT',cr.dtc.pbt,cr.retail.pbt,cr.partner.pbt,r.pbt,'money'],
+    ['Taxable income / база КПН',cr.dtc.taxableIncome,cr.retail.taxableIncome,cr.partner.taxableIncome,r.taxableIncome,'money'],
+    ['Income tax / КПН',cr.dtc.incomeTax,cr.retail.incomeTax,cr.partner.incomeTax,r.incomeTaxExpense,'money'],
+    ['Net profit after tax',cr.dtc.netProfit,cr.retail.netProfit,cr.partner.netProfit,r.netProfit,'money'],
+    ['Net profit margin',cr.dtc.netProfitMargin,cr.retail.netProfitMargin,cr.partner.netProfitMargin,r.netProfitMargin,'pct'],
+    ['Net profit / COGS',cr.dtc.netProfitOnCogs,cr.retail.netProfitOnCogs,cr.partner.netProfitOnCogs,r.netProfitOnCogs,'pct']
+  ];
+  const tb=document.querySelector('#channel_table tbody'); tb.innerHTML='';
+  rows.forEach(([name,a,b,c,t,type])=>{
+    const f=type==='money'?money:(type==='pct'?pct:(v)=>fmt1.format(v));
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${name}</td><td>${f(a)}</td><td>${f(b)}</td><td>${f(c)}</td><td>${t===null?'—':f(t)}</td>`;
+    tb.appendChild(tr);
+  });
+  document.getElementById('bar_dtc').style.width=(r.core.shares.dtc*100)+'%';
+  document.getElementById('bar_retail').style.width=(r.core.shares.retail*100)+'%';
+  document.getElementById('bar_partner').style.width=(r.core.shares.partner*100)+'%';
+  document.getElementById('mix_note').innerHTML=`Фактический mix по штукам: DTC ${pct(r.core.shares.dtc)}, сети ${pct(r.core.shares.retail)}, партнёры ${pct(r.core.shares.partner)}. Введённая сумма весов: ${fmt1.format(r.core.shares.totalWeight)}%. Комиссии: сети ${fmt1.format(r.core.retailCommission*100)}%, партнёры ${fmt1.format(r.core.partnerCommission*100)}% от РРЦ.`;
+}
+function renderPL(r){
+  const rows=[
+    ['Sell-out GSV на полке с НДС',r.sellOutGsvGross,'memo'],['Минус: комиссии каналов / DTC скидка до invoice',-r.channelBridge,'memo'],['Gross invoiced revenue с НДС',r.grossInvoiceRevenue,'memo'],['Минус: НДС к исключению',-r.outputVat,'memo'],['Revenue before contra без НДС',r.revenueBeforeContra,'subtotal'],['Минус: trade rebates / bonuses / contra revenue',-r.sums.contraRevenue,''],['Net revenue без НДС',r.netRevenue,'subtotal'],['COGS базовая себестоимость',-r.coreCogs,''],['COGS доп. параметры',-r.cogsAddons,''],['COGS total',-r.totalCogs,'subtotal'],['Gross profit',r.grossProfit,'subtotal'],['Variable selling / distribution',-r.sums.variableSelling,''],['Contribution margin',r.contribution,'subtotal'],['Marketing',-r.sums.marketing,''],['Fixed OPEX / SG&A',-r.sums.fixedOpex,''],['EBITDA / операц. результат до D&A',r.ebitda,'subtotal'],['D&A',-r.sums.depr,''],['EBIT',r.ebit,'subtotal'],['Finance cost',-r.sums.finance,''],['PBT / прибыль до КПН',r.pbt,'subtotal'],['Невычитаемые расходы / корректировка КПН',r.sums.nonDeductible,'memo'],['Taxable income / налоговая база КПН',r.taxableIncome,'subtotal'],['Income tax / КПН',-r.incomeTaxExpense,''],['Net profit after tax',r.netProfit,'subtotal']
+  ];
+  const tb=document.querySelector('#pl_table tbody'); tb.innerHTML='';
+  rows.forEach(([name,val,type])=>{
+    const tr=document.createElement('tr');
+    if(type==='memo') tr.className='memo-row'; if(type==='subtotal') tr.className='subtotal-row';
+    const cls=val<0?'negative':((name.includes('profit')||name.includes('PBT')||name.includes('EBIT')||name.includes('Contribution')||name.includes('Net revenue')||name.includes('Taxable'))?'positive':'');
+    tr.innerHTML=`<td>${name}</td><td class="${cls}">${money(val)}</td><td>${r.netRevenue?pct(val/r.netRevenue):'—'}</td><td>${r.core.unitsTotal?money(val/r.core.unitsTotal):'—'}</td>`;
+    tb.appendChild(tr);
+  });
+}
+function getInputState(){const ids=['rrp','rrp_mode','cogs','cogs_mode','vat','vat_recoverable','income_tax','margin_basis','units_total','share_dtc','share_retail','share_partner','dtc_discount','retail_commission','partner_commission']; let o={}; ids.forEach(id=>{const el=document.getElementById(id); if(el) o[id]=el.value}); return o}
+function setInputState(o,doRecalc=true){Object.entries(o||{}).forEach(([id,v])=>{const el=document.getElementById(id); if(el) el.value=v}); syncRanges(); if(doRecalc) recalc()}
+function calcWithTemporaryChange(changes){const saved=getInputState(); changes(); const r=calculate(); setInputState(saved,false); return r}
+function renderScenarios(r){
+  const saved=getInputState();
+  const rows=[
+    ['База',r.grossMargin,r.markup,r.ebitda,r.netProfit,r.beUnits],
+    ['Сети +5 п.п. комиссии',...(()=>{const rr=calcWithTemporaryChange(()=>{document.getElementById('retail_commission').value=clamp(parseFloat(saved.retail_commission)+5,0,50)}); return [rr.grossMargin,rr.markup,rr.ebitda,rr.netProfit,rr.beUnits]})()],
+    ['Партнёры +5 п.п. комиссии',...(()=>{const rr=calcWithTemporaryChange(()=>{document.getElementById('partner_commission').value=clamp(parseFloat(saved.partner_commission)+5,0,50)}); return [rr.grossMargin,rr.markup,rr.ebitda,rr.netProfit,rr.beUnits]})()],
+    ['Себестоимость +10%',...(()=>{const rr=calcWithTemporaryChange(()=>{document.getElementById('cogs').value=(parseFloat(saved.cogs)||0)*1.1}); return [rr.grossMargin,rr.markup,rr.ebitda,rr.netProfit,rr.beUnits]})()],
+    ['РРЦ −10%',...(()=>{const rr=calcWithTemporaryChange(()=>{document.getElementById('rrp').value=(parseFloat(saved.rrp)||0)*.9}); return [rr.grossMargin,rr.markup,rr.ebitda,rr.netProfit,rr.beUnits]})()],
+    ['Объём −20%',...(()=>{const rr=calcWithTemporaryChange(()=>{document.getElementById('units_total').value=(parseFloat(saved.units_total)||0)*.8}); return [rr.grossMargin,rr.markup,rr.ebitda,rr.netProfit,rr.beUnits]})()]
+  ];
+  setInputState(saved,false);
+  const tb=document.querySelector('#scenario_table tbody'); tb.innerHTML='';
+  rows.forEach(row=>{const tr=document.createElement('tr'); tr.innerHTML=`<td>${row[0]}</td><td>${pct(row[1])}</td><td>${pct(row[2])}</td><td>${money(row[3])}</td><td class="${row[4]>=0?'positive':'negative'}">${money(row[4])}</td><td>${isFinite(row[5])?fmt.format(Math.ceil(row[5])):'нет'}</td>`; tb.appendChild(tr);});
+  document.getElementById('breakeven_note').innerHTML=`Break-even = Marketing + Fixed OPEX + Finance + D&A / Contribution per unit. При текущем mix: ${isFinite(r.beUnits)?fmt.format(Math.ceil(r.beUnits))+' шт':'не достигается при отрицательной contribution margin'}.`;
+}
+function renderAssumptions(r){
+  const txt=[
+    `РРЦ: ${money(r.core.rrpShelfGross)} с НДС / ${money(r.core.rrpShelfNet)} без НДС`,
+    `COGS: ${money(r.core.cogsGross)} с НДС / ${money(r.core.cogsNet)} без НДС; учетная COGS: ${money(r.core.cogsAccounting)} на ед.`,
+    `НДС: ${fmt1.format(r.core.vat*100)}%; КПН: ${fmt1.format(r.core.incomeTax*100)}%`,
+    `Объём: ${fmt1.format(r.core.unitsTotal)} шт; mix: DTC ${pct(r.core.shares.dtc)}, сети ${pct(r.core.shares.retail)}, партнёры ${pct(r.core.shares.partner)}`,
+    `Комиссии: DTC 0%, сети ${fmt1.format(r.core.retailCommission*100)}%, партнёры ${fmt1.format(r.core.partnerCommission*100)}% от РРЦ. DTC скидка: ${fmt1.format(r.core.dtcDiscount*100)}%`,
+    `Net revenue: ${money(r.netRevenue)}; Gross profit: ${money(r.grossProfit)}; Gross margin: ${pct(r.grossMargin)}; PBT: ${money(r.pbt)}; Net profit: ${money(r.netProfit)}`,
+    `Активные параметры: ${params.filter(p=>p.en).map(p=>p.name+' ['+(p.tax==='no'?'невыч.':'выч.')+']').join('; ')||'нет'}`
+  ].join('\n');
+  document.getElementById('assumptions').value=txt;
+}
+function saveScenario(){localStorage.setItem('marginCalcScenarioV7',JSON.stringify({inputs:getInputState(),params})); alert('Сценарий сохранён в браузере')}
+function loadScenario(){const raw=localStorage.getItem('marginCalcScenarioV7'); if(!raw){alert('Нет сохранённого сценария'); return;} const data=JSON.parse(raw); setInputState(data.inputs,false); params=data.params||params; renderParams(); recalc()}
+function copyAssumptions(){navigator.clipboard.writeText(document.getElementById('assumptions').value).then(()=>alert('Допущения скопированы'))}
+function copyKPI(){
+  if(!lastResult) recalc(); const r=lastResult;
+  const rows=buildKpiRows(r).map(([m,v])=>[m,(typeof v==='number'&&m.toLowerCase().includes('margin'))||m.includes('/')||m==='Markup'||m==='Gross margin'?pct(v):(m.includes('units')? (isFinite(v)?Math.ceil(v):'—') : Math.round(v))]);
+  const text=[['Metric','Value'],...rows].map(x=>x.join('\t')).join('\n');
+  navigator.clipboard.writeText(text).then(()=>alert('KPI скопированы в буфер'));
+}
+function exportCSV(){
+  if(!lastResult) recalc(); const r=lastResult;
+  const rows=[['Metric','Value'],...buildKpiRows(r).map(([m,v])=>[m,typeof v==='number'?v:''])];
+  const csv=rows.map(x=>x.map(y=>'"'+String(y).replaceAll('"','""')+'"').join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='margin_calculator_export_v7.csv'; a.click(); URL.revokeObjectURL(url);
+}
+function syncRanges(){
+  ['rrp','cogs','vat','income_tax','units_total','share_dtc','share_retail','share_partner','dtc_discount','retail_commission','partner_commission'].forEach(id=>{const inp=document.getElementById(id), rng=document.getElementById(id+'_range'); if(inp&&rng) rng.value=inp.value;});
+}
+function bindPairs(){
+  ['rrp','cogs','vat','income_tax','units_total','share_dtc','share_retail','share_partner','dtc_discount','retail_commission','partner_commission'].forEach(id=>{
+    const inp=document.getElementById(id), rng=document.getElementById(id+'_range');
+    if(inp&&rng){inp.addEventListener('input',()=>{rng.value=inp.value; recalc()}); rng.addEventListener('input',()=>{inp.value=rng.value; recalc()});}
+  });
+  ['rrp_mode','cogs_mode','vat_recoverable','margin_basis'].forEach(id=>{const el=document.getElementById(id); if(el) el.addEventListener('change',recalc)});
+}
+function askLocalChat(){
+  if(!lastResult) recalc(); const r=lastResult; const input=document.getElementById('chat_input'); const q=input.value.trim(); if(!q) return;
+  const log=document.getElementById('chat_log');
+  log.innerHTML+=`<div class="chat-msg chat-user">${escapeHtml(q)}</div>`;
+  const l=q.toLowerCase(); let ans='';
+  if(l.includes('партн')){const c=r.channelResults.partner; ans=`Партнёры: ${fmt1.format(c.units)} шт, sell-in ${money(c.invoiceGross)} с НДС за ед., Net revenue ${money(c.netRevenue)}, Net profit ${money(c.netProfit)}, Net profit margin ${pct(c.netProfitMargin)}, Net profit / COGS ${pct(c.netProfitOnCogs)}.`;}
+  else if(l.includes('сеть')||l.includes('сет')){const c=r.channelResults.retail; ans=`Сети: ${fmt1.format(c.units)} шт, комиссия ${fmt1.format(r.core.retailCommission*100)}% от РРЦ, sell-in ${money(c.invoiceGross)} с НДС за ед., Net revenue ${money(c.netRevenue)}, Net profit ${money(c.netProfit)}, Net profit / COGS ${pct(c.netProfitOnCogs)}.`;}
+  else if(l.includes('dtc')||l.includes('прям')){const c=r.channelResults.dtc; ans=`DTC/прямые: ${fmt1.format(c.units)} шт, комиссия посредника 0%, sell-in/цена ${money(c.invoiceGross)} с НДС за ед., Net revenue ${money(c.netRevenue)}, Net profit ${money(c.netProfit)}, Net profit margin ${pct(c.netProfitMargin)}.`;}
+  else if(l.includes('налог')||l.includes('кпн')){ans=`КПН считается от налоговой базы: PBT ${money(r.pbt)} + невычитаемые расходы ${money(r.sums.nonDeductible)} = taxable income ${money(r.taxableIncome)}. КПН = ${money(r.incomeTaxExpense)}. Net profit after tax = ${money(r.netProfit)}.`;}
+  else if(l.includes('markup')||l.includes('маркап')){ans=`Markup = Gross profit / COGS = ${money(r.grossProfit)} / ${money(r.totalCogs)} = ${pct(r.markup)}. Это валовая наценка на себестоимость, не чистая прибыль.`;}
+  else if(l.includes('net profit')||l.includes('чист')){ans=`Чистая прибыль после КПН: ${money(r.netProfit)}. Net profit margin = ${pct(r.netProfitMargin)} от Net revenue. Net profit / COGS = ${pct(r.netProfitOnCogs)} от себестоимости.`;}
+  else {ans=`Текущий результат: Net revenue ${money(r.netRevenue)}, Gross profit ${money(r.grossProfit)}, Gross margin ${pct(r.grossMargin)}, EBITDA ${money(r.ebitda)}, PBT ${money(r.pbt)}, Net profit ${money(r.netProfit)}. Mix: DTC ${pct(r.core.shares.dtc)}, сети ${pct(r.core.shares.retail)}, партнёры ${pct(r.core.shares.partner)}.`;}
+  log.innerHTML+=`<div class="chat-msg chat-bot">${ans}</div>`; log.scrollTop=log.scrollHeight; input.value='';
+}
+
+/* ==================== MULTI VIEW + SCENARIO VERSIONING + SHARE WARNING (v8) ==================== */
+let multiData = [];
+
+function switchView(view) {
+  const single = document.getElementById('single-view');
+  const multi = document.getElementById('multi-view');
+  const tabS = document.getElementById('tab-single');
+  const tabM = document.getElementById('tab-multi');
+  if (!single || !multi) return;
+  const mS=document.getElementById('mobile_tab_single'),mM=document.getElementById('mobile_tab_multi');
+  if(mS)mS.classList.toggle('active',view==='single'); if(mM)mM.classList.toggle('active',view==='multi');
+  if (view === 'single') {
+    single.style.display = 'block';
+    multi.style.display = 'none';
+    if (tabS) { tabS.style.borderBottom = '3px solid #2563eb'; tabS.style.color = '#111'; tabS.style.fontWeight = '600'; }
+    if (tabM) { tabM.style.borderBottom = '3px solid transparent'; tabM.style.color = '#555'; tabM.style.fontWeight = '500'; }
+  } else {
+    single.style.display = 'none';
+    multi.style.display = 'block';
+    if (tabM) { tabM.style.borderBottom = '3px solid #2563eb'; tabM.style.color = '#111'; tabM.style.fontWeight = '600'; }
+    if (tabS) { tabS.style.borderBottom = '3px solid transparent'; tabS.style.color = '#555'; tabS.style.fontWeight = '500'; }
+    const zone = document.getElementById('multi_upload_zone');
+    if (zone && multiData.length === 0) zone.style.display = 'block';
+  }
+}
+
+function downloadMultiTemplate() {
+  // Excel for Windows often opens CSV as ANSI if there is no BOM.
+  // UTF-8 BOM + sep=; makes Cyrillic display correctly and columns split by semicolon.
+  const csv = 'sep=;\r\n' +
+              'Наименование;Артикул;Количество;Закупочная_цена_тенге;Целевая_маржа_процент\r\n' +
+              'Холодильник Премиум А;SKU-001;50;185000;38\r\n' +
+              'Холодильник Б Стандарт;SKU-002;120;92000;32\r\n';
+  const blob = new Blob(['\ufeff' + csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'portfolio_template_utf8.csv';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function decodeCsvArrayBuffer(buffer) {
+  const bytes = new Uint8Array(buffer);
+  if (bytes.length >= 2 && bytes[0] === 0xFF && bytes[1] === 0xFE) return new TextDecoder('utf-16le').decode(bytes);
+  if (bytes.length >= 2 && bytes[0] === 0xFE && bytes[1] === 0xFF) return new TextDecoder('utf-16be').decode(bytes);
+  if (bytes.length >= 3 && bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF) return new TextDecoder('utf-8').decode(bytes);
+
+  const utf8 = new TextDecoder('utf-8', {fatal:false}).decode(bytes);
+  // Mojibake marker: UTF-8 Russian text opened/decoded as Windows-1251 often contains sequences like Рќ, Р°, С‚.
+  const mojibakeScore = (utf8.match(/Р.|С.|�/g) || []).length;
+  if (mojibakeScore > 3) {
+    try {
+      const cp1251 = new TextDecoder('windows-1251').decode(bytes);
+      const cpScore = (cp1251.match(/Р.|С.|�/g) || []).length;
+      if (cpScore < mojibakeScore) return cp1251;
+    } catch(e) {}
+  }
+  return utf8;
+}
+
+function handleMultiFileUpload(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const name = file.name.toLowerCase();
+  if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
+    alert('XLSX напрямую не читается в этой оффлайн HTML-версии. Сохраните Excel-файл как CSV UTF-8 и загрузите CSV.');
+    e.target.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const text = decodeCsvArrayBuffer(ev.target.result);
+      parseAndLoadMulti(text, file.name);
+      const zone = document.getElementById('multi_upload_zone'); if (zone) zone.style.display = 'none';
+    } catch(err) {
+      console.error(err);
+      alert('Не удалось прочитать CSV. Проверьте кодировку и разделитель. Рекомендуется CSV UTF-8.');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function normalizeHeader(h) {
+  return String(h || '')
+    .replace(/^\ufeff/, '')
+    .trim()
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/[\s\-\/]+/g, '_')
+    .replace(/[()%.₸]/g, '')
+    .replace(/_+/g, '_')
+    .replace(/^_|_$/g, '');
+}
+
+function parseSmartNumber(v) {
+  let t = String(v ?? '')
+    .replace(/^\ufeff/, '')
+    .replace(/\u00A0/g, ' ')
+    .replace(/[₸%]/g, '')
+    .trim();
+  if (!t) return 0;
+  t = t.replace(/\s+/g, '');
+  const comma = t.lastIndexOf(',');
+  const dot = t.lastIndexOf('.');
+  if (comma >= 0 && dot >= 0) {
+    if (comma > dot) t = t.replace(/\./g, '').replace(',', '.');
+    else t = t.replace(/,/g, '');
+  } else if (comma >= 0) {
+    t = t.replace(',', '.');
+  }
+  t = t.replace(/[^0-9.\-]/g, '');
+  const num = parseFloat(t);
+  return isFinite(num) ? num : 0;
+}
+
+function detectDelimiter(text) {
+  const sample = text.split(/\r?\n/).filter(x => x.trim() && !/^sep\s*=/.test(x.trim().toLowerCase())).slice(0, 5).join('\n');
+  const candidates = [';', ',', '\t'];
+  let best = ';', bestScore = -1;
+  candidates.forEach(d => {
+    let score = 0, inQ = false;
+    for (let i=0; i<sample.length; i++) {
+      const ch = sample[i];
+      if (ch === '"') inQ = !inQ;
+      else if (!inQ && ch === d) score++;
+    }
+    if (score > bestScore) { bestScore = score; best = d; }
+  });
+  return best;
+}
+
+function parseCsvRows(text) {
+  text = String(text || '').replace(/^\ufeff/, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const delim = detectDelimiter(text);
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for (let i=0; i<text.length; i++) {
+    const ch = text[i];
+    const next = text[i+1];
+    if (ch === '"') {
+      if (inQuotes && next === '"') { field += '"'; i++; }
+      else inQuotes = !inQuotes;
+    } else if (!inQuotes && ch === delim) {
+      row.push(field); field = '';
+    } else if (!inQuotes && ch === '\n') {
+      row.push(field); field = '';
+      if (row.some(c => String(c).trim() !== '')) rows.push(row);
+      row = [];
+    } else {
+      field += ch;
+    }
+  }
+  row.push(field);
+  if (row.some(c => String(c).trim() !== '')) rows.push(row);
+  if (rows.length && /^sep\s*=/.test(String(rows[0][0] || '').trim().toLowerCase())) rows.shift();
+  return rows.map(r => r.map(c => String(c ?? '').replace(/^\ufeff/, '').trim()));
+}
+
+function parseAndLoadMulti(text, filename) {
+  const rows = parseCsvRows(text);
+  if (!rows.length) { alert('Нет данных в CSV'); return; }
+
+  const normalizedFirst = rows[0].map(normalizeHeader);
+  const aliases = {
+    name: ['наименование','название','товар','product','product_name','name','item','item_name'],
+    art: ['артикул','sku','код','код_товара','номер','model','модель','article'],
+    qty: ['количество','кол_во','количество_шт','qty','quantity','units','шт'],
+    purchase: ['закупочная_цена_тенге','закупочная_цена','закупочная_стоимость','закупочная','себестоимость','cost','purchase','purchase_price','fob','ddp'],
+    targetGM: ['целевая_маржа_процент','целевая_маржа','target_gm','target_margin','gm','margin','маржа']
+  };
+  function findIdx(key) {
+    for (const a of aliases[key]) {
+      const idx = normalizedFirst.indexOf(normalizeHeader(a));
+      if (idx !== -1) return idx;
+    }
+    return -1;
+  }
+  const idxs = {name:findIdx('name'), art:findIdx('art'), qty:findIdx('qty'), purchase:findIdx('purchase'), targetGM:findIdx('targetGM')};
+  const hasHeader = Object.values(idxs).filter(i => i !== -1).length >= 2;
+  const dataRows = hasHeader ? rows.slice(1) : rows;
+
+  if (!hasHeader) {
+    idxs.name = 0;
+    idxs.art = 1;
+    idxs.qty = 2;
+    idxs.purchase = 3;
+    idxs.targetGM = 4;
+  }
+
+  multiData = [];
+  for (let i = 0; i < dataRows.length && multiData.length < 30; i++) {
+    const row = dataRows[i];
+    if (!row || row.every(c => String(c).trim() === '')) continue;
+    const name = (row[idxs.name] || '').trim() || `Позиция ${multiData.length + 1}`;
+    const art = (row[idxs.art] || '').trim();
+    const qtyRaw = parseSmartNumber(row[idxs.qty]);
+    const qty = qtyRaw > 0 ? qtyRaw : 1;
+    const purch = parseSmartNumber(row[idxs.purchase]);
+    const targetRaw = parseSmartNumber(row[idxs.targetGM]);
+    const tgm = targetRaw > 0 ? targetRaw : (parseFloat(document.getElementById('multi_target_margin').value) || 35);
+
+    multiData.push({
+      id: Date.now()+i,
+      name,
+      art,
+      qty,
+      purchase: purch,
+      landedUplift: 8,
+      targetGM: tgm,
+      landedCOGS: Math.round(purch * 1.08),
+      suggestedRRP: 0,
+      suggestedWholesale: 0,
+      gpPerUnit: 0,
+      marginPct: 0
+    });
+  }
+
+  renderMultiTable();
+  calculateMultiPrices();
+  if (multiData.length) {
+    alert(`Загружено ${multiData.length} позиций. Формат: ${hasHeader ? 'с заголовками' : 'без заголовков, использован порядок колонок'}. Расчёты выполнены автоматически.`);
+  } else {
+    alert('CSV прочитан, но строки с данными не найдены. Проверьте порядок колонок и наличие закупочной цены.');
+  }
+}
+
+function renderMultiTable() {
+  const tb = document.getElementById('multi_tbody'); if (!tb) return;
+  tb.innerHTML = '';
+  multiData.forEach((r, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="text-align:center;font-weight:600;color:#6b7280;">${i+1}</td>
+      <td style="text-align:left;"><input value="${escapeHtml(r.name)}" onchange="updateMulti(${i},'name',this.value)" style="width:100%;border:none;background:transparent;font-size:12.5px;padding:1px 3px;"></td>
+      <td><input value="${escapeHtml(r.art)}" onchange="updateMulti(${i},'art',this.value)" style="width:100%;border:none;background:transparent;font-size:12px;padding:1px 3px;"></td>
+      <td><input type="number" value="${r.qty}" onchange="updateMulti(${i},'qty',parseFloat(this.value)||1)" style="width:70px;text-align:right;border:none;background:transparent;padding:1px 3px;"></td>
+      <td><input type="number" value="${r.purchase}" onchange="updateMulti(${i},'purchase',parseFloat(this.value)||0);autoLanded(${i})" style="width:100px;text-align:right;border:none;background:transparent;padding:1px 3px;"></td>
+      <td><input type="number" value="${r.landedUplift}" onchange="updateMulti(${i},'landedUplift',parseFloat(this.value)||0);autoLanded(${i})" style="width:80px;text-align:right;border:none;background:transparent;padding:1px 3px;">%</td>
+      <td style="background:#f0fdf4;font-weight:600;color:#166534;">${money(r.landedCOGS)}</td>
+      <td><input type="number" value="${r.targetGM}" onchange="updateMulti(${i},'targetGM',parseFloat(this.value)||35)" style="width:70px;text-align:right;border:none;background:transparent;padding:1px 3px;">%</td>
+      <td style="background:#eff6ff;font-weight:600;">${money(r.suggestedRRP)}</td>
+      <td style="background:#fefce8;font-weight:600;">${money(r.suggestedWholesale)}</td>
+      <td style="font-weight:600;color:${r.gpPerUnit>0?'#166534':'#b91c1c'};">${money(r.gpPerUnit)}</td>
+      <td style="font-weight:700;color:${r.marginPct>0.32?'#166534':'#a16207'};">${pct(r.marginPct)}</td>
+      <td style="text-align:center;"><button onclick="delMulti(${i})" style="border:none;background:#fee2e2;color:#b91c1c;border-radius:5px;padding:1px 7px;cursor:pointer;font-size:11px;">×</button></td>`;
+    tb.appendChild(tr);
+  });
+  updateMultiFoot();
+}
+
+function updateMulti(i, f, v) { if (!multiData[i]) return; multiData[i][f] = v; if (f==='purchase'||f==='landedUplift') autoLanded(i); recalcMultiRow(i); renderMultiTable(); }
+function autoLanded(i) { if (!multiData[i]) return; multiData[i].landedCOGS = Math.round(multiData[i].purchase * (1 + (multiData[i].landedUplift||0)/100)); }
+function recalcMultiRow(i) {
+  const r = multiData[i]; if (!r || r.landedCOGS <= 0) return;
+  const gm = (r.targetGM || 35)/100;
+  r.suggestedRRP = Math.round(r.landedCOGS / (1-gm));
+  r.suggestedWholesale = Math.round(r.suggestedRRP * 0.78);
+  r.gpPerUnit = r.suggestedRRP - r.landedCOGS;
+  r.marginPct = r.suggestedRRP > 0 ? r.gpPerUnit / r.suggestedRRP : 0;
+}
+function updateMultiFoot() {
+  const f = document.getElementById('multi_tfoot'); if (!f) return;
+  if (!multiData.length) { f.innerHTML=''; return; }
+  const tQty = multiData.reduce((a,r)=>a+(r.qty||0),0);
+  const tPurch = multiData.reduce((a,r)=>a+(r.purchase||0)*(r.qty||0),0);
+  const tLanded = multiData.reduce((a,r)=>a+(r.landedCOGS||0)*(r.qty||0),0);
+  const avgM = multiData.reduce((a,r)=>a+(r.marginPct||0),0)/multiData.length;
+  f.innerHTML = `<tr style="border-top:2px solid #e5e7eb;"><td colspan="3" style="text-align:left;padding-left:10px;font-weight:700;">ИТОГО</td><td style="font-weight:700;">${fmt.format(tQty)}</td><td style="font-weight:700;">${money(tPurch)}</td><td></td><td style="background:#f0fdf4;font-weight:700;color:#166534;">${money(tLanded)}</td><td></td><td></td><td></td><td></td><td style="font-weight:700;">${pct(avgM)}</td><td></td></tr>`;
+}
+function delMulti(i) { multiData.splice(i,1); renderMultiTable(); }
+function clearMultiTable() { if (!confirm('Очистить таблицу?')) return; multiData=[]; document.getElementById('multi_tbody').innerHTML=''; document.getElementById('multi_tfoot').innerHTML=''; const z=document.getElementById('multi_upload_zone'); if(z) z.style.display='block'; }
+
+function syncFromSingleModel() {
+  if (!lastResult) recalc();
+  const r = lastResult || calculate(); if (!r) { alert('Сначала посчитайте основную модель'); return; }
+  const base = r.coreCogs || 0; const add = r.cogsAddons || 0;
+  const uplift = base > 0 ? (add / base * 100) : 8;
+  multiData.forEach(row => {
+    row.landedUplift = Math.max(2, Math.min(30, Math.round(uplift*10)/10));
+    row.landedCOGS = Math.round(row.purchase * (1 + row.landedUplift/100));
+  });
+  renderMultiTable();
+  alert(`Uplift landed ~${uplift.toFixed(1)}% применён из ваших гибких параметров.`);
+}
+
+function calculateMultiPrices() {
+  if (!multiData.length) return;
+  const glob = parseFloat(document.getElementById('multi_target_margin').value) || 35;
+  multiData.forEach(r => {
+    const gm = (r.targetGM || glob) / 100;
+    if (r.landedCOGS > 0 && gm > 0.05 && gm < 0.9) {
+      r.suggestedRRP = Math.round(r.landedCOGS / (1-gm));
+      r.suggestedWholesale = Math.round(r.suggestedRRP * 0.78);
+      r.gpPerUnit = r.suggestedRRP - r.landedCOGS;
+      r.marginPct = r.gpPerUnit / r.suggestedRRP;
+    }
+  });
+  renderMultiTable();
+}
+
+function exportMultiToCSV() {
+  if (!multiData.length) return;
+  const h = ['#','Наименование','Артикул','Кол-во','Закупочная','LandedUplift%','LandedCOGS','TargetGM%','RecRRP_DTC','RecWholesale','GPperUnit','Margin%'];
+  const rows = multiData.map((r,i)=>[i+1,r.name,r.art,r.qty,r.purchase,r.landedUplift,r.landedCOGS,r.targetGM,r.suggestedRRP,r.suggestedWholesale,r.gpPerUnit,(r.marginPct*100).toFixed(1)]);
+  const csv = [h,...rows].map(row => row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='portfolio_results_v8.csv';a.click();URL.revokeObjectURL(url);
+}
+
+/* Share sum warning (critical UX) */
+function checkShares() {
+  const d = parseFloat(document.getElementById('share_dtc')?.value)||0;
+  const r = parseFloat(document.getElementById('share_retail')?.value)||0;
+  const p = parseFloat(document.getElementById('share_partner')?.value)||0;
+  const sum = d+r+p;
+  const note = document.getElementById('mix_note');
+  if (note && Math.abs(sum-100)>1.5) note.innerHTML += ` <span style="color:#b91c1c;font-weight:600;">⚠ Сумма долей ${sum.toFixed(1)}% (нормализовано)</span>`;
+}
+const _origRenderCh = renderChannelTable;
+renderChannelTable = function(rr){ _origRenderCh(rr); setTimeout(checkShares,60); };
+
+/* Multi-scenario save/load v8 */
+function saveScenario(){
+  const nm = prompt('Название сценария:','Сценарий '+new Date().toLocaleDateString('ru-RU'));
+  if(!nm) return;
+  let sc = JSON.parse(localStorage.getItem('marginScenariosV8')||'{}');
+  sc[nm] = {inputs:getInputState(), params:params, saved:new Date().toISOString()};
+  localStorage.setItem('marginScenariosV8', JSON.stringify(sc));
+  alert('Сохранено: '+nm);
+}
+function loadScenario(){
+  let sc = JSON.parse(localStorage.getItem('marginScenariosV8')||'{}');
+  const ks = Object.keys(sc);
+  if(!ks.length){ alert('Нет сценариев v8'); return; }
+  const list = ks.map((k,idx)=>`${idx+1}. ${k} (${new Date(sc[k].saved).toLocaleDateString('ru-RU')})`).join('\n');
+  const ch = prompt('Номер сценария:\n'+list);
+  const id = parseInt(ch)-1;
+  if(id>=0 && id<ks.length){
+    const d = sc[ks[id]];
+    setInputState(d.inputs,false); params=d.params||params; renderParams(); recalc();
+    alert('Загружен: '+ks[id]);
+  }
+}
+
+/* ==================== v9 BUSINESS PROFIT + SKU SCOPE + CASH CONTROL ==================== */
+const expenseStatusOptions = [['included','Учесть'],['na','Не применимо'],['review','Проверить']];
+const skuScopeOptions = [['all','Все SKU'],['include','Только указанные'],['exclude','Кроме указанных']];
+const expenseVatOptions = [['none','Без НДС / НДС нет'],['gross_recoverable','С НДС, зачётный'],['gross_nonrecoverable','С НДС, невозмещ.']];
+let breakEvenSolveGuard=false;
+let suppressBreakEvenSolve=false;
+
+function normalizeParamConfig(p){
+  if(!p.status) p.status = p.en ? 'included' : 'review';
+  p.en = p.status === 'included';
+  if(!p.skuMode) p.skuMode = 'all';
+  if(p.skuList == null) p.skuList = '';
+  if(!p.tax) p.tax = 'yes';
+  if(!p.vatTreatment) p.vatTreatment = 'none';
+  return p;
+}
+function normalizeAllParams(){ params.forEach(normalizeParamConfig); }
+blankSums = function(){return {contraRevenue:0,cogs:0,variableSelling:0,marketing:0,fixedOpex:0,finance:0,depr:0,nonDeductible:0,recoverableVat:0}};
+function applyExpenseVat(p,raw,vat){
+  raw=isFinite(raw)?raw:0;
+  if(p.vatTreatment==='gross_recoverable'&&vat>0){
+    const accounting=raw/(1+vat);
+    return {accounting,recoverableVat:raw-accounting};
+  }
+  return {accounting:raw,recoverableVat:0};
+}
+function expenseIsIncluded(p){ return normalizeParamConfig(p).status === 'included'; }
+function splitSkuList(v){
+  return String(v || '').split(/[;,\n]+/).map(x=>x.trim().toLowerCase()).filter(Boolean);
+}
+function paramAppliesToSku(p, sku){
+  normalizeParamConfig(p);
+  if(p.skuMode === 'all') return true;
+  const key = String(sku || '').trim().toLowerCase();
+  const set = splitSkuList(p.skuList);
+  const found = key ? set.includes(key) : false;
+  return p.skuMode === 'include' ? found : !found;
+}
+function changeParamStatus(i, value){
+  if(!params[i]) return;
+  params[i].status = value;
+  params[i].en = value === 'included';
+  renderParams(); recalc();
+  if(multiData.length) calculateMultiPrices();
+}
+function renderExpenseReviewSummary(){
+  const el=document.getElementById('expense_review_summary'); if(!el) return;
+  normalizeAllParams();
+  const included=params.filter(p=>p.status==='included');
+  const na=params.filter(p=>p.status==='na');
+  const review=params.filter(p=>p.status==='review');
+  const sample=review.slice(0,3).map(p=>escapeHtml(p.name)).join('; ');
+  el.className=review.length?'warn-note':'good-note';
+  el.innerHTML=review.length
+    ? `<b>Контроль расходов:</b> учтено ${included.length}, не применимо ${na.length}, требуется проверить ${review.length}. ${sample}${review.length>3?'…':''}`
+    : `<b>Контроль расходов завершён:</b> учтено ${included.length}, подтверждено как не применимо ${na.length}.`;
+}
+
+renderParams = function(){
+  normalizeAllParams();
+  const tb=document.querySelector('#params_table tbody'); tb.innerHTML='';
+  params.forEach((p,i)=>{
+    const amountDisabled = usesAmount(p.mode) ? '' : 'disabled';
+    const pctDisabled = usesPct(p.mode) ? '' : 'disabled';
+    const baseDisabled = usesPct(p.mode) ? '' : 'disabled';
+    const listDisabled = p.skuMode === 'all' ? 'disabled' : '';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td><select onchange="changeParamStatus(${i},this.value)">${optHtml(expenseStatusOptions,p.status)}</select></td>
+      <td><input class="param-name" type="text" value="${escapeHtml(p.name)}" onchange="params[${i}].name=this.value;renderExpenseReviewSummary();recalc()"></td>
+      <td><select onchange="params[${i}].applies=this.value;recalc();if(multiData.length)calculateMultiPrices()">${optHtml(applyOptions,p.applies)}</select></td>
+      <td><select onchange="params[${i}].skuMode=this.value;renderParams();recalc();if(multiData.length)calculateMultiPrices()">${optHtml(skuScopeOptions,p.skuMode)}</select></td>
+      <td><input type="text" value="${escapeHtml(p.skuList)}" placeholder="SKU-1; SKU-2" ${listDisabled} onchange="params[${i}].skuList=this.value;recalc();if(multiData.length)calculateMultiPrices()" style="min-width:170px"></td>
+      <td><select onchange="params[${i}].mode=this.value;renderParams();recalc();if(multiData.length)calculateMultiPrices()">${optHtml(modeOptions,p.mode)}</select></td>
+      <td><input id="amount_${i}" type="number" value="${p.amount}" step="100" min="0" ${amountDisabled} oninput="updateParamAmount(${i},this.value);if(multiData.length)calculateMultiPrices()"></td>
+      <td><input id="amount_range_${i}" type="range" value="${p.amount}" min="0" max="50000000" step="100" ${amountDisabled} oninput="updateParamAmount(${i},this.value);if(multiData.length)calculateMultiPrices()"></td>
+      <td><input id="pct_${i}" type="number" value="${p.pct}" step="0.1" min="0" max="100" ${pctDisabled} oninput="updateParamPct(${i},this.value);if(multiData.length)calculateMultiPrices()"></td>
+      <td><input id="pct_range_${i}" type="range" value="${p.pct}" min="0" max="100" step="0.1" ${pctDisabled} oninput="updateParamPct(${i},this.value);if(multiData.length)calculateMultiPrices()"></td>
+      <td><select class="wide-select" ${baseDisabled} onchange="params[${i}].base=this.value;recalc();if(multiData.length)calculateMultiPrices()">${optHtml(baseOptions,p.base)}</select></td>
+      <td><select class="wide-select" onchange="params[${i}].treat=this.value;recalc();if(multiData.length)calculateMultiPrices()">${optHtml(treatOptions,p.treat)}</select></td>
+      <td><select class="wide-select" onchange="params[${i}].vatTreatment=this.value;recalc();if(multiData.length)calculateMultiPrices()">${optHtml(expenseVatOptions,p.vatTreatment)}</select></td>
+      <td><select onchange="params[${i}].tax=this.value;recalc();if(multiData.length)calculateMultiPrices()">${optHtml(taxOptions,p.tax)}</select></td>
+      <td><button onclick="removeParam(${i});renderExpenseReviewSummary();if(multiData.length)calculateMultiPrices()">×</button></td>`;
+    tb.appendChild(tr);
+  });
+  renderExpenseReviewSummary();
+};
+addParam = function(){
+  params.push({en:false,status:'review',name:'Новый параметр',applies:'all',skuMode:'all',skuList:'',mode:'unit',amount:0,pct:0,base:'channelRevenueNet',treat:'variableSelling',vatTreatment:'none',tax:'yes'});
+  renderParams(); recalc();
+};
+resetDefaults = function(){
+  params=JSON.parse(JSON.stringify(defaultParams)); normalizeAllParams(); renderParams(); recalc();
+  if(multiData.length) calculateMultiPrices();
+};
+
+getInputState = function(){
+  const ids=['rrp','rrp_mode','single_sku','single_target_margin','cogs','cogs_mode','vat','vat_recoverable','income_tax','margin_basis','units_total','share_dtc','share_retail','share_partner','dtc_discount','retail_commission','partner_commission','cash_inventory_increase','cash_ar_increase','cash_ap_increase','cash_capex','cash_loan_principal','cash_other_outflows','cash_reserve','owner_tax_rate'];
+  let o={}; ids.forEach(id=>{const el=document.getElementById(id); if(el) o[id]=el.value}); return o;
+};
+syncRanges = function(){
+  ['rrp','single_target_margin','cogs','vat','income_tax','units_total','share_dtc','share_retail','share_partner','dtc_discount','retail_commission','partner_commission'].forEach(id=>{
+    const inp=document.getElementById(id), rng=document.getElementById(id+'_range'); if(inp&&rng) rng.value=inp.value;
+  });
+};
+bindPairs = function(){
+  ['rrp','single_target_margin','cogs','vat','income_tax','units_total','share_dtc','share_retail','share_partner','dtc_discount','retail_commission','partner_commission'].forEach(id=>{
+    const inp=document.getElementById(id), rng=document.getElementById(id+'_range');
+    if(inp&&rng){
+      inp.addEventListener('input',()=>{rng.value=inp.value; recalc(); if(id==='single_target_margin'&&multiData.length)calculateMultiPrices();});
+      rng.addEventListener('input',()=>{inp.value=rng.value; recalc(); if(id==='single_target_margin'&&multiData.length)calculateMultiPrices();});
+    }
+  });
+  ['rrp_mode','cogs_mode','vat_recoverable','margin_basis','single_sku'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.addEventListener(id==='single_sku'?'input':'change',()=>{recalc();if(multiData.length)calculateMultiPrices();});
+  });
+  ['cash_inventory_increase','cash_ar_increase','cash_ap_increase','cash_capex','cash_loan_principal','cash_other_outflows','cash_reserve','owner_tax_rate'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.addEventListener('input',()=>{recalc();if(multiData.length)calculateMultiPrices();});
+  });
+  const mt=document.getElementById('multi_target_margin'); if(mt) mt.addEventListener('input',()=>{multiData.forEach(r=>{if(r.useGlobalTarget)r.targetGM=getGlobalTargetGM()});calculateMultiPrices();});
+};
+
+calculate = function(){
+  normalizeAllParams();
+  const core=getCore();
+  const channels=Object.values(core.channels);
+  const byChannel={dtc:blankSums(),retail:blankSums(),partner:blankSums()};
+  const sums=blankSums();
+  const sellOutGsvGross=channels.reduce((a,c)=>a+c.shelfGross*c.units,0);
+  const grossInvoiceRevenue=channels.reduce((a,c)=>a+c.invoiceGross*c.units,0);
+  const revenueBeforeContra=channels.reduce((a,c)=>a+c.revenueNet*c.units,0);
+  const totalsPre={sellOutGsvGross,grossInvoiceRevenue,revenueBeforeContra};
+  const channelBridge=sellOutGsvGross-grossInvoiceRevenue;
+  const outputVat=grossInvoiceRevenue-revenueBeforeContra;
+  const currentSku=s('single_sku').trim();
+  const expenseDetails=[];
+
+  params.forEach(p=>{
+    if(!expenseIsIncluded(p) || !paramAppliesToSku(p,currentSku)) return;
+    const applicable=channelsForApply(p.applies,core);
+    const applicableUnits=applicable.reduce((a,c)=>a+c.units,0);
+    let detailTotal=0,detailVat=0;
+    applicable.forEach(ch=>{
+      let v=0;
+      if(usesAmount(p.mode)){
+        if(p.mode==='unit' || p.mode==='unit_pct') v += (parseFloat(p.amount)||0)*ch.units;
+        if(p.mode==='annual' || p.mode==='annual_pct') v += (parseFloat(p.amount)||0) * (applicableUnits?ch.units/applicableUnits:0);
+      }
+      if(usesPct(p.mode)) v += ((parseFloat(p.pct)||0)/100) * basePerUnit(p.base,ch,core,totalsPre) * ch.units;
+      const vatAdj=applyExpenseVat(p,v,core.vat); v=vatAdj.accounting;
+      byChannel[ch.key][p.treat]+=v;
+      sums[p.treat]+=v;
+      byChannel[ch.key].recoverableVat+=vatAdj.recoverableVat;
+      sums.recoverableVat+=vatAdj.recoverableVat;
+      detailTotal+=v; detailVat+=vatAdj.recoverableVat;
+      if(p.tax==='no'){
+        byChannel[ch.key].nonDeductible += v;
+        sums.nonDeductible += v;
+      }
+    });
+    expenseDetails.push({name:p.name,treat:p.treat,total:detailTotal,perUnit:safeDiv(detailTotal,core.unitsTotal),recoverableVat:detailVat,tax:p.tax,vatTreatment:p.vatTreatment,applies:p.applies,skuMode:p.skuMode,skuList:p.skuList});
+  });
+
+  channels.forEach(ch=>{byChannel[ch.key].cogs += core.cogsAccounting*ch.units;});
+  const coreCogs=core.cogsAccounting*core.unitsTotal;
+  const cogsAddons=sums.cogs;
+  const totalCogs=coreCogs+cogsAddons;
+  const netRevenue=revenueBeforeContra-sums.contraRevenue;
+  const grossProfit=netRevenue-totalCogs;
+  const contribution=grossProfit-sums.variableSelling;
+  const ebitda=contribution-sums.marketing-sums.fixedOpex;
+  const ebit=ebitda-sums.depr;
+  const pbt=ebit-sums.finance;
+  const taxableIncome=pbt+sums.nonDeductible;
+  const incomeTaxExpense=Math.max(0,taxableIncome)*core.incomeTax;
+  const netProfit=pbt-incomeTaxExpense;
+
+  const channelResults={};
+  channels.forEach(ch=>{
+    const b=byChannel[ch.key];
+    const revenueBefore=ch.revenueNet*ch.units;
+    const netRev=revenueBefore-b.contraRevenue;
+    const gp=netRev-b.cogs;
+    const cont=gp-b.variableSelling;
+    const ebitdaCh=cont-b.marketing-b.fixedOpex;
+    const ebitCh=ebitdaCh-b.depr;
+    const pbtCh=ebitCh-b.finance;
+    const taxableCh=pbtCh+b.nonDeductible;
+    channelResults[ch.key]={...ch,sums:b,grossInvoiceRevenue:ch.invoiceGross*ch.units,revenueBeforeContra:revenueBefore,netRevenue:netRev,cogs:b.cogs,grossProfit:gp,contribution:cont,ebitda:ebitdaCh,ebit:ebitCh,pbt:pbtCh,taxableIncome:taxableCh,incomeTax:0,netProfit:pbtCh,grossMargin:safeDiv(gp,netRev),markup:safeDiv(gp,b.cogs),netProfitMargin:0,netProfitOnCogs:0};
+  });
+  const positiveTaxableSum=Object.values(channelResults).reduce((a,c)=>a+Math.max(0,c.taxableIncome),0);
+  Object.values(channelResults).forEach(c=>{
+    c.incomeTax=positiveTaxableSum?incomeTaxExpense*Math.max(0,c.taxableIncome)/positiveTaxableSum:0;
+    c.netProfit=c.pbt-c.incomeTax;
+    c.netProfitMargin=safeDiv(c.netProfit,c.netRevenue);
+    c.netProfitOnCogs=safeDiv(c.netProfit,c.cogs);
+  });
+
+  const grossMargin=safeDiv(grossProfit,netRevenue);
+  const markup=safeDiv(grossProfit,totalCogs);
+  const pbtMargin=safeDiv(pbt,netRevenue);
+  const netProfitMargin=safeDiv(netProfit,netRevenue);
+  const netProfitOnCogs=safeDiv(netProfit,totalCogs);
+  const basis=s('margin_basis');
+  let selectedMargin=grossMargin;
+  if(basis==='cash_gross') selectedMargin=safeDiv(grossInvoiceRevenue-core.cogsGross*core.unitsTotal,grossInvoiceRevenue);
+  if(basis==='net_revenue_cogs_gross') selectedMargin=safeDiv(netRevenue-core.cogsGross*core.unitsTotal,netRevenue);
+  if(basis==='markup_on_cogs') selectedMargin=markup;
+  const contributionPerUnit=safeDiv(contribution,core.unitsTotal);
+  const fixedForBE=sums.marketing+sums.fixedOpex+sums.finance+sums.depr;
+  let beUnits=contributionPerUnit>0?fixedForBE/contributionPerUnit:Infinity;
+  if(!breakEvenSolveGuard && !suppressBreakEvenSolve) beUnits=solveBreakEvenByNetProfit();
+
+  const inventoryIncrease=n('cash_inventory_increase');
+  const arIncrease=n('cash_ar_increase');
+  const apIncrease=n('cash_ap_increase');
+  const capex=Math.max(0,n('cash_capex'));
+  const loanPrincipal=Math.max(0,n('cash_loan_principal'));
+  const otherCashOutflows=Math.max(0,n('cash_other_outflows'));
+  const cashReserve=Math.max(0,n('cash_reserve'));
+  const ownerTaxRate=clamp(n('owner_tax_rate')/100,0,1);
+  const operatingCashFlow=netProfit+sums.depr-inventoryIncrease-arIncrease+apIncrease;
+  const freeCashFlow=operatingCashFlow-capex-loanPrincipal-otherCashOutflows;
+  const cashAfterReserve=freeCashFlow-cashReserve;
+  const ownerTax=Math.max(0,cashAfterReserve)*ownerTaxRate;
+  const cashAvailableToOwner=Math.max(0,cashAfterReserve)-ownerTax;
+  const financingGap=Math.max(0,-cashAfterReserve);
+
+  return {core,currentSku,expenseDetails,sellOutGsvGross,grossInvoiceRevenue,outputVat,channelBridge,revenueBeforeContra,netRevenue,sums,coreCogs,cogsAddons,totalCogs,grossProfit,contribution,ebitda,ebit,pbt,taxableIncome,incomeTaxExpense,netProfit,grossMargin,markup,pbtMargin,netProfitMargin,netProfitOnCogs,selectedMargin,beUnits,byChannel,channelResults,inventoryIncrease,arIncrease,apIncrease,capex,loanPrincipal,otherCashOutflows,cashReserve,ownerTaxRate,operatingCashFlow,freeCashFlow,cashAfterReserve,ownerTax,cashAvailableToOwner,financingGap};
+};
+
+function solveBreakEvenByNetProfit(){
+  const unitsEl=document.getElementById('units_total');
+  if(!unitsEl) return Infinity;
+  const saved=unitsEl.value;
+  const evalAt=(q)=>{unitsEl.value=q;breakEvenSolveGuard=true;const rr=calculate();breakEvenSolveGuard=false;return rr.netProfit;};
+  try{
+    let low=0.000001;
+    let lowVal=evalAt(low);
+    if(isFinite(lowVal)&&lowVal>=0) return 0;
+    let high=Math.max(1,parseFloat(saved)||1), highVal=evalAt(high), guard=0;
+    while((!isFinite(highVal)||highVal<0)&&high<1e9&&guard<60){high*=2;highVal=evalAt(high);guard++;}
+    if(!isFinite(highVal)||highVal<0) return Infinity;
+    for(let i=0;i<65;i++){
+      const mid=(low+high)/2, v=evalAt(mid);
+      if(isFinite(v)&&v>=0) high=mid; else low=mid;
+    }
+    return high;
+  } finally {
+    unitsEl.value=saved;
+    breakEvenSolveGuard=false;
+    const range=document.getElementById('units_total_range');if(range)range.value=saved;
+  }
+}
+
+function solveMainTargetRrp(target){
+  target=clamp(target,0,0.90);
+  const rrpEl=document.getElementById('rrp'), modeEl=document.getElementById('rrp_mode');
+  if(!rrpEl||!modeEl) return Infinity;
+  const savedRrp=rrpEl.value, savedMode=modeEl.value;
+  const current=Math.max(1,parseFloat(savedRrp)||1);
+  const savedSuppress=suppressBreakEvenSolve; suppressBreakEvenSolve=true;
+  function at(price){rrpEl.value=price;modeEl.value='gross';return calculate().grossMargin;}
+  let low=0, high=Math.max(current,1000);
+  let gm=at(high), guard=0;
+  while((!isFinite(gm)||gm<target) && high<1e12 && guard<60){high*=2;gm=at(high);guard++;}
+  if(!isFinite(gm)||gm<target){rrpEl.value=savedRrp;modeEl.value=savedMode;suppressBreakEvenSolve=savedSuppress;return Infinity;}
+  for(let i=0;i<70;i++){
+    const mid=(low+high)/2;
+    const m=at(mid);
+    if(isFinite(m)&&m>=target) high=mid; else low=mid;
+  }
+  rrpEl.value=savedRrp; modeEl.value=savedMode; suppressBreakEvenSolve=savedSuppress;
+  const range=document.getElementById('rrp_range'); if(range) range.value=savedRrp;
+  return high;
+}
+
+buildKpiRows = function(r){return [
+  ['Sell-out GSV gross',r.sellOutGsvGross],['Gross invoiced revenue incl VAT',r.grossInvoiceRevenue],['Output VAT excluded',r.outputVat],['Net revenue',r.netRevenue],
+  ['COGS',r.totalCogs],['Gross profit',r.grossProfit],['Gross margin',r.grossMargin],['Markup',r.markup],['Contribution',r.contribution],['EBITDA',r.ebitda],['PBT',r.pbt],['Taxable income',r.taxableIncome],['Income tax',r.incomeTaxExpense],['Net profit',r.netProfit],['Net profit margin',r.netProfitMargin],['Net profit / COGS',r.netProfitOnCogs],['Free cash flow',r.freeCashFlow],['Cash available to owner',r.cashAvailableToOwner],['Financing gap',r.financingGap],['Break-even units',r.beUnits]
+]};
+renderKpis = function(r){
+  const target=r.targetGrossMargin||0;
+  const groups=[
+    ['Revenue / выручка',[['Net revenue',money(r.netRevenue),'','после бонусов, без НДС'],['Revenue / ед.',money(safeDiv(r.netRevenue,r.core.unitsTotal)),'','без НДС'],['Gross invoice с НДС',money(r.grossInvoiceRevenue),'','сумма счёта / оплаты'],['Sell-out GSV на полке',money(r.sellOutGsvGross),'','рыночный оборот, memo']]],
+    ['Gross economics',[['COGS total',money(r.totalCogs),'','база + доп. COGS'],['Gross profit',money(r.grossProfit),r.grossProfit>=0?'good':'bad','Net revenue − COGS'],['Gross margin / Net revenue',pct(r.grossMargin),r.grossMargin>=target?'good':(r.grossMargin>=0?'warn':'bad'),`цель ${pct(target)}`],['Отклонение от цели',pct(r.grossMargin-target),r.grossMargin>=target?'good':'bad','факт − target'],['РРЦ для target GM',isFinite(r.targetRrpGross)?money(r.targetRrpGross):'нет решения',isFinite(r.targetRrpGross)?'':'bad','текущий mix, с НДС'],['Markup / COGS',pct(r.markup),r.markup>=0?'good':'bad','GP / COGS']]],
+    ['Operating / tax / net result',[['Contribution margin',money(r.contribution),r.contribution>=0?'good':'bad','после variable selling'],['EBITDA',money(r.ebitda),r.ebitda>=0?'good':'bad','до D&A'],['PBT',money(r.pbt),r.pbt>=0?'good':'bad','до КПН'],['Taxable income / база КПН',money(r.taxableIncome),r.taxableIncome>=0?'warn':'good','PBT + невыч. расходы'],['Income tax / КПН',money(r.incomeTaxExpense),'','ставка '+fmt1.format(r.core.incomeTax*100)+'%'],['Net profit after tax',money(r.netProfit),r.netProfit>=0?'good':'bad','бухгалтерская чистая прибыль']]],
+    ['Cash / собственник',[['Operating cash flow',money(r.operatingCashFlow),r.operatingCashFlow>=0?'good':'bad','NP + D&A − ΔWC'],['Free cash flow',money(r.freeCashFlow),r.freeCashFlow>=0?'good':'bad','после CAPEX и долга'],['Доступно собственнику',money(r.cashAvailableToOwner),r.cashAvailableToOwner>0?'good':(r.financingGap>0?'bad':'warn'),'после резерва и налога'],['Дефицит финансирования',money(r.financingGap),r.financingGap>0?'bad':'good','если cash после резерва < 0']]],
+    ['Return / окупаемость',[['PBT margin',pct(r.pbtMargin),r.pbtMargin>=0?'good':'bad','PBT / Net revenue'],['Net profit margin',pct(r.netProfitMargin),r.netProfitMargin>=0?'good':'bad','Net profit / Net revenue'],['Net profit / COGS',pct(r.netProfitOnCogs),r.netProfitOnCogs>=0?'good':'bad','чистая прибыль к себестоимости'],['Break-even',isFinite(r.beUnits)?fmt.format(Math.ceil(r.beUnits))+' шт':'нет',isFinite(r.beUnits)?'':'bad','по текущему mix']]]
+  ];
+  document.getElementById('kpi_groups').innerHTML=groups.map(([title,items])=>`<div class="kpi-section"><div class="kpi-title">${title}</div><div class="kpi-grid">${items.map(x=>kpiCard(x[0],x[1],x[2],x[3])).join('')}</div></div>`).join('');
+};
+function renderCashKpis(r){
+  const el=document.getElementById('cash_kpis'); if(!el) return;
+  el.innerHTML=[
+    ['Net profit',money(r.netProfit),r.netProfit>=0?'good':'bad','бухгалтерский результат'],
+    ['Operating cash flow',money(r.operatingCashFlow),r.operatingCashFlow>=0?'good':'bad','после оборотного капитала'],
+    ['Free cash flow',money(r.freeCashFlow),r.freeCashFlow>=0?'good':'bad','после CAPEX и тела долга'],
+    ['После резерва бизнеса',money(r.cashAfterReserve),r.cashAfterReserve>=0?'good':'bad','до вывода собственнику'],
+    ['Налог/удержание при выводе',money(r.ownerTax),'','ставка '+fmt1.format(r.ownerTaxRate*100)+'%'],
+    ['Можно вывести собственнику',money(r.cashAvailableToOwner),r.cashAvailableToOwner>0?'good':(r.financingGap>0?'bad':'warn'),'не больше доступного cash'],
+    ['Нужно профинансировать',money(r.financingGap),r.financingGap>0?'bad':'good','дефицит после резерва']
+  ].map(x=>kpiCard(x[0],x[1],x[2],x[3])).join('');
+}
+function renderModelWarnings(r){
+  const el=document.getElementById('model_warnings'); if(!el) return;
+  const warnings=[];
+  const review=params.filter(p=>normalizeParamConfig(p).status==='review');
+  if(review.length) warnings.push(`${review.length} расходов имеют статус «Проверить». Они не включены в результат до подтверждения.`);
+  const scoped=params.some(p=>expenseIsIncluded(p)&&p.skuMode!=='all');
+  if(scoped&&!r.currentSku) warnings.push('Есть активные расходы с ограничением по SKU, но артикул основной позиции не указан.');
+  if(r.grossMargin+1e-8<r.targetGrossMargin) warnings.push(`Фактическая Gross Margin ${pct(r.grossMargin)} ниже цели ${pct(r.targetGrossMargin)}.`);
+  if(r.financingGap>0) warnings.push(`После денежных потребностей и резерва требуется финансирование ${money(r.financingGap)}.`);
+  else if(r.netProfit>0&&r.cashAvailableToOwner<=0) warnings.push('Бухгалтерская прибыль положительная, но свободных денег для собственника нет.');
+  if(!warnings.length){el.className='good-note';el.innerHTML='<b>Контроль модели:</b> критических предупреждений нет.';return;}
+  el.className='warn-note';el.innerHTML='<b>Контроль модели:</b><br>'+warnings.map(x=>'• '+escapeHtml(x)).join('<br>');
+}
+function renderMultiWarnings(){
+  const el=document.getElementById('multi_warnings'); if(!el) return;
+  if(!multiData.length){el.innerHTML='';el.className='';return;}
+  const warnings=[];
+  const noSolution=multiData.filter(r=>!r.suggestedRRP||!r.suggestedWholesale).length;
+  const missingPurchase=multiData.filter(r=>(parseFloat(r.purchase)||0)<=0).length;
+  const negative=multiData.filter(r=>(r.netProfitPerUnit||0)<0).length;
+  const noOwner=multiData.filter(r=>(r.cashOwnerPerUnit||0)<=0).length;
+  const scoped=params.some(p=>expenseIsIncluded(p)&&p.skuMode!=='all');
+  const blankSku=multiData.filter(r=>!String(r.art||'').trim()).length;
+  const review=params.filter(p=>normalizeParamConfig(p).status==='review').length;
+  const retailLoss=multiData.filter(r=>(r.retailGM||0)<0).length;
+  const partnerLoss=multiData.filter(r=>(r.partnerGM||0)<0).length;
+  if(noSolution) warnings.push(`Нет решения по целевой марже для ${noSolution} SKU.`);
+  if(missingPurchase) warnings.push(`У ${missingPurchase} SKU не указана положительная закупочная цена.`);
+  if(negative) warnings.push(`У ${negative} SKU отрицательная чистая прибыль при текущих расходах.`);
+  if(retailLoss) warnings.push(`У ${retailLoss} SKU отрицательная валовая маржа канала «Сети» при единой РРЦ.`);
+  if(partnerLoss) warnings.push(`У ${partnerLoss} SKU отрицательная валовая маржа канала «Партнёры» при единой РРЦ.`);
+  if(noOwner) warnings.push(`У ${noOwner} SKU нет положительной суммы собственнику после денежных корректировок.`);
+  if(scoped&&blankSku) warnings.push(`${blankSku} строк без артикула: расходы, назначенные конкретным SKU, могут примениться неверно.`);
+  if(review) warnings.push(`${review} расходов ещё имеют статус «Проверить» и не включены.`);
+  if(!warnings.length){el.className='good-note';el.innerHTML='<b>Контроль портфеля:</b> целевая маржа достигнута, отрицательных результатов не выявлено.';return;}
+  el.className='warn-note';el.innerHTML='<b>Контроль портфеля:</b><br>'+warnings.map(x=>'• '+escapeHtml(x)).join('<br>');
+}
+
+renderResults = function(r){
+  r.targetGrossMargin=clamp(n('single_target_margin')/100,0,.90);
+  r.targetRrpGross=solveMainTargetRrp(r.targetGrossMargin);
+  lastResult=r;
+  renderKpis(r);
+  document.getElementById('quick_formula').innerHTML=`Фактическая Gross Margin: <b>${pct(r.grossMargin)}</b>; цель: <b>${pct(r.targetGrossMargin)}</b>; расчётная РРЦ для цели: <b>${isFinite(r.targetRrpGross)?money(r.targetRrpGross):'нет решения'}</b> с НДС.<br>Текущая РРЦ: ${money(r.core.rrpShelfGross)} с НДС / ${money(r.core.rrpShelfNet)} без НДС. Учётная COGS: ${money(r.core.cogsAccounting)} на ед. Каналы: DTC ${pct(r.core.shares.dtc)}, сети ${pct(r.core.shares.retail)}, партнёры ${pct(r.core.shares.partner)}.`;
+  renderChannelTable(r); renderPL(r); renderExpenseBreakdown(r); renderScenarios(r); renderCashKpis(r); renderAssumptions(r); renderExpenseReviewSummary(); renderModelWarnings(r);
+};
+function renderExpenseBreakdown(r){
+  const tb=document.querySelector('#expense_breakdown_table tbody'); if(!tb) return;
+  tb.innerHTML='';
+  const treatMap=Object.fromEntries(treatOptions);
+  if(!r.expenseDetails||!r.expenseDetails.length){
+    const tr=document.createElement('tr');tr.innerHTML='<td colspan="6" style="text-align:left;color:#6b7280">Нет активных гибких расходов. Базовый COGS отражён отдельно.</td>';tb.appendChild(tr);return;
+  }
+  r.expenseDetails.forEach(d=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${escapeHtml(d.name)}</td><td>${escapeHtml(treatMap[d.treat]||d.treat)}</td><td>${money(d.total)}</td><td>${money(d.perUnit)}</td><td>${money(d.recoverableVat)}</td><td>${d.tax==='yes'?'Выч.':'Не выч.'}</td>`;
+    tb.appendChild(tr);
+  });
+}
+renderPL = function(r){
+  const rows=[
+    ['Sell-out GSV на полке с НДС',r.sellOutGsvGross,'memo'],['Минус: комиссии каналов / DTC скидка до invoice',-r.channelBridge,'memo'],['Gross invoiced revenue с НДС',r.grossInvoiceRevenue,'memo'],['Минус: НДС к исключению',-r.outputVat,'memo'],['Зачётный НДС по гибким расходам (memo)',r.sums.recoverableVat,'memo'],['Revenue before contra без НДС',r.revenueBeforeContra,'subtotal'],['Минус: trade rebates / bonuses / contra revenue',-r.sums.contraRevenue,''],['Net revenue без НДС',r.netRevenue,'subtotal'],['COGS базовая себестоимость',-r.coreCogs,''],['COGS доп. параметры',-r.cogsAddons,''],['COGS total',-r.totalCogs,'subtotal'],['Gross profit',r.grossProfit,'subtotal'],['Variable selling / distribution',-r.sums.variableSelling,''],['Contribution margin',r.contribution,'subtotal'],['Marketing',-r.sums.marketing,''],['Fixed OPEX / SG&A',-r.sums.fixedOpex,''],['EBITDA / операц. результат до D&A',r.ebitda,'subtotal'],['D&A',-r.sums.depr,''],['EBIT',r.ebit,'subtotal'],['Finance cost',-r.sums.finance,''],['PBT / прибыль до КПН',r.pbt,'subtotal'],['Невычитаемые расходы / корректировка КПН',r.sums.nonDeductible,'memo'],['Taxable income / налоговая база КПН',r.taxableIncome,'subtotal'],['Income tax / КПН',-r.incomeTaxExpense,''],['Net profit after tax',r.netProfit,'subtotal'],['D&A: неденежный расход, возврат в cash flow',r.sums.depr,'memo'],['Изменение оборотного капитала',-r.inventoryIncrease-r.arIncrease+r.apIncrease,'memo'],['Operating cash flow',r.operatingCashFlow,'subtotal'],['CAPEX, тело долга и прочие выплаты',-r.capex-r.loanPrincipal-r.otherCashOutflows,''],['Free cash flow',r.freeCashFlow,'subtotal'],['Резерв, остающийся в бизнесе',-r.cashReserve,''],['Налог/удержание при выводе',-r.ownerTax,''],['Cash available to owner',r.cashAvailableToOwner,'subtotal']
+  ];
+  const tb=document.querySelector('#pl_table tbody'); tb.innerHTML='';
+  rows.forEach(([name,val,type])=>{
+    const tr=document.createElement('tr'); if(type==='memo') tr.className='memo-row'; if(type==='subtotal') tr.className='subtotal-row';
+    const cls=val<0?'negative':((/profit|PBT|EBIT|Contribution|Net revenue|Taxable|cash flow|Cash available|Free cash/i.test(name))?'positive':'');
+    tr.innerHTML=`<td>${name}</td><td class="${cls}">${money(val)}</td><td>${r.netRevenue?pct(val/r.netRevenue):'—'}</td><td>${r.core.unitsTotal?money(val/r.core.unitsTotal):'—'}</td>`; tb.appendChild(tr);
+  });
+};
+renderAssumptions = function(r){
+  normalizeAllParams();
+  const review=params.filter(p=>p.status==='review').map(p=>p.name);
+  const txt=[
+    `SKU: ${r.currentSku||'не указан; SKU-ограниченные расходы могут не примениться'}`,
+    `РРЦ: ${money(r.core.rrpShelfGross)} с НДС / ${money(r.core.rrpShelfNet)} без НДС; target GM: ${pct(r.targetGrossMargin)}; РРЦ для target: ${isFinite(r.targetRrpGross)?money(r.targetRrpGross):'нет решения'}`,
+    `COGS: ${money(r.core.cogsGross)} с НДС / ${money(r.core.cogsNet)} без НДС; учетная COGS: ${money(r.core.cogsAccounting)} на ед.`,
+    `НДС: ${fmt1.format(r.core.vat*100)}%; КПН: ${fmt1.format(r.core.incomeTax*100)}%; зачётный НДС гибких расходов: ${money(r.sums.recoverableVat)}`,
+    `Для cash flow предполагается, что зачётный НДС возмещается/зачитывается в том же периоде; временной разрыв отражайте через денежные корректировки.`,
+    `Объём: ${fmt1.format(r.core.unitsTotal)} шт; mix: DTC ${pct(r.core.shares.dtc)}, сети ${pct(r.core.shares.retail)}, партнёры ${pct(r.core.shares.partner)}`,
+    `Net revenue: ${money(r.netRevenue)}; Gross profit: ${money(r.grossProfit)}; PBT: ${money(r.pbt)}; Net profit: ${money(r.netProfit)}`,
+    `Free cash flow: ${money(r.freeCashFlow)}; доступно собственнику: ${money(r.cashAvailableToOwner)}; дефицит финансирования: ${money(r.financingGap)}`,
+    `Учтённые параметры: ${params.filter(expenseIsIncluded).map(p=>p.name).join('; ')||'нет'}`,
+    `Требуют проверки: ${review.join('; ')||'нет'}`
+  ].join('\n');
+  document.getElementById('assumptions').value=txt;
+};
+
+/* ---------- Portfolio: exact VAT, SKU expense scope, P&L and cash ---------- */
+function portfolioSkuKey(row){ return String(row.art || row.name || '').trim(); }
+function getGlobalTargetGM(){
+  const el=document.getElementById('multi_target_margin');
+  const v=el?parseFloat(el.value):NaN;
+  return isFinite(v)?clamp(v,0,90):35;
+}
+function normalizeMultiRow(row, index=0){
+  row.id=row.id||Date.now()+index;
+  row.name=String(row.name||`Позиция ${index+1}`);
+  row.art=String(row.art||'');
+  {const q=parseFloat(String(row.qty??'').replace(/\s/g,'').replace(',','.'));row.qty=String(row.qty??'').trim()===''?1:Math.max(0,isFinite(q)?q:1);}
+  row.purchase=Math.max(0,parseSmartNumber(row.purchase));
+  if(row.manualUplift==null) row.manualUplift=Math.max(0,parseSmartNumber(row.landedUplift)||0);
+  row.manualUplift=Math.max(0,parseSmartNumber(row.manualUplift));
+  row.totalUplift=parseSmartNumber(row.totalUplift)||0;
+  row.targetGM=(row.targetGM==null||String(row.targetGM).trim()==='')?getGlobalTargetGM():clamp(parseSmartNumber(row.targetGM),0,90);
+  if(row.useGlobalTarget==null) row.useGlobalTarget=false;
+  row.landedCOGS=parseSmartNumber(row.landedCOGS)||0;
+  row.suggestedRRP=parseSmartNumber(row.suggestedRRP)||0;
+  row.suggestedWholesale=parseSmartNumber(row.suggestedWholesale)||0;
+  row.gpPerUnit=parseSmartNumber(row.gpPerUnit)||0;
+  row.netProfitPerUnit=parseSmartNumber(row.netProfitPerUnit)||0;
+  row.cashOwnerPerUnit=parseSmartNumber(row.cashOwnerPerUnit)||0;
+  row.marginPct=parseSmartNumber(row.marginPct)||0;
+  return row;
+}
+function paramChannelKeys(applies){
+  const map={all:['dtc','retail','partner'],dtc:['dtc'],retail:['retail'],partner:['partner'],dtc_retail:['dtc','retail'],dtc_partner:['dtc','partner'],retail_partner:['retail','partner']};
+  return map[applies]||map.all;
+}
+function paramAppliesToChannel(p,key){return paramChannelKeys(p.applies).includes(key);}
+function portfolioApplicableQty(p){
+  const q=multiData.filter(r=>paramAppliesToSku(p,portfolioSkuKey(r))).reduce((a,r)=>a+(parseFloat(r.qty)||0),0);
+  return q>0?q:1;
+}
+function portfolioApplicableShare(p){
+  const sh=getShares();
+  let sum=paramChannelKeys(p.applies).reduce((a,k)=>a+(sh[k]||0),0);
+  return sum>0?sum:1;
+}
+function rowPurchaseCore(row){
+  const vat=n('vat')/100;
+  const val=Math.max(0,parseFloat(row.purchase)||0);
+  const gross=s('cogs_mode')==='gross'?val:val*(1+vat);
+  const net=s('cogs_mode')==='gross'?safeDiv(val,1+vat):val;
+  const accounting=s('vat_recoverable')==='yes'?net:gross;
+  return {vat,gross,net,accounting};
+}
+function portfolioBasePerUnit(base, env){
+  switch(base){
+    case 'rrpShelfGross': return env.shelfGross;
+    case 'rrpShelfNet': return safeDiv(env.shelfGross,1+env.vat);
+    case 'channelInvoiceGross': return env.invoiceGross;
+    case 'channelRevenueNet': return env.revenueBeforeContra;
+    case 'sellOutGsvGrossTotal': return env.shelfGross;
+    case 'grossInvoiceTotal': return env.invoiceGross;
+    case 'netRevenueBeforeContraTotal': return env.revenueBeforeContra;
+    case 'cogsAccounting': return env.purchase.accounting;
+    case 'cogsGross': return env.purchase.gross;
+    case 'cogsNet': return env.purchase.net;
+    default:return 0;
+  }
+}
+function portfolioCashAdjustPerUnit(){
+  const qty=Math.max(1,multiData.reduce((a,r)=>a+(parseFloat(r.qty)||0),0));
+  return {
+    inventory:n('cash_inventory_increase')/qty,
+    ar:n('cash_ar_increase')/qty,
+    ap:n('cash_ap_increase')/qty,
+    capex:Math.max(0,n('cash_capex'))/qty,
+    loan:Math.max(0,n('cash_loan_principal'))/qty,
+    other:Math.max(0,n('cash_other_outflows'))/qty,
+    reserve:Math.max(0,n('cash_reserve'))/qty,
+    ownerTaxRate:clamp(n('owner_tax_rate')/100,0,1)
+  };
+}
+function evaluateSkuChannel(row,shelfGross,channelKey){
+  normalizeParamConfig;
+  const purchase=rowPurchaseCore(row);
+  const vat=purchase.vat;
+  const commission=channelKey==='retail'?clamp(n('retail_commission')/100,0,.95):(channelKey==='partner'?clamp(n('partner_commission')/100,0,.95):0);
+  const discount=channelKey==='dtc'?clamp(n('dtc_discount')/100,0,.95):0;
+  const invoiceGross=shelfGross*(1-commission)*(1-discount);
+  const revenueBeforeContra=safeDiv(invoiceGross,1+vat);
+  const env={vat,purchase,shelfGross,invoiceGross,revenueBeforeContra};
+  const sums=blankSums();
+  const paramDetails=[];
+  const sku=portfolioSkuKey(row);
+  params.forEach(p=>{
+    if(!expenseIsIncluded(p)||!paramAppliesToSku(p,sku)||!paramAppliesToChannel(p,channelKey)) return;
+    let v=0;
+    if(usesAmount(p.mode)){
+      if(p.mode==='unit'||p.mode==='unit_pct') v+=(parseFloat(p.amount)||0);
+      if(p.mode==='annual'||p.mode==='annual_pct') v+=(parseFloat(p.amount)||0)/(portfolioApplicableQty(p)*portfolioApplicableShare(p));
+    }
+    if(usesPct(p.mode)) v+=((parseFloat(p.pct)||0)/100)*portfolioBasePerUnit(p.base,env);
+    const vatAdj=applyExpenseVat(p,v,vat); v=vatAdj.accounting;
+    sums[p.treat]+=v;
+    sums.recoverableVat+=vatAdj.recoverableVat;
+    if(p.tax==='no') sums.nonDeductible+=v;
+    paramDetails.push({name:p.name,treat:p.treat,value:v,recoverableVat:vatAdj.recoverableVat,tax:p.tax,vatTreatment:p.vatTreatment});
+  });
+  const manualCogs=purchase.accounting*Math.max(0,parseFloat(row.manualUplift)||0)/100;
+  const totalCogs=purchase.accounting+manualCogs+sums.cogs;
+  const netRevenue=revenueBeforeContra-sums.contraRevenue;
+  const grossProfit=netRevenue-totalCogs;
+  const contribution=grossProfit-sums.variableSelling;
+  const ebitda=contribution-sums.marketing-sums.fixedOpex;
+  const ebit=ebitda-sums.depr;
+  const pbt=ebit-sums.finance;
+  const taxable=pbt+sums.nonDeductible;
+  const incomeTax=Math.max(0,taxable)*clamp(n('income_tax')/100,0,1);
+  const netProfit=pbt-incomeTax;
+  const cash=portfolioCashAdjustPerUnit();
+  const operatingCash=netProfit+sums.depr-cash.inventory-cash.ar+cash.ap;
+  const freeCash=operatingCash-cash.capex-cash.loan-cash.other;
+  const afterReserve=freeCash-cash.reserve;
+  const ownerTax=Math.max(0,afterReserve)*cash.ownerTaxRate;
+  const cashOwner=Math.max(0,afterReserve)-ownerTax;
+  return {channelKey,shelfGross,invoiceGross,paramDetails,revenueBeforeContra,netRevenue,totalCogs,manualCogs,sums,grossProfit,grossMargin:safeDiv(grossProfit,netRevenue),contribution,ebitda,ebit,pbt,taxable,incomeTax,netProfit,operatingCash,freeCash,afterReserve,ownerTax,cashOwner,purchase};
+}
+function solveSkuTarget(row,channelKey,targetGM){
+  const target=clamp(targetGM,0,.90);
+  const pc=rowPurchaseCore(row);
+  let low=0, high=Math.max(1000,pc.gross*2,pc.accounting*(1+pc.vat)*2);
+  let rr=evaluateSkuChannel(row,high,channelKey), guard=0;
+  while((!isFinite(rr.grossMargin)||rr.grossMargin<target)&&high<1e12&&guard<60){high*=2;rr=evaluateSkuChannel(row,high,channelKey);guard++;}
+  if(!isFinite(rr.grossMargin)||rr.grossMargin<target) return null;
+  for(let i=0;i<70;i++){
+    const mid=(low+high)/2;
+    const x=evaluateSkuChannel(row,mid,channelKey);
+    if(isFinite(x.grossMargin)&&x.grossMargin>=target) high=mid; else low=mid;
+  }
+  return evaluateSkuChannel(row,high,channelKey);
+}
+
+
+function evaluateSkuMix(row,shelfGross){
+  const sh=getShares();
+  const channels={
+    dtc:evaluateSkuChannel(row,shelfGross,'dtc'),
+    retail:evaluateSkuChannel(row,shelfGross,'retail'),
+    partner:evaluateSkuChannel(row,shelfGross,'partner')
+  };
+  const weighted=(field)=>channels.dtc[field]*sh.dtc+channels.retail[field]*sh.retail+channels.partner[field]*sh.partner;
+  const sums=blankSums();
+  for(const key of Object.keys(sums)) sums[key]=(channels.dtc.sums[key]||0)*sh.dtc+(channels.retail.sums[key]||0)*sh.retail+(channels.partner.sums[key]||0)*sh.partner;
+  const netRevenue=weighted('netRevenue');
+  const totalCogs=weighted('totalCogs');
+  const grossProfit=netRevenue-totalCogs;
+  const contribution=grossProfit-sums.variableSelling;
+  const ebitda=contribution-sums.marketing-sums.fixedOpex;
+  const ebit=ebitda-sums.depr;
+  const pbt=ebit-sums.finance;
+  const taxable=pbt+sums.nonDeductible;
+  const incomeTax=Math.max(0,taxable)*clamp(n('income_tax')/100,0,1);
+  const netProfit=pbt-incomeTax;
+  const cash=portfolioCashAdjustPerUnit();
+  const operatingCash=netProfit+sums.depr-cash.inventory-cash.ar+cash.ap;
+  const freeCash=operatingCash-cash.capex-cash.loan-cash.other;
+  const afterReserve=freeCash-cash.reserve;
+  const ownerTax=Math.max(0,afterReserve)*cash.ownerTaxRate;
+  const cashOwner=Math.max(0,afterReserve)-ownerTax;
+  const detailMap=new Map();
+  for(const [key,w] of [['dtc',sh.dtc],['retail',sh.retail],['partner',sh.partner]]){
+    for(const d of channels[key].paramDetails){
+      const id=[d.name,d.treat,d.tax,d.vatTreatment].join('|');
+      const cur=detailMap.get(id)||{...d,value:0,recoverableVat:0};
+      cur.value+=d.value*w;cur.recoverableVat+=d.recoverableVat*w;detailMap.set(id,cur);
+    }
+  }
+  const paramDetails=Array.from(detailMap.values());
+  return {shelfGross,channels,sums,paramDetails,netRevenue,totalCogs,grossProfit,grossMargin:safeDiv(grossProfit,netRevenue),contribution,ebitda,ebit,pbt,taxable,incomeTax,netProfit,operatingCash,freeCash,afterReserve,ownerTax,cashOwner,purchase:channels.dtc.purchase};
+}
+function solveSkuMixTarget(row,targetGM){
+  const target=clamp(targetGM,0,.90);
+  const pc=rowPurchaseCore(row);
+  let low=0,high=Math.max(1000,pc.gross*2,pc.accounting*(1+pc.vat)*2);
+  let rr=evaluateSkuMix(row,high),guard=0;
+  while((!isFinite(rr.grossMargin)||rr.grossMargin<target)&&high<1e12&&guard<60){high*=2;rr=evaluateSkuMix(row,high);guard++;}
+  if(!isFinite(rr.grossMargin)||rr.grossMargin<target)return null;
+  for(let i=0;i<70;i++){
+    const mid=(low+high)/2,x=evaluateSkuMix(row,mid);
+    if(isFinite(x.grossMargin)&&x.grossMargin>=target)high=mid;else low=mid;
+  }
+  return evaluateSkuMix(row,high);
+}
+
+renderMultiTable = function(){
+  const tb=document.getElementById('multi_tbody'); if(!tb) return; tb.innerHTML='';
+  multiData.forEach((raw,i)=>{
+    const r=normalizeMultiRow(raw,i);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td style="text-align:center;font-weight:600;color:#6b7280;">${i+1}</td>
+      <td style="text-align:left;"><input value="${escapeHtml(r.name)}" onchange="updateMulti(${i},'name',this.value)" style="width:100%;border:none;background:transparent;font-size:12.5px;padding:1px 3px;"></td>
+      <td><input value="${escapeHtml(r.art)}" onchange="updateMulti(${i},'art',this.value)" style="width:100%;border:none;background:transparent;font-size:12px;padding:1px 3px;"></td>
+      <td><input type="number" value="${r.qty}" onchange="updateMulti(${i},'qty',isFinite(parseFloat(this.value))?Math.max(0,parseFloat(this.value)):1)" style="width:70px;text-align:right;border:none;background:transparent;padding:1px 3px;"></td>
+      <td><input type="number" value="${r.purchase}" onchange="updateMulti(${i},'purchase',parseFloat(this.value)||0)" style="width:100px;text-align:right;border:none;background:transparent;padding:1px 3px;"></td>
+      <td><input type="number" value="${r.manualUplift}" onchange="updateMulti(${i},'manualUplift',parseFloat(this.value)||0)" style="width:75px;text-align:right;border:none;background:transparent;padding:1px 3px;">%</td>
+      <td style="font-weight:600;">${fmt1.format(r.totalUplift)}%</td>
+      <td style="background:#f0fdf4;font-weight:600;color:#166534;">${money(r.landedCOGS)}</td>
+      <td><input type="number" value="${r.targetGM}" onchange="updateMulti(${i},'targetGM',parseFloat(this.value)||0)" style="width:70px;text-align:right;border:none;background:transparent;padding:1px 3px;">%</td>
+      <td style="background:#eff6ff;font-weight:600;">${r.suggestedRRP?money(r.suggestedRRP):'нет решения'}</td>
+      <td style="background:#fefce8;font-weight:600;">${r.suggestedWholesale?money(r.suggestedWholesale):'нет решения'}</td>
+      <td style="font-weight:600;color:${r.gpPerUnit>=0?'#166534':'#b91c1c'};">${money(r.gpPerUnit)}</td>
+      <td style="font-weight:600;color:${r.netProfitPerUnit>=0?'#166534':'#b91c1c'};">${money(r.netProfitPerUnit)}</td>
+      <td style="font-weight:700;color:${r.cashOwnerPerUnit>0?'#166534':'#a16207'};">${money(r.cashOwnerPerUnit)}</td>
+      <td style="font-weight:700;color:${r.marginPct+1e-7>=(r.targetGM/100)?'#166534':'#b91c1c'};">${pct(r.marginPct)}</td>
+      <td style="text-align:center;"><button onclick="showMultiDetail(${i})" style="border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;border-radius:5px;padding:2px 6px;cursor:pointer;font-size:10.5px;margin-right:3px;">P&L</button><button onclick="delMulti(${i})" style="border:none;background:#fee2e2;color:#b91c1c;border-radius:5px;padding:2px 7px;cursor:pointer;font-size:11px;">×</button></td>`;
+    tb.appendChild(tr);
+  });
+  updateMultiFoot();
+};
+function showMultiDetail(i){
+  const row=multiData[i],panel=document.getElementById('multi_detail_panel');if(!row||!panel)return;
+  const mix=evaluateSkuMix(row,row.suggestedRRP||0);
+  const treatMap=Object.fromEntries(treatOptions);
+  const expenseRows=mix.paramDetails.length?mix.paramDetails.map(d=>`<tr><td>${escapeHtml(d.name)}</td><td>${escapeHtml(treatMap[d.treat]||d.treat)}</td><td>${money(d.value)}</td><td>${money(d.recoverableVat)}</td><td>${d.tax==='yes'?'Выч.':'Не выч.'}</td></tr>`).join(''):'<tr><td colspan="5" style="text-align:left;color:#6b7280">Активных гибких расходов для SKU нет.</td></tr>';
+  const manual=mix.purchase.accounting*(parseFloat(row.manualUplift)||0)/100;
+  panel.style.display='block';
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><b>P&L на единицу: ${escapeHtml(row.name)} (${escapeHtml(row.art||'без артикула')})</b><button onclick="document.getElementById('multi_detail_panel').style.display='none'">Закрыть</button></div>
+  <div class="table-wrap" style="margin-top:8px"><table><thead><tr><th>Показатель</th><th>Сумма / ед.</th></tr></thead><tbody>
+  <tr><td>Единая РРЦ с НДС</td><td>${money(mix.shelfGross)}</td></tr><tr><td>DTC invoice с НДС</td><td>${money(mix.channels.dtc.invoiceGross)}</td></tr><tr><td>Sell-in сети с НДС</td><td>${money(mix.channels.retail.invoiceGross)}</td></tr><tr><td>Sell-in партнёры с НДС</td><td>${money(mix.channels.partner.invoiceGross)}</td></tr>
+  <tr class="subtotal-row"><td>Net revenue mix без НДС</td><td>${money(mix.netRevenue)}</td></tr><tr><td>Базовая учётная себестоимость</td><td>${money(mix.purchase.accounting)}</td></tr><tr><td>Ручной uplift в COGS</td><td>${money(manual)}</td></tr><tr><td>Дополнительные COGS-параметры</td><td>${money(mix.sums.cogs)}</td></tr><tr class="subtotal-row"><td>COGS total</td><td>${money(mix.totalCogs)}</td></tr><tr class="subtotal-row"><td>Gross profit / GM</td><td>${money(mix.grossProfit)} / ${pct(mix.grossMargin)}</td></tr>
+  <tr><td>Variable selling</td><td>${money(mix.sums.variableSelling)}</td></tr><tr><td>Marketing</td><td>${money(mix.sums.marketing)}</td></tr><tr><td>Fixed OPEX</td><td>${money(mix.sums.fixedOpex)}</td></tr><tr><td>D&A</td><td>${money(mix.sums.depr)}</td></tr><tr><td>Finance cost</td><td>${money(mix.sums.finance)}</td></tr><tr class="subtotal-row"><td>PBT</td><td>${money(mix.pbt)}</td></tr><tr><td>Невычитаемые расходы</td><td>${money(mix.sums.nonDeductible)}</td></tr><tr><td>КПН</td><td>${money(mix.incomeTax)}</td></tr><tr class="subtotal-row"><td>Net profit</td><td>${money(mix.netProfit)}</td></tr><tr><td>Free cash flow</td><td>${money(mix.freeCash)}</td></tr><tr><td>Резерв и налог собственника</td><td>${money((portfolioCashAdjustPerUnit().reserve||0)+mix.ownerTax)}</td></tr><tr class="subtotal-row"><td>Доступно собственнику</td><td>${money(mix.cashOwner)}</td></tr>
+  <tr><td>GM DTC / сети / партнёры</td><td>${pct(mix.channels.dtc.grossMargin)} / ${pct(mix.channels.retail.grossMargin)} / ${pct(mix.channels.partner.grossMargin)}</td></tr></tbody></table></div>
+  <h3 style="margin-top:10px">Активные гибкие расходы на единицу текущего mix</h3><div class="table-wrap"><table><thead><tr><th>Расход</th><th>P&L</th><th>Сумма</th><th>Зачётный НДС</th><th>КПН</th></tr></thead><tbody>${expenseRows}</tbody></table></div>`;
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+updateMulti = function(i,f,v){
+  if(!multiData[i]) return; multiData[i][f]=v; if(f==='targetGM') multiData[i].useGlobalTarget=false; calculateMultiPrices();
+};
+delMulti = function(i){multiData.splice(i,1);calculateMultiPrices();};
+autoLanded = function(){};
+recalcMultiRow = function(i){if(multiData[i])calculateMultiPrices();};
+updateMultiFoot = function(){
+  const f=document.getElementById('multi_tfoot'); if(!f) return; if(!multiData.length){f.innerHTML='';return;}
+  const tQty=multiData.reduce((a,r)=>a+(r.qty||0),0);
+  const tPurch=multiData.reduce((a,r)=>a+(r.purchase||0)*(r.qty||0),0);
+  const tLanded=multiData.reduce((a,r)=>a+(r.landedCOGS||0)*(r.qty||0),0);
+  const tGP=multiData.reduce((a,r)=>a+(r.gpPerUnit||0)*(r.qty||0),0);
+  const tNP=multiData.reduce((a,r)=>a+(r.netProfitPerUnit||0)*(r.qty||0),0);
+  const tOwner=multiData.reduce((a,r)=>a+(r.cashOwnerPerUnit||0)*(r.qty||0),0);
+  const weightedGM=safeDiv(tGP,multiData.reduce((a,r)=>a+safeDiv((r.gpPerUnit||0),(r.marginPct||0))*(r.qty||0),0));
+  f.innerHTML=`<tr style="border-top:2px solid #e5e7eb;"><td colspan="3" style="text-align:left;padding-left:10px;font-weight:700;">ИТОГО</td><td>${fmt.format(tQty)}</td><td>${money(tPurch)}</td><td></td><td></td><td style="background:#f0fdf4;color:#166534;">${money(tLanded)}</td><td></td><td></td><td></td><td>${money(tGP)}</td><td>${money(tNP)}</td><td>${money(tOwner)}</td><td>${pct(weightedGM)}</td><td></td></tr>`;
+};
+calculateMultiPrices = function(){
+  if(!multiData.length){renderMultiTable();return;}
+  normalizeAllParams();
+  const glob=getGlobalTargetGM();
+  multiData.forEach((raw,i)=>{
+    const r=normalizeMultiRow(raw,i);
+    const rv=parseFloat(r.targetGM);const gm=clamp((isFinite(rv)?rv:glob)/100,0,.90);
+    const mix=solveSkuMixTarget(r,gm);
+    if(mix){
+      r.suggestedRRP=mix.shelfGross;
+      r.suggestedWholesale=mix.channels.retail.invoiceGross;
+      r.landedCOGS=mix.totalCogs;
+      r.totalUplift=mix.purchase.accounting?safeDiv(mix.totalCogs-mix.purchase.accounting,mix.purchase.accounting)*100:0;
+      r.gpPerUnit=mix.grossProfit;
+      r.netProfitPerUnit=mix.netProfit;
+      r.cashOwnerPerUnit=mix.cashOwner;
+      r.marginPct=mix.grossMargin;
+      r.dtcGM=mix.channels.dtc.grossMargin;
+      r.retailGM=mix.channels.retail.grossMargin;
+      r.partnerGM=mix.channels.partner.grossMargin;
+    }else{
+      r.suggestedRRP=0;r.suggestedWholesale=0;r.landedCOGS=0;r.totalUplift=0;r.gpPerUnit=0;r.netProfitPerUnit=0;r.cashOwnerPerUnit=0;r.marginPct=0;r.dtcGM=0;r.retailGM=0;r.partnerGM=0;
+    }
+  });
+  renderMultiTable(); renderMultiWarnings();
+};
+function applyGlobalTargetToAll(){
+  const glob=getGlobalTargetGM();
+  multiData.forEach(r=>{r.targetGM=glob;r.useGlobalTarget=true;});
+  calculateMultiPrices();
+}
+syncFromSingleModel = function(){
+  const globalTarget=clamp(n('single_target_margin'),0,90);
+  const mt=document.getElementById('multi_target_margin'); if(mt) mt.value=globalTarget;
+  multiData.forEach(r=>{if(r.useGlobalTarget||r.targetGM==null||String(r.targetGM).trim()===''){r.targetGM=globalTarget;r.useGlobalTarget=true;}});
+  calculateMultiPrices();
+  alert('НДС, режим COGS, комиссии, КПН, денежные корректировки и активные расходы по SKU применены. Принудительный минимум uplift 2% отсутствует.');
+};
+
+downloadMultiTemplate = function(){
+  const csv='sep=;\r\nНаименование;Артикул;Количество;Закупочная_цена_тенге;Целевая_маржа_процент;Ручной_uplift_процент\r\nХолодильник Премиум А;SKU-001;50;185000;38;0\r\nХолодильник Б Стандарт;SKU-002;120;92000;32;1.5\r\n';
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='portfolio_template_utf8_v9.csv';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+};
+function loadMultiRows(rows,filename=''){
+  if(!rows.length){alert('Нет данных в файле');return;}
+  const normalizedFirst=rows[0].map(normalizeHeader);
+  const aliases={
+    name:['наименование','название','товар','product','product_name','name','item','item_name'],
+    art:['артикул','sku','код','код_товара','номер','model','модель','article'],
+    qty:['количество','кол_во','количество_шт','qty','quantity','units','шт'],
+    purchase:['закупочная_цена_тенге','закупочная_цена','закупочная_стоимость','закупочная','себестоимость','cost','purchase','purchase_price','fob','ddp'],
+    targetGM:['целевая_маржа_процент','целевая_маржа','target_gm','target_margin','gm','margin','маржа'],
+    manualUplift:['ручной_uplift_процент','ручной_uplift','manual_uplift','uplift','landed_uplift']
+  };
+  function findIdx(key){for(const a of aliases[key]){const idx=normalizedFirst.indexOf(normalizeHeader(a));if(idx!==-1)return idx;}return -1;}
+  const idxs={name:findIdx('name'),art:findIdx('art'),qty:findIdx('qty'),purchase:findIdx('purchase'),targetGM:findIdx('targetGM'),manualUplift:findIdx('manualUplift')};
+  const hasHeader=[idxs.name,idxs.art,idxs.qty,idxs.purchase,idxs.targetGM].filter(i=>i!==-1).length>=2;
+  const dataRows=hasHeader?rows.slice(1):rows;
+  if(!hasHeader){idxs.name=0;idxs.art=1;idxs.qty=2;idxs.purchase=3;idxs.targetGM=4;idxs.manualUplift=5;}
+  const glob=getGlobalTargetGM();
+  multiData=[];
+  for(let i=0;i<dataRows.length&&multiData.length<30;i++){
+    const row=dataRows[i];if(!row||row.every(c=>String(c).trim()===''))continue;
+    const targetCell=idxs.targetGM>=0?row[idxs.targetGM]:'';
+    const targetProvided=String(targetCell??'').trim()!=='';
+    const targetRaw=targetProvided?clamp(parseSmartNumber(targetCell),0,90):glob;
+    const qtyCell=idxs.qty>=0?row[idxs.qty]:'';
+    const qtyProvided=String(qtyCell??'').trim()!=='';
+    multiData.push(normalizeMultiRow({id:Date.now()+i,name:(row[idxs.name]||'').trim()||`Позиция ${multiData.length+1}`,art:(row[idxs.art]||'').trim(),qty:qtyProvided?parseSmartNumber(qtyCell):1,purchase:parseSmartNumber(row[idxs.purchase]),manualUplift:idxs.manualUplift>=0?parseSmartNumber(row[idxs.manualUplift]):0,targetGM:targetRaw,useGlobalTarget:!targetProvided},i));
+  }
+  const zone=document.getElementById('multi_upload_zone');if(zone&&multiData.length)zone.style.display='none';
+  calculateMultiPrices();
+  alert(multiData.length?`Загружено ${multiData.length} позиций из ${filename||'файла'}. Цены и прибыль рассчитаны автоматически.`:'Строки с данными не найдены.');
+}
+parseAndLoadMulti = function(text,filename){loadMultiRows(parseCsvRows(text),filename);};
+
+async function unzipXlsxEntries(buffer){
+  const bytes=new Uint8Array(buffer), view=new DataView(buffer);
+  let eocd=-1;
+  for(let i=bytes.length-22;i>=Math.max(0,bytes.length-65557);i--){if(view.getUint32(i,true)===0x06054b50){eocd=i;break;}}
+  if(eocd<0) throw new Error('ZIP directory not found');
+  const count=view.getUint16(eocd+10,true), centralOffset=view.getUint32(eocd+16,true);
+  const entries=new Map(); let pos=centralOffset;
+  for(let i=0;i<count;i++){
+    if(view.getUint32(pos,true)!==0x02014b50) throw new Error('Invalid ZIP central directory');
+    const method=view.getUint16(pos+10,true), compSize=view.getUint32(pos+20,true), nameLen=view.getUint16(pos+28,true), extraLen=view.getUint16(pos+30,true), commentLen=view.getUint16(pos+32,true), localOffset=view.getUint32(pos+42,true);
+    const name=new TextDecoder('utf-8').decode(bytes.slice(pos+46,pos+46+nameLen));
+    const localNameLen=view.getUint16(localOffset+26,true), localExtraLen=view.getUint16(localOffset+28,true), dataStart=localOffset+30+localNameLen+localExtraLen;
+    const compressed=bytes.slice(dataStart,dataStart+compSize);
+    let data;
+    if(method===0) data=compressed;
+    else if(method===8){
+      if(typeof DecompressionStream==='undefined') throw new Error('Browser does not support XLSX decompression');
+      const stream=new Blob([compressed]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+      data=new Uint8Array(await new Response(stream).arrayBuffer());
+    }else throw new Error('Unsupported XLSX compression method '+method);
+    entries.set(name,data);
+    pos+=46+nameLen+extraLen+commentLen;
+  }
+  return entries;
+}
+function xmlText(bytes){return new TextDecoder('utf-8').decode(bytes||new Uint8Array());}
+function resolveZipPath(base,target){
+  if(target.startsWith('/')) return target.slice(1);
+  const parts=base.split('/');parts.pop();
+  target.split('/').forEach(x=>{if(x==='..')parts.pop();else if(x!=='.'&&x)parts.push(x);});
+  return parts.join('/');
+}
+async function parseXlsxRows(buffer){
+  const entries=await unzipXlsxEntries(buffer);
+  const parser=new DOMParser();
+  const workbookPath='xl/workbook.xml', relsPath='xl/_rels/workbook.xml.rels';
+  const workbook=parser.parseFromString(xmlText(entries.get(workbookPath)),'application/xml');
+  const firstSheet=workbook.getElementsByTagName('sheet')[0];if(!firstSheet)throw new Error('XLSX has no sheets');
+  const relId=firstSheet.getAttribute('r:id')||firstSheet.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','id');
+  const rels=parser.parseFromString(xmlText(entries.get(relsPath)),'application/xml');
+  let target='worksheets/sheet1.xml';
+  for(const rel of rels.getElementsByTagName('Relationship')) if(rel.getAttribute('Id')===relId){target=rel.getAttribute('Target');break;}
+  const sheetPath=resolveZipPath(workbookPath,target);
+  const shared=[];
+  if(entries.has('xl/sharedStrings.xml')){
+    const sx=parser.parseFromString(xmlText(entries.get('xl/sharedStrings.xml')),'application/xml');
+    for(const si of sx.getElementsByTagName('si')) shared.push(Array.from(si.getElementsByTagName('t')).map(t=>t.textContent||'').join(''));
+  }
+  const sheet=parser.parseFromString(xmlText(entries.get(sheetPath)),'application/xml');
+  const rows=[];
+  for(const rowNode of sheet.getElementsByTagName('row')){
+    const row=[];
+    for(const c of rowNode.getElementsByTagName('c')){
+      const ref=c.getAttribute('r')||'';const letters=(ref.match(/[A-Z]+/i)||['A'])[0].toUpperCase();
+      let col=0;for(const ch of letters)col=col*26+(ch.charCodeAt(0)-64);col--;
+      const type=c.getAttribute('t');let val='';
+      if(type==='inlineStr') val=Array.from(c.getElementsByTagName('t')).map(t=>t.textContent||'').join('');
+      else {const v=c.getElementsByTagName('v')[0];val=v?v.textContent||'':'';if(type==='s')val=shared[parseInt(val,10)]??'';}
+      row[col]=val;
+    }
+    rows.push(row.map(v=>v??''));
+  }
+  return rows;
+}
+handleMultiFileUpload = async function(e){
+  const file=e.target.files[0];if(!file)return;
+  try{
+    const buffer=await file.arrayBuffer();
+    if(file.name.toLowerCase().endsWith('.xlsx')) loadMultiRows(await parseXlsxRows(buffer),file.name);
+    else parseAndLoadMulti(decodeCsvArrayBuffer(buffer),file.name);
+  }catch(err){console.error(err);alert('Не удалось прочитать файл: '+err.message+'. Для CSV рекомендуется UTF-8; для XLSX — обычный файл Excel без пароля.');}
+  e.target.value='';
+};
+exportMultiToCSV = function(){
+  if(!multiData.length)return;
+  const h=['#','Наименование','Артикул','Кол-во','Закупочная','Ручной uplift %','Итоговый uplift %','Landed COGS','Target GM %','Рек. единая РРЦ с НДС','Рек. sell-in сети с НДС','GP/ед. (mix)','Net profit/ед.','Собственнику/ед.','GM mix %'];
+  const rows=multiData.map((r,i)=>[i+1,r.name,r.art,r.qty,r.purchase,r.manualUplift,r.totalUplift.toFixed(2),Math.round(r.landedCOGS),r.targetGM,Math.round(r.suggestedRRP),Math.round(r.suggestedWholesale),Math.round(r.gpPerUnit),Math.round(r.netProfitPerUnit),Math.round(r.cashOwnerPerUnit),(r.marginPct*100).toFixed(2)]);
+  const csv='sep=;\r\n'+[h,...rows].map(row=>row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(';')).join('\r\n');
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='portfolio_results_v9.csv';a.click();URL.revokeObjectURL(url);
+};
+
+normalizeAllParams();
+
+const _v9RenderScenarios=renderScenarios;
+renderScenarios=function(r){
+  _v9RenderScenarios(r);
+  const note=document.getElementById('breakeven_note');
+  if(note) note.innerHTML=`Break-even после КПН определяется численным поиском объёма, при котором Net profit = 0, с учётом текущего mix, всех активных расходов и их налоговой вычитаемости: ${isFinite(r.beUnits)?fmt.format(Math.ceil(r.beUnits))+' шт':'не достигается'}.`;
+};
+
+
+renderParams(); bindPairs(); recalc();
+setTimeout(checkShares,700);
+
+
+/* ==================== PWA Install Button Logic ==================== */
+let deferredPrompt;
+const installBtn = document.getElementById('install-btn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (installBtn) installBtn.style.display = 'inline-flex';
+  console.log('PWA install prompt ready');
+});
+
+function installPWA() {
+  if (!deferredPrompt || !installBtn) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then((choiceResult) => {
+    if (choiceResult.outcome === 'accepted') {
+      console.log('User accepted install');
+      installBtn.style.display = 'none';
+    }
+    deferredPrompt = null;
+  });
+}
+
+/* ==================== Demo Data for Multi Tab (ready-to-use examples) ==================== */
+function loadDemoMulti(count = 3) {
+  multiData = [];
+  const demos = [
+    {name: 'Смартфон Premium X1', art: 'SPX1-256', qty: 40, purchase: 185000, landedUplift: 12, targetGM: 38},
+    {name: 'Ноутбук Pro 15"', art: 'NBPRO-15', qty: 25, purchase: 420000, landedUplift: 9, targetGM: 35},
+    {name: 'Беспроводные наушники', art: 'WH-ANC', qty: 80, purchase: 65000, landedUplift: 15, targetGM: 42},
+    {name: 'Планшет 11" WiFi', art: 'TAB11-128', qty: 30, purchase: 195000, landedUplift: 11, targetGM: 36},
+    {name: 'Умные часы Sport', art: 'WATCH-S', qty: 55, purchase: 78000, landedUplift: 14, targetGM: 40},
+    {name: 'Портативная колонка', art: 'SPK-BT', qty: 65, purchase: 42000, landedUplift: 18, targetGM: 45}
+  ];
+
+  for (let i = 0; i < Math.min(count, demos.length); i++) {
+    const d = demos[i];
+    const landed = Math.round(d.purchase * (1 + d.landedUplift / 100));
+    multiData.push({
+      id: Date.now() + i,
+      name: d.name,
+      art: d.art,
+      qty: d.qty,
+      purchase: d.purchase,
+      landedUplift: d.landedUplift,
+      targetGM: d.targetGM,
+      landedCOGS: landed,
+      suggestedRRP: 0,
+      suggestedWholesale: 0,
+      gpPerUnit: 0,
+      marginPct: 0
+    });
+  }
+
+  const zone = document.getElementById('multi_upload_zone');
+  if (zone) zone.style.display = 'none';
+
+  renderMultiTable();
+
+  // Auto calculate suggested prices
+  setTimeout(() => {
+    calculateMultiPrices();
+    alert(`Загружен демо-набор из ${multiData.length} позиций. Нажмите «Синхронизировать из основной модели», если хотите применить реальный uplift из вашего расчёта.`);
+  }, 300);
+}
+
+// Make demo buttons easily accessible from console too
+window.loadDemoMulti = loadDemoMulti;
+
+const isIosDevice = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+function showIosInstallGuide(){document.getElementById('ios_install_sheet').hidden=false;document.body.style.overflow='hidden'}
+function hideIosInstallGuide(){document.getElementById('ios_install_sheet').hidden=true;document.body.style.overflow=''}
+function dismissIosInstall(){document.getElementById('ios_install_bar').hidden=true;try{localStorage.setItem('iosInstallDismissed','1')}catch(e){}}
+function initIosInstall(){
+  const bar=document.getElementById('ios_install_bar');
+  let dismissed=false;try{dismissed=localStorage.getItem('iosInstallDismissed')==='1'}catch(e){}
+  if(isIosDevice && !isStandaloneMode && !dismissed) bar.hidden=false;
+}
+if('serviceWorker' in navigator && location.protocol!=='file:') window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js',{scope:'./'}).catch(()=>{}));
+window.addEventListener('load',initIosInstall);
+
+window.addEventListener('load',()=>{const q=new URLSearchParams(location.search).get('view');if(q==='multi')switchView('multi');});
+
+</script>
+</body>
+</html>

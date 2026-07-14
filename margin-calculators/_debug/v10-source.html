@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=5">
+<meta name="theme-color" content="#183153">
+<meta name="apple-mobile-web-app-title" content="Бизнес v10">
+<title>Бизнес-модель цены, прибыли и денег v10</title>
+<style>
+:root{
+  --bg:#f3f5f7;--panel:#fff;--panel2:#f8fafc;--ink:#172033;--muted:#667085;--line:#d7dde5;
+  --brand:#183153;--brand2:#285a8e;--soft:#eaf1f8;--good:#157347;--goodbg:#eaf7ef;--warn:#9a6700;--warnbg:#fff6dd;
+  --bad:#b42318;--badbg:#fff0ee;--shadow:0 10px 30px rgba(20,36,58,.08);--radius:16px;--drawer:430px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.38}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.topbar{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+.topbar-inner{max-width:1840px;margin:auto;padding:11px 22px;display:flex;gap:14px;align-items:center}
+.brand{min-width:270px}.brand-title{font-size:16px;font-weight:800;letter-spacing:-.01em}.brand-sub{font-size:11px;color:var(--muted)}
+.nav{display:flex;gap:4px;overflow:auto;flex:1}.nav button{white-space:nowrap;border:0;background:transparent;padding:9px 12px;border-radius:10px;color:#526071;font-weight:650;font-size:13px}.nav button.active{background:var(--soft);color:var(--brand)}
+.top-actions{display:flex;gap:7px;align-items:center}.mode-toggle,.icon-btn,.primary,.secondary,.danger{border-radius:10px;padding:8px 11px;border:1px solid var(--line);background:#fff;color:var(--ink);font-weight:650;font-size:12px}.primary{background:var(--brand);border-color:var(--brand);color:#fff}.danger{color:var(--bad);border-color:#efc6c0}.mode-toggle.active{background:var(--soft);border-color:#a9bfd6;color:var(--brand)}
+.app{max-width:1840px;margin:0 auto;padding:18px 22px 60px}.view{display:none}.view.active{display:block}
+.hero{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(320px,.7fr);gap:14px;margin-bottom:14px}.hero-main,.hero-side,.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.hero-main{padding:22px}.hero h1{font-size:24px;margin:0 0 6px;letter-spacing:-.025em}.hero p{margin:0;color:var(--muted);font-size:13px}.hero-side{padding:16px}.scenario-row{display:grid;grid-template-columns:1fr 100px;gap:8px}.scenario-row input,.scenario-row select{width:100%}
+.answer-grid{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:10px;margin-bottom:14px}.answer-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;min-height:102px;box-shadow:0 5px 18px rgba(20,36,58,.05);cursor:pointer}.answer-card .label{font-size:11px;color:var(--muted);margin-bottom:8px}.answer-card .value{font-size:20px;font-weight:800;letter-spacing:-.02em}.answer-card .small{font-size:11px;color:var(--muted);margin-top:6px}.answer-card.good .value{color:var(--good)}.answer-card.warn .value{color:var(--warn)}.answer-card.bad .value{color:var(--bad)}
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px}.span-12{grid-column:span 12}.span-8{grid-column:span 8}.span-7{grid-column:span 7}.span-6{grid-column:span 6}.span-5{grid-column:span 5}.span-4{grid-column:span 4}.span-3{grid-column:span 3}
+.card{padding:16px;min-width:0}.card h2{font-size:14px;text-transform:uppercase;letter-spacing:.07em;margin:0 0 12px;color:#3d4d61}.card h3{font-size:14px;margin:0 0 10px}.section-note{font-size:12px;color:var(--muted);margin:-5px 0 12px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.form-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.field{min-width:0}.field label{display:flex;align-items:center;gap:5px;font-size:11.5px;color:#5f6d7c;margin-bottom:5px;font-weight:620;cursor:pointer}.help-dot{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:var(--soft);color:var(--brand2);font-size:10px;font-weight:800;border:1px solid #c6d5e4}.field input,.field select,.field textarea,.search-input{width:100%;border:1px solid var(--line);border-radius:10px;background:#fff;padding:8px 9px;color:var(--ink);min-height:36px}.field input:focus,.field select:focus,.field textarea:focus,.search-input:focus{outline:2px solid #b7cce1;border-color:#86a7c7}.field .hint{font-size:10.5px;color:var(--muted);margin-top:4px}
+.channel-cards{display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:10px}.channel-card{border:1px solid var(--line);border-radius:13px;padding:12px;background:var(--panel2)}.channel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.channel-name{font-size:13px;font-weight:800}.switch{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
+.status-box,.notice{border-radius:12px;padding:10px 12px;font-size:12px;margin-top:10px}.status-box.good,.notice.good{background:var(--goodbg);border:1px solid #b6dec5;color:#145c37}.status-box.warn,.notice.warn{background:var(--warnbg);border:1px solid #ead79a;color:#745000}.status-box.bad,.notice.bad{background:var(--badbg);border:1px solid #efc0ba;color:#8c2017}.status-box.info,.notice.info{background:var(--soft);border:1px solid #bfd1e3;color:#294a6a}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px;background:#fff}.table-wrap.tall{max-height:570px}table{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}th,td{padding:8px 9px;border-bottom:1px solid #edf0f3;text-align:right;white-space:nowrap;vertical-align:middle}th{background:#f7f9fb;color:#526071;position:sticky;top:0;z-index:2;font-weight:750}th:first-child,td:first-child{text-align:left}.subtotal td{font-weight:800;background:#fafbfc}.memo td{color:#6b7480;background:#fcfcfd}.clickable-row{cursor:pointer}.clickable-row:hover td{background:#f3f7fb}.num.good{color:var(--good);font-weight:750}.num.bad{color:var(--bad);font-weight:750}.num.warn{color:var(--warn);font-weight:750}
+.price-ladder{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:9px}.price-box{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--panel2);cursor:pointer}.price-box .p-label{font-size:10.5px;color:var(--muted)}.price-box .p-value{font-size:17px;font-weight:800;margin-top:5px}.price-box .p-note{font-size:10px;color:var(--muted);margin-top:4px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}.toolbar .spacer{flex:1}.file-label{display:inline-flex;align-items:center;border-radius:10px;padding:8px 11px;background:var(--brand);color:#fff;font-weight:700;font-size:12px;cursor:pointer}.file-label input{display:none}
+.portfolio-table{min-width:1900px}.portfolio-table input,.portfolio-table select,.expense-table input,.expense-table select{border:1px solid transparent;background:transparent;padding:5px 6px;border-radius:7px;font-size:11.5px;min-width:70px}.portfolio-table input:focus,.portfolio-table select:focus,.expense-table input:focus,.expense-table select:focus{background:#fff;border-color:#9bb6d1;outline:none}.cell-input-wide{min-width:170px!important}.expense-table{min-width:2050px}
+.pill{display:inline-block;padding:3px 7px;border-radius:999px;font-size:10px;font-weight:750}.pill.good{background:var(--goodbg);color:var(--good)}.pill.warn{background:var(--warnbg);color:var(--warn)}.pill.bad{background:var(--badbg);color:var(--bad)}.pill.info{background:var(--soft);color:var(--brand2)}
+details{border:1px solid var(--line);border-radius:12px;background:#fff;margin-top:10px}summary{cursor:pointer;padding:10px 12px;font-size:12px;font-weight:750;color:#3d4d61}.details-body{padding:0 12px 12px}
+.simple-mode .expert-only{display:none!important}.expert-mode .simple-only{display:none!important}
+.help-fab{position:fixed;right:18px;bottom:18px;z-index:70;width:54px;height:54px;border-radius:50%;border:0;background:var(--brand);color:#fff;font-size:20px;font-weight:900;box-shadow:0 12px 30px rgba(24,49,83,.28)}
+.drawer-backdrop{display:none;position:fixed;inset:0;background:rgba(17,31,48,.24);z-index:75}.drawer-backdrop.open{display:block}.help-drawer{position:fixed;z-index:80;right:12px;top:12px;bottom:12px;width:min(var(--drawer),calc(100vw - 24px));background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 24px 60px rgba(18,35,54,.25);transform:translateX(calc(100% + 30px));transition:transform .22s ease;display:flex;flex-direction:column;overflow:hidden}.help-drawer.open{transform:translateX(0)}
+.drawer-head{padding:13px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}.drawer-title{font-weight:800;flex:1}.drawer-close{border:0;background:transparent;font-size:20px}.drawer-tabs{display:flex;padding:7px;border-bottom:1px solid var(--line);gap:4px}.drawer-tabs button{flex:1;border:0;background:transparent;padding:8px;border-radius:9px;font-size:11.5px;font-weight:750;color:#647181}.drawer-tabs button.active{background:var(--soft);color:var(--brand)}.drawer-body{flex:1;overflow:auto;padding:13px}.drawer-pane{display:none}.drawer-pane.active{display:block}.help-title{font-size:17px;font-weight:850;margin-bottom:7px}.help-section{margin:12px 0}.help-section h4{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:#6a7787;margin:0 0 5px}.help-section p{font-size:12.5px;margin:0;color:#344254}.formula-box{font-family:Consolas,monospace;background:#f5f7f9;border:1px solid var(--line);padding:9px;border-radius:10px;font-size:11.5px;white-space:pre-wrap}.library-list{display:grid;gap:7px;margin-top:10px}.library-item{border:1px solid var(--line);border-radius:10px;padding:9px;cursor:pointer}.library-item:hover{background:var(--panel2)}.library-item b{font-size:12px}.library-item div{font-size:10.5px;color:var(--muted);margin-top:3px}
+.chat-log{height:330px;overflow:auto;border:1px solid var(--line);border-radius:12px;background:#fafbfc;padding:9px}.msg{font-size:12px;padding:9px 10px;border-radius:11px;margin:7px 0;white-space:pre-wrap}.msg.user{background:#eaf1f8;margin-left:25px}.msg.ai{background:#fff;border:1px solid var(--line);margin-right:16px}.msg.error{background:var(--badbg);color:var(--bad)}.chat-compose{display:grid;grid-template-columns:1fr auto;gap:7px;margin-top:8px}.chat-compose textarea{min-height:58px;resize:vertical;border:1px solid var(--line);border-radius:10px;padding:8px}.ai-settings{border:1px solid var(--line);border-radius:11px;padding:10px;margin-bottom:9px;background:#fbfcfd}.ai-settings .field{margin-bottom:7px}.connection{font-size:10.5px;color:var(--muted)}.action-preview{border:1px solid #b9cee2;background:#f2f7fb;border-radius:11px;padding:9px;margin-top:8px;font-size:11.5px}.action-preview ul{padding-left:18px;margin:6px 0}
+.audit-list{display:grid;gap:7px}.audit-item{border-left:3px solid #b7c8da;padding:7px 9px;background:#fafbfc;font-size:11.5px}.muted{color:var(--muted)}.small{font-size:11px}.hidden{display:none!important}
+@media(max-width:1300px){.answer-grid{grid-template-columns:repeat(3,1fr)}.hero{grid-template-columns:1fr}.channel-cards{grid-template-columns:1fr}.span-3,.span-4,.span-5,.span-6,.span-7,.span-8{grid-column:span 12}}
+@media(max-width:760px){.topbar-inner{padding:9px 10px;flex-wrap:wrap}.brand{min-width:0;flex:1}.brand-sub{display:none}.nav{order:3;width:100%}.top-actions .secondary{display:none}.app{padding:12px 10px 80px}.answer-grid{grid-template-columns:1fr 1fr}.form-grid,.form-grid.three{grid-template-columns:1fr}.price-ladder{grid-template-columns:1fr 1fr}.help-drawer{left:6px;right:6px;top:auto;bottom:6px;width:auto;height:min(86vh,760px);transform:translateY(calc(100% + 20px))}.help-drawer.open{transform:translateY(0)}.help-fab{right:12px;bottom:12px}}
+@media print{.topbar,.help-fab,.help-drawer,.drawer-backdrop,.no-print{display:none!important}.view{display:block!important}.app{max-width:none;padding:0}.card,.hero-main,.hero-side,.answer-card{box-shadow:none;break-inside:avoid}}
+
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior-y:none}
+body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+button,input,select,textarea{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.table-wrap{-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.ios-install-bar{position:fixed;left:10px;right:10px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:120;background:rgba(255,255,255,.96);backdrop-filter:blur(18px);border:1px solid #cbd5e1;border-radius:15px;box-shadow:0 14px 35px rgba(15,23,42,.18);padding:10px 42px 10px 12px;display:flex;align-items:center;gap:10px}
+.ios-install-bar[hidden]{display:none!important}.ios-install-bar div{flex:1;min-width:0}.ios-install-bar b{display:block;font-size:12px}.ios-install-bar span{display:block;font-size:10.5px;color:#64748b;margin-top:2px}.ios-install-bar button{min-height:38px;padding:7px 10px;font-size:11px;font-weight:750}.ios-install-close{position:absolute;right:6px;top:4px;border:0!important;background:transparent!important;font-size:20px!important;padding:4px!important;min-height:32px!important}
+.ios-install-sheet{position:fixed;inset:0;z-index:200}.ios-install-sheet[hidden]{display:none!important}.ios-sheet-backdrop{position:absolute;inset:0;background:rgba(15,23,42,.36)}.ios-sheet-card{position:absolute;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));background:#fff;border-radius:20px;padding:10px 18px 18px;box-shadow:0 24px 60px rgba(15,23,42,.3)}.ios-sheet-handle{width:38px;height:5px;border-radius:99px;background:#d1d5db;margin:0 auto 12px}.ios-sheet-card h3{font-size:18px;margin:0 0 10px}.ios-sheet-card ol{margin:0;padding-left:22px}.ios-sheet-card li{margin:9px 0;font-size:14px;line-height:1.4}.ios-sheet-card p{font-size:12px;color:#64748b}.ios-sheet-done{width:100%;min-height:46px;border-radius:12px;background:#183153!important;color:#fff!important;border:0!important;font-weight:800}
+@media(max-width:760px){
+  input,select,textarea{font-size:16px!important}
+  button,.file-label{min-height:44px}
+  body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+  .card{border-radius:14px;box-shadow:0 5px 16px rgba(15,23,42,.06)}
+  .table-wrap{max-width:100%;border-radius:10px}
+}
+@media(display-mode:standalone){.ios-install-bar{display:none!important}}
+
+.mobile-bottom-nav{display:none}
+.mobile-wide-hint{display:none}
+@media(max-width:760px){
+  .topbar{position:sticky;top:0;padding-top:env(safe-area-inset-top)}.topbar-inner{padding:8px 10px}.brand-title{font-size:14px}.top-actions{margin-left:auto}.mode-toggle{min-height:40px;padding:6px 9px}
+  #main_nav{display:none!important}.app{padding:10px 8px calc(86px + env(safe-area-inset-bottom))}.hero-main{padding:15px}.hero h1,.hero-main h1{font-size:20px;line-height:1.15}.hero-side{padding:12px}
+  .answer-grid{grid-template-columns:1fr 1fr;gap:8px}.answer-card{padding:11px;min-height:92px}.answer-card .value{font-size:17px}
+  .grid{gap:9px}.card{padding:11px}.channel-cards{gap:8px}.price-ladder{gap:7px}
+  .toolbar{gap:6px}.toolbar button,.toolbar .file-label,.toolbar select{flex:1 1 46%;justify-content:center}.toolbar .spacer{display:none}
+  .mobile-bottom-nav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:6px;right:6px;bottom:calc(5px + env(safe-area-inset-bottom));z-index:90;background:rgba(255,255,255,.97);backdrop-filter:blur(18px);border:1px solid #cbd5e1;border-radius:17px;padding:5px 3px;box-shadow:0 14px 35px rgba(15,23,42,.2);gap:2px}
+  .mobile-bottom-nav button{border:0;background:transparent;min-height:50px;border-radius:11px;padding:4px 1px;font-size:9.5px;font-weight:750;color:#64748b;line-height:1.1}.mobile-bottom-nav button span{display:block;font-size:17px;margin-bottom:2px}.mobile-bottom-nav button.active{background:#eaf1f8;color:#183153}
+  .mobile-wide-hint{display:block;font-size:10.5px;color:#64748b;margin:6px 0}.table-wrap.tall{max-height:66vh}.portfolio-table th:first-child,.portfolio-table td:first-child{position:sticky;left:0;z-index:4;background:#fff}.portfolio-table th:nth-child(2),.portfolio-table td:nth-child(2){position:sticky;left:34px;z-index:4;background:#fff;box-shadow:3px 0 5px rgba(15,23,42,.05)}
+  .expense-table th:first-child,.expense-table td:first-child{position:sticky;left:0;z-index:4;background:#fff}
+  .help-fab{bottom:calc(72px + env(safe-area-inset-bottom));width:48px;height:48px}.ios-install-bar{bottom:calc(74px + env(safe-area-inset-bottom))}
+  .chat-log{height:42vh}.chat-compose{grid-template-columns:1fr}.chat-compose button{width:100%}
+}
+
+</style>
+
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+<meta name="color-scheme" content="light">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+
+</head>
+<body class="simple-mode">
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><div class="brand-title">Бизнес-модель цены, прибыли и денег <span class="pill info">v10</span></div><div class="brand-sub">Цена → pocket revenue → прибыль → денежный поток → потенциально собственнику</div></div>
+    <div class="nav" id="main_nav">
+      <button class="active" data-view="decision">Решение</button><button data-view="portfolio">Портфель</button><button data-view="expenses">Расходы</button><button data-view="cash">Деньги</button><button data-view="controls">Контроли</button>
+    </div>
+    <div class="top-actions">
+      <button id="mode_btn" class="mode-toggle" title="Показать профессиональные параметры">Простой режим</button>
+      <button class="secondary" onclick="saveScenario()">Сохранить</button>
+      <button class="secondary" onclick="loadScenario()">Загрузить</button>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+<section id="view-decision" class="view active">
+  <div class="hero">
+    <div class="hero-main">
+      <h1>Сколько зарабатывает товар и сколько денег реально остаётся</h1>
+      <p>Сначала смотрите на пять ответов ниже. Детали раскрываются по клику на показатель или параметр.</p>
+    </div>
+    <div class="hero-side">
+      <div class="scenario-row">
+        <div class="field"><label data-help="scenario_name">Название сценария <span class="help-dot">?</span></label><input data-bind="scenarioName" id="scenario_name"></div>
+        <div class="field"><label data-help="period_months">Период, мес. <span class="help-dot">?</span></label><input data-bind="periodMonths" id="period_months" type="number" min="1" max="60"></div>
+      </div>
+      <div class="small muted" style="margin-top:7px">Расчёты выполняются локально. AI работает только через настроенный защищённый proxy.</div>
+    </div>
+  </div>
+
+  <div id="business_answers" class="answer-grid"></div>
+
+  <div class="grid">
+    <div class="card span-4">
+      <h2>1. Товар и количество</h2>
+      <div class="form-grid">
+        <div class="field"><label data-help="product_name">Наименование <span class="help-dot">?</span></label><input data-bind="singleProduct.name"></div>
+        <div class="field"><label data-help="sku">Артикул / SKU <span class="help-dot">?</span></label><input data-bind="singleProduct.sku"></div>
+        <div class="field"><label data-help="purchase_price">Закупочная цена <span class="help-dot">?</span></label><input type="number" min="0" step="100" data-bind="singleProduct.purchasePrice"></div>
+        <div class="field"><label data-help="purchase_price_mode">Цена закупки указана <span class="help-dot">?</span></label><select data-bind="singleProduct.purchasePriceMode"><option value="net">без НДС</option><option value="gross">с НДС</option></select></div>
+        <div class="field"><label data-help="input_vat">Входящий НДС можно зачесть <span class="help-dot">?</span></label><select data-bind="singleProduct.inputVatRecoverable" data-type="boolean"><option value="true">Да</option><option value="false">Нет</option></select></div>
+        <div class="field"><label data-help="manual_landed">Ручные затраты на доведение / ед. <span class="help-dot">?</span></label><input type="number" min="0" step="100" data-bind="singleProduct.manualLandedPerUnit"></div>
+        <div class="field"><label data-help="purchased_units">Закуплено за период, шт. <span class="help-dot">?</span></label><input type="number" min="0" step="1" data-bind="singleProduct.purchasedUnits"></div>
+        <div class="field"><label data-help="sold_units">Продано за период, шт. <span class="help-dot">?</span></label><input type="number" min="0" step="1" data-bind="singleProduct.soldUnits"></div>
+        <div class="field expert-only"><label data-help="opening_stock">Начальный остаток, шт. <span class="help-dot">?</span></label><input type="number" min="0" step="1" data-bind="singleProduct.openingStockUnits"></div>
+        <div class="field expert-only"><label data-help="opening_stock_cost">Себестоимость начального остатка / ед. <span class="help-dot">?</span></label><input type="number" min="0" step="100" data-bind="singleProduct.openingStockUnitCost"></div>
+        <div class="field expert-only"><label data-help="writeoff_units">Списано / утеряно, шт. <span class="help-dot">?</span></label><input type="number" min="0" step="1" data-bind="singleProduct.writeoffUnits"></div>
+      </div>
+      <div id="inventory_status" class="status-box info"></div>
+    </div>
+
+    <div class="card span-4">
+      <h2>2. Цена и цель</h2>
+      <div class="form-grid">
+        <div class="field"><label data-help="approved_price">Текущая / утверждённая РРЦ с НДС <span class="help-dot">?</span></label><input type="number" min="0" step="100" data-bind="singleProduct.approvedRrpGross"></div>
+        <div class="field"><label data-help="target_metric">Что хотим получить <span class="help-dot">?</span></label><select data-bind="singleProduct.targetMetric"><option value="grossMargin">Gross Margin, %</option><option value="contributionMargin">Маржа после переменных расходов, %</option><option value="netProfitMargin">Чистая прибыль / выручка, %</option><option value="netProfitPerUnit">Чистая прибыль на единицу, ₸</option><option value="cashBeforeFinancingPerUnit">Денежный результат до финансирования / ед., ₸</option></select></div>
+        <div class="field"><label data-help="target_value">Целевое значение <span class="help-dot">?</span></label><input type="number" step="0.1" data-bind="singleProduct.targetValue"></div>
+        <div class="field"><label data-help="market_reference">Ориентир рынка с НДС <span class="help-dot">?</span></label><input type="number" min="0" step="100" data-bind="singleProduct.marketReferenceGross"></div>
+        <div class="field expert-only"><label data-help="market_min">Минимум рынка с НДС <span class="help-dot">?</span></label><input type="number" min="0" step="100" data-bind="singleProduct.marketMinGross"></div>
+        <div class="field expert-only"><label data-help="market_max">Максимум рынка с НДС <span class="help-dot">?</span></label><input type="number" min="0" step="100" data-bind="singleProduct.marketMaxGross"></div>
+      </div>
+      <div class="toolbar no-print"><button class="primary" onclick="useTargetPrice()">Поставить целевую цену</button><button class="secondary" onclick="useMarketReference()">Поставить цену рынка</button></div>
+      <div id="price_status" class="status-box info"></div>
+    </div>
+
+    <div class="card span-4">
+      <h2>3. Налоги и общие правила</h2>
+      <div class="form-grid">
+        <div class="field"><label data-help="vat_rate">НДС, % <span class="help-dot">?</span></label><input type="number" min="0" max="50" step="0.1" data-bind="vatRate"></div>
+        <div class="field"><label data-help="income_tax_rate">КПН / налог на прибыль, % <span class="help-dot">?</span></label><input type="number" min="0" max="60" step="0.1" data-bind="incomeTaxRate"></div>
+        <div class="field"><label data-help="owner_tax_rate">Налог/удержание при выводе, % <span class="help-dot">?</span></label><input type="number" min="0" max="60" step="0.1" data-bind="ownerTaxRate"></div>
+        <div class="field"><label data-help="cash_reserve">Резерв денег в бизнесе <span class="help-dot">?</span></label><input type="number" min="0" step="1000" data-bind="cash.cashReserve"></div>
+      </div>
+      <div class="notice warn">КПН и НДС рассчитаны как управленческая оценка. Перенос убытков, временные разницы и специальные налоговые ограничения не моделируются.</div>
+    </div>
+
+    <div class="card span-12">
+      <h2>4. Каналы продаж</h2>
+      <p class="section-note">Доля показывает, сколько единиц продаётся через канал. «Снижение от РРЦ» — сколько остаётся сети/партнёру или скидка прямому клиенту до выставления счёта.</p>
+      <div id="channel_cards" class="channel-cards"></div>
+    </div>
+
+    <div class="card span-12">
+      <h2>5. Карта цены</h2>
+      <div id="price_ladder" class="price-ladder"></div>
+    </div>
+
+    <div class="card span-7">
+      <h2>6. Куда уходит цена — Price Waterfall</h2>
+      <div class="table-wrap"><table id="waterfall_table"><thead><tr><th>Шаг</th><th>Сумма</th><th>на ед.</th><th>Простое объяснение</th></tr></thead><tbody></tbody></table></div>
+    </div>
+    <div class="card span-5">
+      <h2>7. Результат по каналам</h2>
+      <div class="table-wrap"><table id="channel_result_table"><thead><tr><th>Показатель</th><th>DTC</th><th>Сети</th><th>Партнёры</th><th>Итого</th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <div class="card span-7">
+      <h2>8. P&L — прибыль по шагам</h2>
+      <div class="table-wrap"><table id="pl_table"><thead><tr><th>Статья</th><th>Сумма</th><th>% выручки</th><th>на проданную ед.</th></tr></thead><tbody></tbody></table></div>
+    </div>
+    <div class="card span-5">
+      <h2>9. Риски и неполные данные</h2>
+      <div id="single_warnings"></div>
+      <div class="toolbar"><button class="secondary" onclick="openView('expenses')">Проверить расходы</button><button class="secondary" onclick="openView('cash')">Проверить деньги</button></div>
+    </div>
+  </div>
+</section>
+
+<section id="view-portfolio" class="view">
+  <div class="hero-main" style="margin-bottom:14px"><h1>Портфель SKU</h1><p>Для каждой позиции рассчитываются фактическая экономика, минимальная цена и цена для достижения индивидуальной цели. Общие годовые расходы распределяются один раз по выбранному драйверу.</p></div>
+  <div class="card">
+    <div class="toolbar no-print">
+      <button class="secondary" onclick="downloadTemplate()">Скачать шаблон CSV</button>
+      <label class="file-label">Загрузить CSV/XLSX<input id="portfolio_file" type="file" accept=".csv,.txt,.xlsx" onchange="handlePortfolioFile(event)"></label>
+      <button class="secondary" onclick="addPortfolioRow()">Добавить SKU</button>
+      <button class="secondary" onclick="applyGlobalTarget()">Применить цель основной позиции ко всем</button>
+      <span class="spacer"></span><button class="danger" onclick="clearPortfolio()">Очистить</button>
+    </div>
+    <div id="portfolio_summary" class="answer-grid"></div>
+    <div class="mobile-wide-hint">Таблица прокручивается вправо. Наименование закреплено слева.</div><div class="table-wrap tall"><table class="portfolio-table"><thead><tr>
+      <th>#</th><th data-help="product_name">Наименование ?</th><th data-help="sku">SKU ?</th><th data-help="purchased_units">Закуплено ?</th><th data-help="sold_units">Продано ?</th><th data-help="purchase_price">Закупочная ?</th><th data-help="purchase_price_mode">Режим ?</th><th data-help="approved_price">РРЦ факт ?</th><th data-help="target_metric">Цель ?</th><th data-help="target_value">Target ?</th><th data-help="market_reference">Рынок ?</th><th data-help="target_price">Цена для цели ?</th><th data-help="variable_floor">Floor variable ?</th><th data-help="accounting_landed">Landed / ед. ?</th><th data-help="pocket_revenue">Pocket revenue / ед. ?</th><th data-help="contribution">Contribution / ед. ?</th><th data-help="net_profit">Net profit / ед. ?</th><th data-help="gross_margin">GM ?</th><th data-help="contribution_margin">CM ?</th><th data-help="closing_inventory">Остаток ?</th><th data-help="price_status_help">Статус ?</th><th></th>
+    </tr></thead><tbody id="portfolio_body"></tbody><tfoot id="portfolio_foot"></tfoot></table></div>
+    <div id="portfolio_warnings" style="margin-top:10px"></div>
+  </div>
+</section>
+
+<section id="view-expenses" class="view">
+  <div class="hero-main" style="margin-bottom:14px"><h1>Расходы без бухгалтерской путаницы</h1><p>Статус «Проверить» не входит в расчёт. «Учесть» входит. «Не применимо» означает, что вы осознанно подтвердили отсутствие расхода для данного периода или SKU.</p></div>
+  <div class="card">
+    <div class="toolbar no-print"><button class="primary" onclick="addExpense()">Добавить расход</button><button class="secondary" onclick="markAllReviewedNa()">Все «Проверить» → «Не применимо»</button><button class="secondary" onclick="restoreDefaultExpenses()">Восстановить стандартный список</button><span class="spacer"></span><select id="expense_filter" onchange="renderExpenses()"><option value="all">Все категории</option><option value="inventory">В стоимость товара</option><option value="contra">Скидки и бонусы</option><option value="variable">Продать и обслужить</option><option value="marketing">Маркетинг</option><option value="fixed">Постоянные расходы</option><option value="depr">Амортизация</option><option value="finance">Финансирование</option><option value="cash">Только деньги</option></select></div>
+    <div id="expense_summary" class="status-box info"></div>
+    <div class="mobile-wide-hint">Таблица прокручивается вправо. Статус закреплён слева.</div><div class="table-wrap tall"><table class="expense-table"><thead><tr><th data-help="expense_status">Статус ?</th><th data-help="expense_name">Расход ?</th><th data-help="expense_category">Простая категория ?</th><th data-help="expense_channels">Каналы ?</th><th data-help="expense_sku_scope">SKU ?</th><th data-help="expense_sku_list">Список SKU ?</th><th data-help="expense_method">Как задан ?</th><th data-help="expense_value">Значение ?</th><th data-help="expense_base">База % ?</th><th data-help="expense_vat">НДС расхода ?</th><th data-help="expense_tax">Вычет по КПН ?</th><th data-help="expense_allocation">Распределить общую сумму по ?</th><th></th></tr></thead><tbody id="expense_body"></tbody></table></div>
+    <div class="notice info">Расходы категории «В стоимость товара» формируют Landed / Accounting COGS. Продажа, доставка клиенту, маркетинг и финансирование показываются отдельно и не маскируются внутри себестоимости.</div>
+  </div>
+</section>
+
+<section id="view-cash" class="view">
+  <div class="hero-main" style="margin-bottom:14px"><h1>Денежный поток</h1><p>Чистая прибыль не равна деньгам на счёте. Здесь учитываются запасы, отсрочка клиентов и поставщиков, CAPEX, кредиты и резерв бизнеса.</p></div>
+  <div id="cash_answers" class="answer-grid"></div>
+  <div class="grid">
+    <div class="card span-4">
+      <h2>Оборотный капитал</h2>
+      <div class="form-grid">
+        <div class="field"><label data-help="dso">DSO — дни оплаты клиентов <span class="help-dot">?</span></label><input type="number" min="0" step="1" data-bind="cash.dso"></div>
+        <div class="field"><label data-help="dpo">DPO — дни оплаты поставщикам <span class="help-dot">?</span></label><input type="number" min="0" step="1" data-bind="cash.dpo"></div>
+        <div class="field expert-only"><label data-help="opening_ar">Начальная дебиторка без НДС <span class="help-dot">?</span></label><input type="number" step="1000" data-bind="cash.openingARNet"></div>
+        <div class="field expert-only"><label data-help="opening_ap">Начальная кредиторка без НДС <span class="help-dot">?</span></label><input type="number" step="1000" data-bind="cash.openingAPNet"></div>
+        <div class="field expert-only"><label data-help="opening_inventory">Начальные запасы по стоимости <span class="help-dot">?</span></label><input type="number" step="1000" data-bind="cash.openingInventory"></div>
+        <div class="field expert-only"><label data-help="vat_cash_mode">Денежный НДС <span class="help-dot">?</span></label><select data-bind="cash.vatCashMode"><option value="auto">оценить автоматически</option><option value="manual">ввести вручную</option></select></div>
+        <div class="field expert-only"><label data-help="vat_cash_settlement">НДС уплачен / (возмещён) за период <span class="help-dot">?</span></label><input type="number" step="1000" data-bind="cash.vatCashSettlement"></div>
+      </div>
+    </div>
+    <div class="card span-4">
+      <h2>Инвестиции и финансирование</h2>
+      <div class="form-grid">
+        <div class="field"><label data-help="capex">CAPEX / оборудование <span class="help-dot">?</span></label><input type="number" min="0" step="1000" data-bind="cash.capex"></div>
+        <div class="field"><label data-help="new_debt">Новые кредиты <span class="help-dot">?</span></label><input type="number" min="0" step="1000" data-bind="cash.newDebt"></div>
+        <div class="field"><label data-help="debt_principal">Погашение тела кредита <span class="help-dot">?</span></label><input type="number" min="0" step="1000" data-bind="cash.debtPrincipal"></div>
+        <div class="field"><label data-help="owner_injection">Вклад собственника <span class="help-dot">?</span></label><input type="number" min="0" step="1000" data-bind="cash.ownerInjection"></div>
+        <div class="field"><label data-help="other_outflows">Прочие денежные выплаты <span class="help-dot">?</span></label><input type="number" min="0" step="1000" data-bind="cash.otherOutflows"></div>
+      </div>
+    </div>
+    <div class="card span-4">
+      <h2>Правило собственника</h2>
+      <div class="form-grid">
+        <div class="field"><label data-help="cash_reserve">Резерв, который нельзя выводить <span class="help-dot">?</span></label><input type="number" min="0" step="1000" data-bind="cash.cashReserve"></div>
+        <div class="field"><label data-help="owner_tax_rate">Налог/удержание при выводе, % <span class="help-dot">?</span></label><input type="number" min="0" max="60" step="0.1" data-bind="ownerTaxRate"></div>
+      </div>
+      <div class="notice warn">«Потенциально собственнику» — не юридическое разрешение на дивиденды. Это денежный ориентир после введённых ограничений.</div>
+    </div>
+    <div class="card span-12">
+      <h2>Cash bridge</h2>
+      <div class="table-wrap"><table id="cash_table"><thead><tr><th>Шаг</th><th>Сумма</th><th>Что означает</th></tr></thead><tbody></tbody></table></div>
+    </div>
+  </div>
+</section>
+
+<section id="view-controls" class="view">
+  <div class="hero-main" style="margin-bottom:14px"><h1>Контроли, допущения и журнал</h1><p>Здесь видны противоречия, непроверенные расходы, сохранённые сценарии и изменения, выполненные AI.</p></div>
+  <div class="grid">
+    <div class="card span-6"><h2>Автоматические проверки</h2><div id="diagnostics"></div></div>
+    <div class="card span-6"><h2>Сценарии и обмен</h2><div class="toolbar"><button class="primary" onclick="saveScenario()">Сохранить в браузере</button><button class="secondary" onclick="loadScenario()">Загрузить</button><button class="secondary" onclick="exportScenarioJson()">Экспорт JSON</button><label class="file-label">Импорт JSON<input type="file" accept=".json" onchange="importScenarioJson(event)"></label></div><div id="saved_scenarios" class="small muted"></div></div>
+    <div class="card span-6"><h2>Ключевые допущения</h2><textarea id="assumptions_text" style="width:100%;min-height:260px;border:1px solid var(--line);border-radius:12px;padding:10px" readonly></textarea></div>
+    <div class="card span-6"><h2>Журнал изменений</h2><div id="audit_log" class="audit-list"></div></div>
+    <div class="card span-12"><h2 data-help="sensitivity">Сценарии устойчивости ?</h2><p class="section-note">Автоматическая проверка, выдерживает ли результат снижение цены/объёма и рост закупочной стоимости. Это не прогноз спроса.</p><div class="table-wrap"><table id="sensitivity_table"><thead><tr><th>Сценарий</th><th>РРЦ</th><th>Продано</th><th>Закупочная</th><th>Net profit</th><th>Потенциально собственнику</th><th>Вывод</th></tr></thead><tbody></tbody></table></div></div>
+  </div>
+</section>
+</div>
+
+
+<div id="ios_install_bar" class="ios-install-bar" hidden>
+  <div><b>Установить как приложение</b><span>Будет открываться с экрана «Домой».</span></div>
+  <button type="button" onclick="showIosInstallGuide()">Как установить</button>
+  <button type="button" class="ios-install-close" onclick="dismissIosInstall()" aria-label="Закрыть">×</button>
+</div>
+<div id="ios_install_sheet" class="ios-install-sheet" hidden role="dialog" aria-modal="true" aria-label="Установка приложения">
+  <div class="ios-sheet-backdrop" onclick="hideIosInstallGuide()"></div>
+  <div class="ios-sheet-card">
+    <div class="ios-sheet-handle"></div>
+    <h3>Установка на iPhone</h3>
+    <ol>
+      <li>Откройте эту страницу в <b>Safari</b>. Если она открыта внутри ChatGPT, используйте «Поделиться» → «Открыть в Safari».</li>
+      <li>Нажмите кнопку <b>Поделиться</b> в Safari.</li>
+      <li>Выберите <b>На экран «Домой»</b>, затем <b>Добавить</b>.</li>
+    </ol>
+    <p>После установки калькулятор открывается как отдельное приложение и работает офлайн после первого успешного запуска.</p>
+    <button type="button" class="ios-sheet-done" onclick="hideIosInstallGuide()">Понятно</button>
+  </div>
+</div>
+
+<nav class="mobile-bottom-nav" aria-label="Навигация приложения">
+<button class="active" data-view="decision" onclick="openView('decision')"><span>◎</span>Решение</button>
+<button data-view="portfolio" onclick="openView('portfolio')"><span>▦</span>Портфель</button>
+<button data-view="expenses" onclick="openView('expenses')"><span>−</span>Расходы</button>
+<button data-view="cash" onclick="openView('cash')"><span>₸</span>Деньги</button>
+<button data-view="controls" onclick="openView('controls')"><span>✓</span>Контроли</button>
+</nav>
+
+<button class="help-fab" onclick="openHelp()" aria-label="Открыть справку">?</button>
+<div id="drawer_backdrop" class="drawer-backdrop" onclick="closeHelp()"></div>
+<aside id="help_drawer" class="help-drawer" role="dialog" aria-modal="true" aria-label="Справка и AI-консультант">
+  <div class="drawer-head"><div class="drawer-title">Помощник по калькулятору</div><button class="drawer-close" onclick="closeHelp()" aria-label="Закрыть">×</button></div>
+  <div class="drawer-tabs"><button class="active" data-pane="explain">Пояснение</button><button data-pane="library">Библиотека</button><button data-pane="ai">AI-консультант</button></div>
+  <div class="drawer-body">
+    <div id="pane-explain" class="drawer-pane active"><div id="help_content"><div class="help-title">Нажмите на параметр или показатель</div><div class="muted small">Здесь появятся простое описание, формула, текущий расчёт, риски неправильного ввода и связанные поля.</div></div></div>
+    <div id="pane-library" class="drawer-pane"><input id="library_search" class="search-input" placeholder="Например: чистая прибыль, НДС, DSO" oninput="renderLibrary(this.value)"><div id="library_list" class="library-list"></div></div>
+    <div id="pane-ai" class="drawer-pane">
+      <div class="ai-settings">
+        <div class="field"><label>Адрес защищённого AI proxy</label><input id="ai_endpoint" value="http://localhost:3000/api/assistant"></div>
+        <div style="display:flex;gap:7px;align-items:center"><button class="secondary" onclick="testAiConnection()">Проверить</button><label class="switch"><input id="ai_allow_actions" type="checkbox" checked> разрешить предлагать изменения</label></div>
+        <div id="ai_connection" class="connection">Без proxy работает локальная справка. API-ключ в HTML не сохраняется.</div>
+      </div>
+      <div id="ai_chat_log" class="chat-log"><div class="msg ai">Я получаю только текущий снимок калькулятора. Могу объяснить цифры, найти слабое место и предложить изменения. Любое изменение сначала показывается вам для подтверждения.</div></div>
+      <div id="ai_action_box"></div>
+      <div class="chat-compose"><textarea id="ai_question" placeholder="Например: почему мало денег собственнику? Повысь Target GM до 20% и предложи цену."></textarea><button class="primary" onclick="sendAiQuestion()">Отправить</button></div>
+      <div class="toolbar"><button class="secondary" onclick="undoAiChange()">Отменить последнее AI-изменение</button></div>
+    </div>
+  </div>
+</aside>
+
+<script>
+(function(root,factory){
+  const api=factory();
+  if(typeof module==='object'&&module.exports) module.exports=api;
+  else root.MarginEngineV10=api;
+})(typeof self!=='undefined'?self:this,function(){
+  'use strict';
+  const EPS=1e-9;
+  const clamp=(x,a,b)=>Math.max(a,Math.min(b,Number(x)||0));
+  const div=(a,b)=>Math.abs(b)>EPS?a/b:0;
+  const clone=o=>JSON.parse(JSON.stringify(o));
+  const sum=(arr,fn=x=>x)=>arr.reduce((a,x)=>a+(Number(fn(x))||0),0);
+  const round2=x=>Math.round((Number(x)||0)*100)/100;
+  const normSku=s=>String(s||'').trim().toLowerCase();
+
+  const DEFAULT_CHANNELS={
+    dtc:{id:'dtc',name:'DTC / прямые',active:true,share:50,sellInReductionPct:0,invoiceDiscountPct:0,rebatePct:0,returnsPct:0,paymentFeePct:0,lastMilePerUnit:0},
+    retail:{id:'retail',name:'Сети',active:true,share:50,sellInReductionPct:25,invoiceDiscountPct:0,rebatePct:0,returnsPct:0,paymentFeePct:0,lastMilePerUnit:0},
+    partner:{id:'partner',name:'Другие партнёры',active:true,share:0,sellInReductionPct:15,invoiceDiscountPct:0,rebatePct:0,returnsPct:0,paymentFeePct:0,lastMilePerUnit:0}
+  };
+
+  const DEFAULT_EXPENSES=[
+    {id:'inbound_logistics',status:'review',name:'Входящая логистика до склада',category:'inventory',channels:['all'],skuMode:'all',skuList:'',method:'unit',value:4500,base:'purchaseCost',vatTreatment:'net_plus_recoverable',taxDeductible:true,allocationDriver:'purchaseUnits'},
+    {id:'customs_cert',status:'review',name:'Таможня, пошлина и сертификация',category:'inventory',channels:['all'],skuMode:'all',skuList:'',method:'pct',value:3,base:'purchaseCost',vatTreatment:'no_vat',taxDeductible:true,allocationDriver:'purchaseValue'},
+    {id:'warehouse_after_ready',status:'review',name:'Склад после готовности товара к продаже',category:'variable',channels:['all'],skuMode:'all',skuList:'',method:'unit',value:0,base:'unitsSold',vatTreatment:'net_plus_recoverable',taxDeductible:true,allocationDriver:'units'},
+    {id:'warranty_returns',status:'review',name:'Гарантия и сервис после продажи',category:'variable',channels:['all'],skuMode:'all',skuList:'',method:'pct',value:2,base:'netRevenueBeforeContra',vatTreatment:'no_vat',taxDeductible:true,allocationDriver:'revenue'},
+    {id:'dtc_lastmile',status:'review',name:'Доставка последней мили DTC',category:'variable',channels:['dtc'],skuMode:'all',skuList:'',method:'unit',value:3000,base:'unitsSold',vatTreatment:'net_plus_recoverable',taxDeductible:true,allocationDriver:'units'},
+    {id:'retail_bonus',status:'review',name:'Дополнительный ретро-бонус сети',category:'contra',channels:['retail'],skuMode:'all',skuList:'',method:'pct',value:0,base:'invoiceNet',vatTreatment:'no_vat',taxDeductible:true,allocationDriver:'revenue'},
+    {id:'trade_marketing',status:'review',name:'Trade marketing сети',category:'marketing',channels:['retail'],skuMode:'all',skuList:'',method:'pct',value:0,base:'shelfNet',vatTreatment:'net_plus_recoverable',taxDeductible:true,allocationDriver:'revenue'},
+    {id:'performance_marketing',status:'review',name:'Performance / media marketing',category:'marketing',channels:['all'],skuMode:'all',skuList:'',method:'period',value:0,base:'period',vatTreatment:'net_plus_recoverable',taxDeductible:true,allocationDriver:'revenue'},
+    {id:'sales_team',status:'review',name:'Команда продаж и коммерческий OPEX',category:'fixed',channels:['all'],skuMode:'all',skuList:'',method:'period',value:0,base:'period',vatTreatment:'net_plus_recoverable',taxDeductible:true,allocationDriver:'revenue'},
+    {id:'admin_opex',status:'review',name:'Административный OPEX проекта',category:'fixed',channels:['all'],skuMode:'all',skuList:'',method:'period',value:0,base:'period',vatTreatment:'net_plus_recoverable',taxDeductible:true,allocationDriver:'revenue'},
+    {id:'bad_debt',status:'review',name:'Просрочка и безнадёжная задолженность',category:'variable',channels:['all'],skuMode:'all',skuList:'',method:'pct',value:0,base:'netRevenueBeforeContra',vatTreatment:'no_vat',taxDeductible:true,allocationDriver:'revenue'},
+    {id:'depreciation',status:'review',name:'Амортизация оборудования и IT',category:'depr',channels:['all'],skuMode:'all',skuList:'',method:'period',value:0,base:'period',vatTreatment:'no_vat',taxDeductible:true,allocationDriver:'revenue'},
+    {id:'finance_cost',status:'review',name:'Проценты и стоимость финансирования',category:'finance',channels:['all'],skuMode:'all',skuList:'',method:'period',value:0,base:'period',vatTreatment:'no_vat',taxDeductible:true,allocationDriver:'purchaseValue'},
+    {id:'cash_only',status:'na',name:'Денежные выплаты вне P&L',category:'cash',channels:['all'],skuMode:'all',skuList:'',method:'period',value:0,base:'period',vatTreatment:'no_vat',taxDeductible:false,allocationDriver:'revenue'}
+  ];
+
+  const DEFAULT_PRODUCT={
+    id:'single',name:'Товар',sku:'SKU-001',purchasePrice:280000,purchasePriceMode:'net',inputVatRecoverable:true,
+    openingStockUnits:0,openingStockUnitCost:0,purchasedUnits:100,soldUnits:100,writeoffUnits:0,manualLandedPerUnit:0,
+    approvedRrpGross:550000,marketMinGross:0,marketReferenceGross:550000,marketMaxGross:0,
+    targetMetric:'grossMargin',targetValue:35,allocationWeight:1
+  };
+
+  const DEFAULT_STATE={
+    version:'10.0',scenarioName:'Базовый сценарий',periodMonths:12,vatRate:12,incomeTaxRate:20,ownerTaxRate:0,
+    channels:clone(DEFAULT_CHANNELS),expenses:clone(DEFAULT_EXPENSES),singleProduct:clone(DEFAULT_PRODUCT),portfolio:[],
+    cash:{dso:0,dpo:0,openingARNet:0,openingAPNet:0,openingInventory:0,vatCashMode:'auto',vatCashSettlement:0,capex:0,newDebt:0,debtPrincipal:0,ownerInjection:0,otherOutflows:0,cashReserve:0}
+  };
+
+  function normalizeShares(channels){
+    const active=Object.values(channels||{}).filter(c=>c&&c.active!==false);
+    let total=sum(active,c=>Math.max(0,c.share));
+    if(total<=EPS){
+      return active.map((c,i)=>({...c,normShare:i===0?1:0}));
+    }
+    return active.map(c=>({...c,normShare:Math.max(0,c.share)/total}));
+  }
+
+  function skuMatches(exp,sku){
+    const mode=exp.skuMode||'all';
+    if(mode==='all') return true;
+    const list=String(exp.skuList||'').split(/[;,\n]/).map(normSku).filter(Boolean);
+    const key=normSku(sku);
+    if(mode==='include') return list.includes(key);
+    if(mode==='exclude') return !list.includes(key);
+    return true;
+  }
+  function channelMatches(exp,channelId){
+    const arr=Array.isArray(exp.channels)?exp.channels:['all'];
+    return arr.includes('all')||arr.includes(channelId);
+  }
+  function included(exp){return exp&&exp.status==='include';}
+
+  function amountTreatment(raw,treatment,vat){
+    raw=Math.max(0,Number(raw)||0); vat=Math.max(0,Number(vat)||0);
+    switch(treatment){
+      case 'net_plus_recoverable': return {pnl:raw,cash:raw*(1+vat),recoverableVat:raw*vat};
+      case 'gross_recoverable': return {pnl:raw/(1+vat),cash:raw,recoverableVat:raw-raw/(1+vat)};
+      case 'gross_nonrecoverable': return {pnl:raw,cash:raw,recoverableVat:0};
+      case 'no_vat': default: return {pnl:raw,cash:raw,recoverableVat:0};
+    }
+  }
+
+  function purchaseCore(product,vat){
+    const v=Math.max(0,Number(product.purchasePrice)||0);
+    const gross=product.purchasePriceMode==='gross'?v:v*(1+vat);
+    const net=product.purchasePriceMode==='gross'?v/(1+vat):v;
+    const accounting=product.inputVatRecoverable===false?gross:net;
+    const recoverableVat=product.inputVatRecoverable===false?0:gross-net;
+    return {gross,net,accounting,recoverableVat};
+  }
+
+  function expenseRaw(exp,ctx){
+    const value=Math.max(0,Number(exp.value)||0);
+    if(exp.method==='period') return value;
+    if(exp.method==='unit'){
+      const units=exp.category==='inventory'?ctx.purchaseUnits:ctx.units;
+      return value*Math.max(0,units);
+    }
+    if(exp.method==='pct'){
+      let base=0;
+      switch(exp.base){
+        case 'purchaseCost': base=ctx.purchaseCostAccounting*Math.max(0,ctx.purchaseUnits); break;
+        case 'accountingCogs': base=ctx.accountingCogs||0; break;
+        case 'invoiceGross': base=ctx.invoiceGross||0; break;
+        case 'invoiceNet': base=ctx.invoiceNet||0; break;
+        case 'shelfNet': base=ctx.shelfNet||0; break;
+        case 'netRevenueBeforeContra': base=ctx.netRevenueBeforeContra||0; break;
+        case 'netRevenue': base=ctx.netRevenue||0; break;
+        default: base=0;
+      }
+      return base*value/100;
+    }
+    return 0;
+  }
+
+  function allocateToChannels(total,eligible,driver='revenue'){
+    const out={};
+    if(!eligible.length) return out;
+    const weight=c=>{
+      if(driver==='units') return Math.max(0,c.units);
+      if(driver==='cogs') return Math.max(0,c.baseCogs);
+      if(driver==='purchaseValue') return Math.max(0,c.baseCogs);
+      return Math.max(0,c.invoiceNet);
+    };
+    let den=sum(eligible,weight);
+    eligible.forEach((c,i)=>{out[c.id]=den>EPS?total*weight(c)/den:total/eligible.length;});
+    return out;
+  }
+
+  function calcProduct(state,product,opts={}){
+    state=state||DEFAULT_STATE; product=product||state.singleProduct||DEFAULT_PRODUCT;
+    const vat=clamp(state.vatRate,0,100)/100;
+    const taxRate=clamp(state.incomeTaxRate,0,100)/100;
+    const channels=normalizeShares(state.channels||DEFAULT_CHANNELS);
+    const pCore=purchaseCore(product,vat);
+    const purchaseUnits=Math.max(0,Number(product.purchasedUnits)||0);
+    const openingUnits=Math.max(0,Number(product.openingStockUnits)||0);
+    const soldUnits=Math.max(0,Number(product.soldUnits)||0);
+    const writeoffUnits=Math.max(0,Number(product.writeoffUnits)||0);
+    const availableUnits=openingUnits+purchaseUnits;
+    const closingUnits=Math.max(0,availableUnits-soldUnits-writeoffUnits);
+    const warnings=[];
+    if(soldUnits+writeoffUnits>availableUnits+EPS) warnings.push('Продажи и списания превышают доступный товар.');
+    if(purchaseUnits<=EPS&&openingUnits<=EPS) warnings.push('Не задано доступное количество товара.');
+    if(soldUnits<=EPS) warnings.push('Продажи равны нулю: прибыль и целевая цена неинформативны.');
+
+    const expenseOverrides=opts.expenseOverrides||{};
+    const expenses=(state.expenses||[]).map(e=>expenseOverrides[e.id]?{...e,...expenseOverrides[e.id]}:e);
+    let inventoryPnl=0,inventoryCash=0,inventoryVat=0,inventoryNonDeductible=0;
+    const expenseDetails=[];
+    for(const exp of expenses){
+      if(!included(exp)||exp.category!=='inventory'||!skuMatches(exp,product.sku)) continue;
+      const raw=expenseRaw(exp,{purchaseUnits,purchaseCostAccounting:pCore.accounting});
+      const a=amountTreatment(raw,exp.vatTreatment,vat);
+      inventoryPnl+=a.pnl; inventoryCash+=a.cash; inventoryVat+=a.recoverableVat;
+      if(exp.taxDeductible===false) inventoryNonDeductible+=a.pnl;
+      expenseDetails.push({id:exp.id,name:exp.name,category:exp.category,pnl:a.pnl,cash:a.cash,recoverableVat:a.recoverableVat,taxDeductible:exp.taxDeductible!==false});
+    }
+    const manualLanded=Math.max(0,Number(product.manualLandedPerUnit)||0);
+    const purchaseDen=purchaseUnits>EPS?purchaseUnits:Math.max(1,soldUnits);
+    const currentPurchaseUnitCost=pCore.accounting+manualLanded+inventoryPnl/purchaseDen;
+    const openingStockUnitCost=Math.max(0,Number(product.openingStockUnitCost)||0)||currentPurchaseUnitCost;
+    if(openingUnits>EPS&&!(Number(product.openingStockUnitCost)>0)) warnings.push('Себестоимость начального остатка не задана: используется текущая Landed cost на единицу.');
+    const openingInventoryAccounting=openingUnits*openingStockUnitCost;
+    const currentPurchasesAccounting=purchaseUnits*currentPurchaseUnitCost;
+    const accountingUnitCost=availableUnits>EPS?(openingInventoryAccounting+currentPurchasesAccounting)/availableUnits:currentPurchaseUnitCost;
+    const cogsSold=accountingUnitCost*soldUnits;
+    const writeoffCost=accountingUnitCost*writeoffUnits;
+    const totalAccountingCogs=cogsSold+writeoffCost;
+    const closingInventory=accountingUnitCost*closingUnits;
+    const inventoryNonDeductiblePnl=currentPurchaseUnitCost>EPS&&purchaseUnits>EPS?inventoryNonDeductible*Math.min(1,(soldUnits+writeoffUnits)/Math.max(1,availableUnits)):0;
+    const approvedRrpGross=Math.max(0,Number(product.approvedRrpGross)||0);
+
+    const byChannel={};
+    for(const c of channels){
+      const units=soldUnits*c.normShare;
+      const reduction=clamp(c.sellInReductionPct,0,95)/100;
+      const invoiceDisc=clamp(c.invoiceDiscountPct,0,95)/100;
+      const invoiceGrossPerUnit=approvedRrpGross*(1-reduction)*(1-invoiceDisc);
+      const invoiceGross=invoiceGrossPerUnit*units;
+      const invoiceNet=invoiceGross/(1+vat);
+      const shelfGross=approvedRrpGross*units;
+      const shelfNet=shelfGross/(1+vat);
+      const baseContra=invoiceNet*(clamp(c.rebatePct,0,100)+clamp(c.returnsPct,0,100))/100;
+      const paymentFee=invoiceGross*clamp(c.paymentFeePct,0,100)/100;
+      const lastMile=Math.max(0,Number(c.lastMilePerUnit)||0)*units;
+      byChannel[c.id]={id:c.id,name:c.name,share:c.normShare,units,shelfGross,shelfNet,invoiceGross,invoiceNet,invoiceGrossPerUnit,
+        baseContra,baseVariable:paymentFee+lastMile,contra:baseContra,variable:paymentFee+lastMile,marketing:0,fixed:0,depr:0,finance:0,cashOnly:0,
+        expenseCash:paymentFee+lastMile,recoverableVat:0,nonDeductible:0,baseCogs:accountingUnitCost*units};
+    }
+
+    const channelList=Object.values(byChannel);
+    for(const exp of expenses){
+      if(!included(exp)||exp.category==='inventory'||!skuMatches(exp,product.sku)) continue;
+      const eligible=channelList.filter(c=>channelMatches(exp,c.id));
+      if(!eligible.length) continue;
+      if(exp.method==='period'){
+        const rawTotal=Math.max(0,Number(exp.value)||0);
+        const alloc=allocateToChannels(rawTotal,eligible,exp.allocationDriver);
+        for(const ch of eligible){
+          const a=amountTreatment(alloc[ch.id]||0,exp.vatTreatment,vat);
+          applyExpense(ch,exp,a);
+          expenseDetails.push({id:exp.id,name:exp.name,category:exp.category,channel:ch.id,pnl:a.pnl,cash:a.cash,recoverableVat:a.recoverableVat,taxDeductible:exp.taxDeductible!==false});
+        }
+      }else{
+        for(const ch of eligible){
+          const raw=expenseRaw(exp,{units:ch.units,purchaseUnits,purchaseCostAccounting:pCore.accounting,accountingCogs:ch.baseCogs,invoiceGross:ch.invoiceGross,invoiceNet:ch.invoiceNet,shelfNet:ch.shelfNet,netRevenueBeforeContra:ch.invoiceNet,netRevenue:ch.invoiceNet-ch.contra});
+          const a=amountTreatment(raw,exp.vatTreatment,vat);
+          applyExpense(ch,exp,a);
+          expenseDetails.push({id:exp.id,name:exp.name,category:exp.category,channel:ch.id,pnl:a.pnl,cash:a.cash,recoverableVat:a.recoverableVat,taxDeductible:exp.taxDeductible!==false});
+        }
+      }
+    }
+
+    function applyExpense(ch,exp,a){
+      const cat=exp.category;
+      if(cat==='contra') ch.contra+=a.pnl;
+      else if(cat==='variable') ch.variable+=a.pnl;
+      else if(cat==='marketing') ch.marketing+=a.pnl;
+      else if(cat==='fixed') ch.fixed+=a.pnl;
+      else if(cat==='depr') ch.depr+=a.pnl;
+      else if(cat==='finance') ch.finance+=a.pnl;
+      else if(cat==='cash') ch.cashOnly+=a.cash;
+      ch.expenseCash+=a.cash; ch.recoverableVat+=a.recoverableVat;
+      if(exp.taxDeductible===false&&cat!=='cash') ch.nonDeductible+=a.pnl;
+    }
+
+    let totals={shelfGross:0,invoiceGross:0,invoiceNet:0,contra:0,netRevenue:0,cogs:totalAccountingCogs,grossProfit:0,variable:0,contribution:0,marketing:0,fixed:0,ebitda:0,depr:0,ebit:0,finance:0,pbt:0,nonDeductible:0,taxableIncome:0,incomeTax:0,netProfit:0,cashOnly:0};
+    for(const ch of channelList){
+      ch.netRevenue=ch.invoiceNet-ch.contra;
+      ch.cogs=ch.baseCogs;
+      ch.grossProfit=ch.netRevenue-ch.cogs;
+      ch.contribution=ch.grossProfit-ch.variable;
+      ch.ebitda=ch.contribution-ch.marketing-ch.fixed;
+      ch.ebit=ch.ebitda-ch.depr;
+      ch.pbt=ch.ebit-ch.finance;
+      Object.keys(totals).forEach(k=>{if(typeof ch[k]==='number'&&k!=='cogs') totals[k]+=ch[k];});
+      totals.shelfGross+=0; // already added via generic loop prevention handled below
+    }
+    // Rebuild selected totals explicitly to avoid double counting derived lines.
+    totals.shelfGross=sum(channelList,c=>c.shelfGross);
+    totals.invoiceGross=sum(channelList,c=>c.invoiceGross);
+    totals.invoiceNet=sum(channelList,c=>c.invoiceNet);
+    totals.contra=sum(channelList,c=>c.contra);
+    totals.netRevenue=sum(channelList,c=>c.netRevenue);
+    totals.variable=sum(channelList,c=>c.variable);
+    totals.marketing=sum(channelList,c=>c.marketing);
+    totals.fixed=sum(channelList,c=>c.fixed);
+    totals.depr=sum(channelList,c=>c.depr);
+    totals.finance=sum(channelList,c=>c.finance);
+    totals.cashOnly=sum(channelList,c=>c.cashOnly);
+    totals.nonDeductible=sum(channelList,c=>c.nonDeductible)+inventoryNonDeductiblePnl;
+    totals.grossProfit=totals.netRevenue-totals.cogs;
+    totals.contribution=totals.grossProfit-totals.variable;
+    totals.ebitda=totals.contribution-totals.marketing-totals.fixed;
+    totals.ebit=totals.ebitda-totals.depr;
+    totals.pbt=totals.ebit-totals.finance;
+    totals.taxableIncome=totals.pbt+totals.nonDeductible;
+    totals.incomeTax=Math.max(0,totals.taxableIncome)*taxRate;
+    totals.netProfit=totals.pbt-totals.incomeTax;
+
+    const outputVat=totals.invoiceGross-totals.invoiceNet;
+    const inputVatPurchase=pCore.recoverableVat*purchaseUnits;
+    const inputVatExpenses=inventoryVat+sum(channelList,c=>c.recoverableVat);
+    const estimatedVatPosition=outputVat-inputVatPurchase-inputVatExpenses;
+
+    const metrics={
+      grossMargin:div(totals.grossProfit,totals.netRevenue),markup:div(totals.grossProfit,totals.cogs),
+      contributionMargin:div(totals.contribution,totals.netRevenue),ebitdaMargin:div(totals.ebitda,totals.netRevenue),
+      netProfitMargin:div(totals.netProfit,totals.netRevenue),netProfitPerUnit:div(totals.netProfit,soldUnits),
+      contributionPerUnit:div(totals.contribution,soldUnits),grossProfitPerUnit:div(totals.grossProfit,soldUnits)
+    };
+
+    const cash=opts.skipCash?null:calcCash(state,{netProfit:totals.netProfit,depr:totals.depr,netRevenue:totals.netRevenue,purchaseValueAccounting:pCore.accounting*purchaseUnits+inventoryPnl,openingInventoryAccounting,closingInventory,estimatedVatPosition,otherCashOnly:totals.cashOnly,soldUnits});
+    if(cash) metrics.cashBeforeFinancingPerUnit=div(cash.freeCashFlowBeforeFinancing,soldUnits);
+    if(cash&&state.cash&&state.cash.vatCashMode==='auto'&&estimatedVatPosition<0) warnings.push('Отрицательная VAT position не считается денежным поступлением автоматически: возмещение нужно подтвердить и ввести вручную.');
+
+    const reviewExpenses=(state.expenses||[]).filter(e=>e.status==='review'&&skuMatches(e,product.sku)).map(e=>e.name);
+    if(reviewExpenses.length) warnings.push('Есть расходы со статусом «Проверить»: '+reviewExpenses.join(', ')+'.');
+    if(totals.netRevenue<totals.cogs-EPS) warnings.push('Выручка без НДС ниже COGS: товар убыточен уже на валовом уровне.');
+    for(const ch of channelList){if(ch.contribution< -EPS) warnings.push(`${ch.name}: отрицательная прибыль после переменных расходов.`);}
+    if(product.marketMaxGross>0&&approvedRrpGross>product.marketMaxGross) warnings.push('Утверждённая цена выше указанного максимума рынка.');
+    if(product.marketMinGross>0&&approvedRrpGross<product.marketMinGross) warnings.push('Утверждённая цена ниже указанного минимума рынка.');
+
+    return {product:clone(product),vat,taxRate,purchase:pCore,purchaseUnits,openingUnits,openingStockUnitCost,openingInventoryAccounting,currentPurchaseUnitCost,soldUnits,writeoffUnits,closingUnits,accountingUnitCost,inventoryPnl,inventoryCash,inventoryVat,cogsSold,writeoffCost,closingInventory,byChannel,totals,metrics,outputVat,inputVatPurchase,inputVatExpenses,estimatedVatPosition,expenseDetails,cash,warnings};
+  }
+
+  function calcCash(state,x){
+    const c=state.cash||{};
+    const dso=clamp(c.dso,0,3650), dpo=clamp(c.dpo,0,3650);
+    const periodMonths=clamp(state.periodMonths||12,1,120);
+    const periodDays=365*periodMonths/12;
+    const closingAR=x.netRevenue*dso/periodDays;
+    const closingAP=x.purchaseValueAccounting*dpo/periodDays;
+    const openingInventoryManual=Number(c.openingInventory)||0;
+    const openingInventoryUsed=openingInventoryManual>EPS?openingInventoryManual:Math.max(0,Number(x.openingInventoryAccounting)||0);
+    const deltaAR=closingAR-(Number(c.openingARNet)||0);
+    const deltaAP=closingAP-(Number(c.openingAPNet)||0);
+    const deltaInventory=x.closingInventory-openingInventoryUsed;
+    const deltaWC=deltaAR+deltaInventory-deltaAP;
+    const operatingCashFlowBeforeVat=x.netProfit+x.depr-deltaWC;
+    const vatCashSettlement=c.vatCashMode==='manual'?(Number(c.vatCashSettlement)||0):Math.max(0,Number(x.estimatedVatPosition)||0);
+    const operatingCashFlow=operatingCashFlowBeforeVat-vatCashSettlement;
+    const capex=Math.max(0,Number(c.capex)||0);
+    const otherOutflows=Math.max(0,Number(c.otherOutflows)||0)+Math.max(0,Number(x.otherCashOnly)||0);
+    const freeCashFlowBeforeFinancing=operatingCashFlow-capex-otherOutflows;
+    const cashAfterFinancing=freeCashFlowBeforeFinancing+Math.max(0,Number(c.newDebt)||0)+Math.max(0,Number(c.ownerInjection)||0)-Math.max(0,Number(c.debtPrincipal)||0);
+    const cashReserve=Math.max(0,Number(c.cashReserve)||0);
+    const cashAfterReserve=cashAfterFinancing-cashReserve;
+    const ownerTaxRate=clamp(state.ownerTaxRate,0,100)/100;
+    const distributableBeforeOwnerTax=Math.max(0,cashAfterReserve);
+    const ownerTax=distributableBeforeOwnerTax*ownerTaxRate;
+    const potentiallyDistributableCash=distributableBeforeOwnerTax-ownerTax;
+    const financingGap=Math.max(0,-cashAfterReserve);
+    return {periodDays,closingAR,closingAP,openingInventoryUsed,closingInventory:x.closingInventory,deltaAR,deltaAP,deltaInventory,deltaWC,operatingCashFlowBeforeVat,vatCashSettlement,operatingCashFlow,capex,otherOutflows,freeCashFlowBeforeFinancing,cashAfterFinancing,cashReserve,cashAfterReserve,ownerTaxRate,ownerTax,potentiallyDistributableCash,financingGap};
+  }
+
+  function metricValue(result,metric){
+    if(!result) return -Infinity;
+    switch(metric){
+      case 'grossMargin': return result.metrics.grossMargin;
+      case 'contributionMargin': return result.metrics.contributionMargin;
+      case 'netProfitMargin': return result.metrics.netProfitMargin;
+      case 'netProfitPerUnit': return result.metrics.netProfitPerUnit;
+      case 'cashBeforeFinancingPerUnit': return result.metrics.cashBeforeFinancingPerUnit||0;
+      default:return result.metrics.grossMargin;
+    }
+  }
+  function normalizedTarget(metric,value){
+    value=Number(value)||0;
+    return ['grossMargin','contributionMargin','netProfitMargin'].includes(metric)?value/100:value;
+  }
+
+  function solvePrice(state,product,metric,target,opts={}){
+    const t=normalizedTarget(metric,target);
+    const p=clone(product);
+    const evalAt=price=>{p.approvedRrpGross=price;return calcProduct(state,p,opts);};
+    let low=0,high=Math.max(1000,(Number(product.approvedRrpGross)||0), (Number(product.purchasePrice)||0)*2);
+    let rh=evalAt(high),guard=0;
+    while((!isFinite(metricValue(rh,metric))||metricValue(rh,metric)<t)&&high<1e13&&guard<80){high*=2;rh=evalAt(high);guard++;}
+    if(metricValue(rh,metric)<t) return {price:Infinity,result:rh};
+    for(let i=0;i<90;i++){
+      const mid=(low+high)/2,rm=evalAt(mid);
+      if(metricValue(rm,metric)>=t) high=mid; else low=mid;
+    }
+    const result=evalAt(high);
+    return {price:high,result};
+  }
+
+  function solveZero(state,product,line,opts={}){
+    const p=clone(product);
+    const val=r=>line==='pbt'?r.totals.pbt:line==='netProfit'?r.totals.netProfit:r.totals.contribution;
+    const evalAt=price=>{p.approvedRrpGross=price;return calcProduct(state,p,opts);};
+    let low=0,high=Math.max(1000,(Number(product.approvedRrpGross)||0),(Number(product.purchasePrice)||0)*2),rh=evalAt(high),g=0;
+    while(val(rh)<0&&high<1e13&&g<80){high*=2;rh=evalAt(high);g++;}
+    if(val(rh)<0) return Infinity;
+    for(let i=0;i<90;i++){const mid=(low+high)/2,rm=evalAt(mid);if(val(rm)>=0)high=mid;else low=mid;}
+    return high;
+  }
+
+  function priceDecision(state,product,opts={}){
+    const target=solvePrice(state,product,product.targetMetric,product.targetValue,opts);
+    const variableFloor=solveZero(state,product,'contribution',opts);
+    const fullCostFloor=solveZero(state,product,'netProfit',opts);
+    const marketMin=Math.max(0,Number(product.marketMinGross)||0),marketRef=Math.max(0,Number(product.marketReferenceGross)||0),marketMax=Math.max(0,Number(product.marketMaxGross)||0);
+    let status='Не задан рыночный диапазон';
+    if(isFinite(target.price)&&marketMax>0&&target.price>marketMax+EPS) status='Целевая цена выше рынка: нужно снижать затраты, менять канал или цель';
+    else if(isFinite(target.price)&&marketMin>0&&target.price<marketMin-EPS) status='Целевая цена ниже рынка: возможно есть запас для цены, но рынок нужно подтвердить';
+    else if(isFinite(target.price)&&(marketMin>0||marketMax>0)) status='Целевая цена находится в указанном рыночном диапазоне';
+    return {targetPriceGross:target.price,targetResult:target.result,variableFloorGross:variableFloor,fullCostFloorGross:fullCostFloor,marketMinGross:marketMin,marketReferenceGross:marketRef,marketMaxGross:marketMax,approvedPriceGross:Number(product.approvedRrpGross)||0,status};
+  }
+
+  function eligibleProducts(exp,products){return products.filter(p=>skuMatches(exp,p.sku));}
+  function allocationWeight(exp,p){
+    const coreCost=Number(p.purchasePrice)||0;
+    switch(exp.allocationDriver){
+      case 'units': return Math.max(0,Number(p.soldUnits)||0);
+      case 'purchaseUnits': return Math.max(0,Number(p.purchasedUnits)||0);
+      case 'purchaseValue': return Math.max(0,Number(p.purchasedUnits)||0)*coreCost;
+      case 'cogs': return Math.max(0,Number(p.soldUnits)||0)*coreCost;
+      case 'manual': return Math.max(0,Number(p.allocationWeight)||0);
+      case 'revenue': default: return Math.max(0,Number(p.soldUnits)||0)*Math.max(0,Number(p.approvedRrpGross)||0);
+    }
+  }
+
+  function portfolioExpenseOverrides(state,products){
+    const map={}; products.forEach(p=>map[p.id]={});
+    for(const exp of state.expenses||[]){
+      if(!included(exp)||exp.method!=='period') continue;
+      const eligible=eligibleProducts(exp,products);
+      if(!eligible.length) continue;
+      let den=sum(eligible,p=>allocationWeight(exp,p));
+      eligible.forEach(p=>{
+        const alloc=den>EPS?(Number(exp.value)||0)*allocationWeight(exp,p)/den:(Number(exp.value)||0)/eligible.length;
+        map[p.id][exp.id]={value:alloc,method:'period'};
+      });
+    }
+    return map;
+  }
+
+  function calcPortfolio(state){
+    const products=(state.portfolio||[]).filter(p=>p&&String(p.sku||p.name||'').trim());
+    const overrides=portfolioExpenseOverrides(state,products);
+    const rows=[];
+    for(const p of products){
+      const opts={skipCash:true,expenseOverrides:overrides[p.id]||{}};
+      const result=calcProduct(state,p,opts);
+      const decision=priceDecision(state,p,opts);
+      rows.push({product:p,result,decision});
+    }
+    const totals={};
+    const keys=['shelfGross','invoiceGross','invoiceNet','contra','netRevenue','cogs','grossProfit','variable','contribution','marketing','fixed','ebitda','depr','ebit','finance','pbt','nonDeductible','taxableIncome','incomeTax','netProfit','cashOnly'];
+    keys.forEach(k=>totals[k]=sum(rows,r=>r.result.totals[k]));
+    const soldUnits=sum(rows,r=>r.result.soldUnits),purchaseValueAccounting=sum(rows,r=>r.result.purchase.accounting*r.result.purchaseUnits+r.result.inventoryPnl),openingInventoryAccounting=sum(rows,r=>r.result.openingInventoryAccounting),closingInventory=sum(rows,r=>r.result.closingInventory),estimatedVatPosition=sum(rows,r=>r.result.estimatedVatPosition);
+    const cash=calcCash(state,{netProfit:totals.netProfit,depr:totals.depr,netRevenue:totals.netRevenue,purchaseValueAccounting,openingInventoryAccounting,closingInventory,estimatedVatPosition,otherCashOnly:totals.cashOnly,soldUnits});
+    const metrics={grossMargin:div(totals.grossProfit,totals.netRevenue),contributionMargin:div(totals.contribution,totals.netRevenue),netProfitMargin:div(totals.netProfit,totals.netRevenue),netProfitPerUnit:div(totals.netProfit,soldUnits),contributionPerUnit:div(totals.contribution,soldUnits)};
+    const warnings=[]; rows.forEach(r=>r.result.warnings.forEach(w=>warnings.push(`${r.product.sku||r.product.name}: ${w}`)));
+    if(products.length===0) warnings.push('Портфель пуст.');
+    return {rows,totals,metrics,cash,soldUnits,purchaseValueAccounting,openingInventoryAccounting,closingInventory,estimatedVatPosition,warnings,overrides};
+  }
+
+  function diagnostics(state,singleResult,portfolioResult){
+    const issues=[];
+    const r=singleResult||calcProduct(state,state.singleProduct);
+    if(r.totals.netProfit<0) issues.push({severity:'high',title:'Отрицательная чистая прибыль',text:'После введённых расходов и КПН бизнес получает убыток.'});
+    if(r.metrics.contributionMargin<0) issues.push({severity:'high',title:'Отрицательная contribution margin',text:'Каждая дополнительная продажа в текущем mix ухудшает результат.'});
+    if(r.cash&&r.cash.financingGap>0) issues.push({severity:'high',title:'Нужны деньги для финансирования',text:`Расчётный дефицит: ${round2(r.cash.financingGap)}.`});
+    if((state.expenses||[]).some(e=>e.status==='review')) issues.push({severity:'medium',title:'Есть непроверенные расходы',text:'Они не включены в результат, пока статус не изменён на «Учесть».'});
+    if(r.soldUnits>r.purchaseUnits+r.openingUnits) issues.push({severity:'high',title:'Продано больше доступного',text:'Проверьте закупку и начальный остаток.'});
+    const shares=sum(Object.values(state.channels||{}).filter(c=>c.active!==false),c=>Math.max(0,c.share));
+    if(Math.abs(shares-100)>0.01) issues.push({severity:'low',title:'Доли каналов нормализованы',text:`Введено ${round2(shares)}%; модель пересчитала их пропорционально до 100%.`});
+    if(portfolioResult&&portfolioResult.rows.some(x=>x.decision.marketMaxGross>0&&x.decision.targetPriceGross>x.decision.marketMaxGross)) issues.push({severity:'high',title:'Есть SKU с недостижимой рыночной ценой',text:'Целевая доходность требует цены выше указанного максимума рынка.'});
+    if(!issues.length) issues.push({severity:'ok',title:'Критических противоречий не найдено',text:'Это не заменяет проверку исходных данных и налоговую экспертизу.'});
+    return issues;
+  }
+
+  return {DEFAULT_STATE,DEFAULT_PRODUCT,DEFAULT_CHANNELS,DEFAULT_EXPENSES,clone,calcProduct,calcPortfolio,calcCash,priceDecision,solvePrice,solveZero,metricValue,diagnostics,normalizeShares,amountTreatment,skuMatches,channelMatches,round2};
+});
+</script>
+<script>
+'use strict';
+const E=MarginEngineV10;
+const safeStorage={get(k){try{return window.safeStorage.get(k)}catch(e){return null}},set(k,v){try{window.safeStorage.set(k,v);return true}catch(e){return false}}};
+let state=E.clone(E.DEFAULT_STATE);
+let singleResult=null,priceDecision=null,portfolioResult=null;
+let auditLog=[];
+let pendingAiActions=[];
+let lastAiUndo=null;
+const fmt=new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0});
+const fmt1=new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1});
+const money=v=>Number.isFinite(v)?fmt.format(Math.round(v))+' ₸':'—';
+const number=v=>Number.isFinite(v)?fmt1.format(v):'—';
+const pct=v=>Number.isFinite(v)?fmt1.format(v*100)+'%':'—';
+const metricTargetLabel=m=>({grossMargin:'Gross Margin',contributionMargin:'Маржа после переменных расходов',netProfitMargin:'Чистая маржа',netProfitPerUnit:'Чистая прибыль / ед.',cashBeforeFinancingPerUnit:'Денежный результат / ед.'}[m]||m);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function getPath(obj,path){return path.split('.').reduce((o,k)=>o==null?undefined:o[k],obj)}
+function setPath(obj,path,val){const ks=path.split('.');let o=obj;ks.slice(0,-1).forEach(k=>{if(o[k]==null)o[k]={};o=o[k]});o[ks.at(-1)]=val}
+function valueFromInput(el){if(el.dataset.type==='boolean')return el.value==='true';if(el.type==='number')return Number(el.value)||0;return el.value}
+function syncInputs(){document.querySelectorAll('[data-bind]').forEach(el=>{const v=getPath(state,el.dataset.bind);if(document.activeElement!==el)el.value=typeof v==='boolean'?String(v):(v??'')})}
+function addAudit(text,source='Пользователь'){auditLog.unshift({time:new Date().toLocaleString('ru-RU'),source,text});auditLog=auditLog.slice(0,100);renderAudit()}
+function bindStaticInputs(){document.querySelectorAll('[data-bind]').forEach(el=>{el.addEventListener('change',()=>{setPath(state,el.dataset.bind,valueFromInput(el));addAudit(`${el.dataset.bind} = ${el.value}`);recalculate()});if(el.type==='number')el.addEventListener('input',()=>{setPath(state,el.dataset.bind,valueFromInput(el));recalculate(false)})})}
+function openView(name){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));document.querySelectorAll('#main_nav button,.mobile-bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===name));window.scrollTo({top:0,behavior:'smooth'})}
+document.querySelectorAll('#main_nav button').forEach(b=>b.onclick=()=>openView(b.dataset.view));
+document.getElementById('mode_btn').onclick=()=>{const expert=document.body.classList.toggle('expert-mode');document.body.classList.toggle('simple-mode',!expert);document.getElementById('mode_btn').textContent=expert?'Профессиональный режим':'Простой режим';document.getElementById('mode_btn').classList.toggle('active',expert)};
+
+function recalculate(full=true){
+  singleResult=E.calcProduct(state,state.singleProduct);priceDecision=E.priceDecision(state,state.singleProduct);portfolioResult=E.calcPortfolio(state);
+  syncInputs();renderChannels();renderDecision();renderPortfolio();renderExpenses();renderCash();renderControls();if(full)renderLibrary(document.getElementById('library_search')?.value||'');
+}
+function cls(v){return v>0?'good':v<0?'bad':'warn'}
+function answerCard(label,value,small,helpId,status=''){return `<div class="answer-card ${status}" data-help="${helpId}"><div class="label">${label}</div><div class="value">${value}</div><div class="small">${small}</div></div>`}
+function renderDecision(){
+ const r=singleResult,c=r.cash,d=priceDecision,p=state.singleProduct;
+ const priceGap=Number.isFinite(d.targetPriceGross)?p.approvedRrpGross-d.targetPriceGross:0;
+ document.getElementById('business_answers').innerHTML=[
+  answerCard('Чистая прибыль за период',money(r.totals.netProfit),`${money(r.metrics.netProfitPerUnit)} на проданную ед.`,'net_profit',cls(r.totals.netProfit)),
+  answerCard('Потенциально собственнику',money(c?.potentiallyDistributableCash||0),'после резерва, финансирования и указанного налога','owner_cash',(c?.potentiallyDistributableCash||0)>0?'good':(c?.financingGap>0?'bad':'warn')),
+  answerCard('Цена для вашей цели',money(d.targetPriceGross),metricTargetLabel(p.targetMetric)+' = '+formatTarget(p.targetMetric,p.targetValue),'target_price',Number.isFinite(d.targetPriceGross)?'':'bad'),
+  answerCard('Запас / недостаток текущей цены',money(priceGap),priceGap>=0?'текущая цена выше необходимой':'текущая цена ниже необходимой','price_gap',priceGap>=0?'good':'bad'),
+  answerCard('Дефицит финансирования',money(c?.financingGap||0),(c?.financingGap||0)>0?'нужно покрыть деньгами':'дефицита по введённым данным нет','financing_gap',(c?.financingGap||0)>0?'bad':'good')
+ ].join('');
+ document.getElementById('inventory_status').className='status-box '+(r.soldUnits+r.writeoffUnits<=r.purchaseUnits+r.openingUnits?'good':'bad');
+ document.getElementById('inventory_status').textContent=`Доступно ${number(r.purchaseUnits+r.openingUnits)} шт.; продано ${number(r.soldUnits)}; списано ${number(r.writeoffUnits)}; остаток ${number(r.closingUnits)} шт. на ${money(r.closingInventory)}.`;
+ document.getElementById('price_status').className='status-box '+(d.status.includes('выше рынка')?'bad':d.status.includes('диапазоне')?'good':'warn');document.getElementById('price_status').textContent=d.status;
+ renderPriceLadder();renderWaterfall();renderChannelResults();renderPL();renderWarnings('single_warnings',r.warnings);
+}
+function formatTarget(metric,v){return ['grossMargin','contributionMargin','netProfitMargin'].includes(metric)?number(v)+'%':money(v)}
+function renderPriceLadder(){const d=priceDecision,p=state.singleProduct;const boxes=[
+ ['Variable floor',d.variableFloorGross,'Ниже этой цены дополнительная продажа ухудшает результат','variable_floor'],
+ ['Full-cost floor',d.fullCostFloorGross,'Цена нулевой чистой прибыли после КПН','full_cost_floor'],
+ ['Цена для цели',d.targetPriceGross,metricTargetLabel(p.targetMetric)+' '+formatTarget(p.targetMetric,p.targetValue),'target_price'],
+ ['Ориентир рынка',d.marketReferenceGross,'Вводится пользователем, калькулятор рынок не знает','market_reference'],
+ ['Текущая цена',d.approvedPriceGross,'По ней рассчитаны все текущие показатели','approved_price']];
+ document.getElementById('price_ladder').innerHTML=boxes.map(x=>`<div class="price-box" data-help="${x[3]}"><div class="p-label">${x[0]}</div><div class="p-value">${money(x[1])}</div><div class="p-note">${x[2]}</div></div>`).join('')}
+function renderWaterfall(){const r=singleResult,t=r.totals,u=r.soldUnits;const rows=[
+ ['Sell-out на полке с НДС',t.shelfGross,'Полочная стоимость продаж'],['Минус: снижение цены до счёта',-(t.shelfGross-t.invoiceGross),'Маржа канала, скидка и invoice discount'],['Счета клиентам с НДС',t.invoiceGross,'Сколько выставлено клиентам'],['Минус: НДС',-(t.invoiceGross-t.invoiceNet),'Налог, не являющийся выручкой'],['Выручка до бонусов',t.invoiceNet,'Выручка без НДС до последующих скидок'],['Минус: бонусы и возвраты',-t.contra,'Retro bonus, returns и другие contra revenue'],['Pocket / Net revenue',t.netRevenue,'Реальная выручка после ценовых утечек'],['Минус: COGS',-t.cogs,'Стоимость проданного и списанного товара'],['Gross profit',t.grossProfit,'Что осталось после товара'],['Минус: переменные расходы продажи',-t.variable,'Доставка, эквайринг, гарантия и обслуживание'],['Contribution',t.contribution,'Что добавляют продажи до фиксированных расходов']];
+ const ids=['sellout','channel_reduction','invoice_gross','output_vat','invoice_net','contra_revenue','net_revenue','cogs','gross_profit','variable_cost','contribution'];
+ document.querySelector('#waterfall_table tbody').innerHTML=rows.map((x,i)=>`<tr class="clickable-row ${i===6||i===8||i===10?'subtotal':''}" data-help="${ids[i]}"><td>${x[0]}</td><td class="num ${x[1]<0?'bad':''}">${money(x[1])}</td><td>${money(u?x[1]/u:0)}</td><td style="text-align:left;white-space:normal">${x[2]}</td></tr>`).join('')}
+function renderChannelResults(){const r=singleResult,ids=['dtc','retail','partner'];const total=r.totals;const rows=[['Продано, шт.','units',x=>number(x)],['Sell-in с НДС / ед.','invoiceGrossPerUnit',x=>money(x)],['Net revenue','netRevenue',x=>money(x)],['Gross profit','grossProfit',x=>money(x)],['Contribution','contribution',x=>money(x)],['Contribution / ед.','contribution',x=>money(x)],['GM','grossMargin',x=>pct(x)],['CM','contributionMargin',x=>pct(x)]];
+ document.querySelector('#channel_result_table tbody').innerHTML=rows.map(([name,key,fn],ri)=>{const vals=ids.map(id=>{const c=r.byChannel[id];if(!c)return 0;if(key==='grossMargin')return c.netRevenue?c.grossProfit/c.netRevenue:0;if(key==='contributionMargin')return c.netRevenue?c.contribution/c.netRevenue:0;if(name.includes('/ ед.')&&key==='contribution')return c.units?c.contribution/c.units:0;return c[key]||0});let tv=0;if(key==='units')tv=r.soldUnits;else if(key==='invoiceGrossPerUnit')tv=r.soldUnits?total.invoiceGross/r.soldUnits:0;else if(key==='grossMargin')tv=r.metrics.grossMargin;else if(key==='contributionMargin')tv=r.metrics.contributionMargin;else if(name.includes('/ ед.'))tv=r.metrics.contributionPerUnit;else tv=total[key]||0;return `<tr class="clickable-row" data-help="${key==='grossMargin'?'gross_margin':key==='contributionMargin'?'contribution_margin':key}"><td>${name}</td>${vals.map(v=>`<td>${fn(v)}</td>`).join('')}<td>${fn(tv)}</td></tr>`}).join('')}
+function renderPL(){const r=singleResult,t=r.totals,u=r.soldUnits;const rows=[['Net revenue',t.netRevenue,'net_revenue'],['COGS',-t.cogs,'cogs'],['Gross profit',t.grossProfit,'gross_profit'],['Переменные расходы',-t.variable,'variable_cost'],['Contribution',t.contribution,'contribution'],['Marketing',-t.marketing,'marketing'],['Fixed OPEX',-t.fixed,'fixed_opex'],['EBITDA',t.ebitda,'ebitda'],['Амортизация',-t.depr,'depreciation'],['EBIT',t.ebit,'ebit'],['Finance cost',-t.finance,'finance_cost'],['PBT',t.pbt,'pbt'],['Невычитаемые расходы — add back',t.nonDeductible,'non_deductible'],['Налоговая база',t.taxableIncome,'taxable_income'],['КПН',-t.incomeTax,'income_tax'],['Net profit',t.netProfit,'net_profit']];document.querySelector('#pl_table tbody').innerHTML=rows.map((x,i)=>`<tr class="clickable-row ${[0,2,4,7,9,11,13,15].includes(i)?'subtotal':''}" data-help="${x[2]}"><td>${x[0]}</td><td class="num ${x[1]<0?'bad':x[1]>0&&[2,4,7,9,11,15].includes(i)?'good':''}">${money(x[1])}</td><td>${t.netRevenue?pct(x[1]/t.netRevenue):'—'}</td><td>${money(u?x[1]/u:0)}</td></tr>`).join('')}
+function renderWarnings(id,warnings){const el=document.getElementById(id);el.innerHTML=warnings.length?warnings.map(w=>`<div class="notice warn">${esc(w)}</div>`).join(''):'<div class="notice good">Критических предупреждений по введённым данным нет.</div>'}
+
+function renderChannels(){const wrap=document.getElementById('channel_cards');wrap.innerHTML=Object.values(state.channels).map(c=>`<div class="channel-card"><div class="channel-head"><div class="channel-name">${esc(c.name)}</div><label class="switch"><input type="checkbox" ${c.active!==false?'checked':''} onchange="updateChannel('${c.id}','active',this.checked)"> активен</label></div><div class="form-grid three"><div class="field"><label data-help="channel_share">Доля, % <span class="help-dot">?</span></label><input type="number" min="0" max="100" step="0.1" value="${c.share}" onchange="updateChannel('${c.id}','share',this.value)"></div><div class="field"><label data-help="sellin_reduction">Снижение от РРЦ, % <span class="help-dot">?</span></label><input type="number" min="0" max="95" step="0.1" value="${c.sellInReductionPct}" onchange="updateChannel('${c.id}','sellInReductionPct',this.value)"></div><div class="field expert-only"><label data-help="invoice_discount">Доп. скидка в счёте, % <span class="help-dot">?</span></label><input type="number" min="0" max="95" step="0.1" value="${c.invoiceDiscountPct}" onchange="updateChannel('${c.id}','invoiceDiscountPct',this.value)"></div><div class="field"><label data-help="rebate_pct">Бонус после продажи, % <span class="help-dot">?</span></label><input type="number" min="0" max="100" step="0.1" value="${c.rebatePct}" onchange="updateChannel('${c.id}','rebatePct',this.value)"></div><div class="field expert-only"><label data-help="returns_pct">Возвраты / компенсации, % <span class="help-dot">?</span></label><input type="number" min="0" max="100" step="0.1" value="${c.returnsPct}" onchange="updateChannel('${c.id}','returnsPct',this.value)"></div><div class="field expert-only"><label data-help="payment_fee">Эквайринг / комиссия оплаты, % <span class="help-dot">?</span></label><input type="number" min="0" max="100" step="0.1" value="${c.paymentFeePct}" onchange="updateChannel('${c.id}','paymentFeePct',this.value)"></div><div class="field expert-only"><label data-help="last_mile">Доставка клиенту / ед. <span class="help-dot">?</span></label><input type="number" min="0" step="100" value="${c.lastMilePerUnit}" onchange="updateChannel('${c.id}','lastMilePerUnit',this.value)"></div></div></div>`).join('')}
+function updateChannel(id,field,val){state.channels[id][field]=field==='active'?!!val:Number(val)||0;addAudit(`Канал ${id}: ${field} = ${val}`);recalculate()}
+function useTargetPrice(){if(!Number.isFinite(priceDecision.targetPriceGross)){alert('Для цели не найдено конечной цены. Проверьте расходы и целевое значение.');return}state.singleProduct.approvedRrpGross=Math.round(priceDecision.targetPriceGross);addAudit('Текущая цена заменена на цену для цели');recalculate()}
+function useMarketReference(){state.singleProduct.approvedRrpGross=Number(state.singleProduct.marketReferenceGross)||0;addAudit('Текущая цена заменена на ориентир рынка');recalculate()}
+
+function addPortfolioRow(){const base=E.clone(state.singleProduct);base.id='sku_'+Date.now();base.name='Новая позиция';base.sku='SKU-'+(state.portfolio.length+1);state.portfolio.push(base);addAudit('Добавлена позиция портфеля '+base.sku);recalculate()}
+function clearPortfolio(){if(!confirm('Очистить портфель?'))return;state.portfolio=[];addAudit('Портфель очищен');recalculate()}
+function applyGlobalTarget(){state.portfolio.forEach(p=>{p.targetMetric=state.singleProduct.targetMetric;p.targetValue=state.singleProduct.targetValue});addAudit('Цель основной позиции применена ко всему портфелю');recalculate()}
+function updatePortfolio(id,field,val,type='number'){const p=state.portfolio.find(x=>x.id===id);if(!p)return;p[field]=type==='string'?val:type==='boolean'?val==='true':Number(val)||0;recalculate(false)}
+function deletePortfolio(id){state.portfolio=state.portfolio.filter(x=>x.id!==id);addAudit('Удалена позиция портфеля');recalculate()}
+function renderPortfolio(){const pr=portfolioResult,c=pr.cash;document.getElementById('portfolio_summary').innerHTML=[answerCard('Net revenue портфеля',money(pr.totals.netRevenue),`${number(pr.soldUnits)} проданных единиц`,'net_revenue'),answerCard('Net profit портфеля',money(pr.totals.netProfit),pct(pr.metrics.netProfitMargin)+' от выручки','net_profit',cls(pr.totals.netProfit)),answerCard('Contribution',money(pr.totals.contribution),pct(pr.metrics.contributionMargin)+' от выручки','contribution',cls(pr.totals.contribution)),answerCard('Потенциально собственнику',money(c.potentiallyDistributableCash),'по портфелю после общих cash-параметров','owner_cash',c.potentiallyDistributableCash>0?'good':c.financingGap>0?'bad':'warn'),answerCard('Запасы на конец',money(pr.closingInventory),'деньги, остающиеся в товаре','closing_inventory',pr.closingInventory>0?'warn':'good')].join('');
+ document.getElementById('portfolio_body').innerHTML=pr.rows.map((row,i)=>{const p=row.product,r=row.result,d=row.decision;const targetOpt=`<select onchange="updatePortfolio('${p.id}','targetMetric',this.value,'string')"><option value="grossMargin" ${p.targetMetric==='grossMargin'?'selected':''}>GM %</option><option value="contributionMargin" ${p.targetMetric==='contributionMargin'?'selected':''}>CM %</option><option value="netProfitMargin" ${p.targetMetric==='netProfitMargin'?'selected':''}>NP %</option><option value="netProfitPerUnit" ${p.targetMetric==='netProfitPerUnit'?'selected':''}>NP/ед.</option><option value="cashBeforeFinancingPerUnit" ${p.targetMetric==='cashBeforeFinancingPerUnit'?'selected':''}>Cash/ед.</option></select>`;const market=Number(p.marketReferenceGross)||0;const statusClass=d.status.includes('выше рынка')?'bad':d.status.includes('диапазоне')?'good':'warn';return `<tr><td>${i+1}</td><td><input class="cell-input-wide" value="${esc(p.name)}" onchange="updatePortfolio('${p.id}','name',this.value,'string')"></td><td><input value="${esc(p.sku)}" onchange="updatePortfolio('${p.id}','sku',this.value,'string')"></td><td><input type="number" value="${p.purchasedUnits}" onchange="updatePortfolio('${p.id}','purchasedUnits',this.value)"></td><td><input type="number" value="${p.soldUnits}" onchange="updatePortfolio('${p.id}','soldUnits',this.value)"></td><td><input type="number" value="${p.purchasePrice}" onchange="updatePortfolio('${p.id}','purchasePrice',this.value)"></td><td><select onchange="updatePortfolio('${p.id}','purchasePriceMode',this.value,'string')"><option value="net" ${p.purchasePriceMode==='net'?'selected':''}>без НДС</option><option value="gross" ${p.purchasePriceMode==='gross'?'selected':''}>с НДС</option></select></td><td><input type="number" value="${p.approvedRrpGross}" onchange="updatePortfolio('${p.id}','approvedRrpGross',this.value)"></td><td>${targetOpt}</td><td><input type="number" value="${p.targetValue}" onchange="updatePortfolio('${p.id}','targetValue',this.value)"></td><td><input type="number" value="${market}" onchange="updatePortfolio('${p.id}','marketReferenceGross',this.value)"></td><td>${money(d.targetPriceGross)}</td><td>${money(d.variableFloorGross)}</td><td>${money(r.accountingUnitCost)}</td><td>${money(r.soldUnits?r.totals.netRevenue/r.soldUnits:0)}</td><td class="num ${cls(r.metrics.contributionPerUnit)}">${money(r.metrics.contributionPerUnit)}</td><td class="num ${cls(r.metrics.netProfitPerUnit)}">${money(r.metrics.netProfitPerUnit)}</td><td>${pct(r.metrics.grossMargin)}</td><td>${pct(r.metrics.contributionMargin)}</td><td>${number(r.closingUnits)}</td><td><span class="pill ${statusClass}" title="${esc(d.status)}">${esc(shortStatus(d.status))}</span></td><td><button class="danger" onclick="deletePortfolio('${p.id}')">×</button></td></tr>`}).join('');
+ document.getElementById('portfolio_foot').innerHTML=pr.rows.length?`<tr class="subtotal"><td colspan="3">ИТОГО</td><td>${number(sumPortfolio('purchasedUnits'))}</td><td>${number(pr.soldUnits)}</td><td colspan="8"></td><td>${money(pr.purchaseValueAccounting/(sumPortfolio('purchasedUnits')||1))}</td><td>${money(pr.soldUnits?pr.totals.netRevenue/pr.soldUnits:0)}</td><td>${money(pr.metrics.contributionPerUnit)}</td><td>${money(pr.metrics.netProfitPerUnit)}</td><td>${pct(pr.metrics.grossMargin)}</td><td>${pct(pr.metrics.contributionMargin)}</td><td>${number(pr.rows.reduce((a,x)=>a+x.result.closingUnits,0))}</td><td colspan="2"></td></tr>`:'';renderWarnings('portfolio_warnings',pr.warnings.slice(0,20))}
+function sumPortfolio(field){return state.portfolio.reduce((a,p)=>a+(Number(p[field])||0),0)}
+function shortStatus(s){if(s.includes('выше рынка'))return 'выше рынка';if(s.includes('ниже рынка'))return 'ниже рынка';if(s.includes('диапазоне'))return 'в диапазоне';return 'нет диапазона'}
+
+const categoryOptions=[['inventory','В стоимость товара'],['contra','Скидки и бонусы'],['variable','Продать и обслужить'],['marketing','Маркетинг'],['fixed','Постоянные расходы'],['depr','Амортизация'],['finance','Финансирование'],['cash','Только деньги']];
+const methodOptions=[['unit','₸ на единицу'],['pct','% от базы'],['period','Сумма за период']];
+const baseOptions=[['purchaseCost','Закупочная стоимость'],['accountingCogs','COGS'],['invoiceGross','Счёт с НДС'],['invoiceNet','Счёт без НДС'],['shelfNet','РРЦ без НДС'],['netRevenueBeforeContra','Выручка до бонусов'],['netRevenue','Net revenue'],['period','Не используется']];
+const vatOptions=[['net_plus_recoverable','Сумма без НДС + зачётный НДС'],['gross_recoverable','Сумма с зачётным НДС'],['gross_nonrecoverable','Сумма с невозмещаемым НДС'],['no_vat','Без НДС / не облагается']];
+const allocationOptions=[['revenue','выручке'],['units','проданным единицам'],['purchaseUnits','закупленным единицам'],['purchaseValue','стоимости закупки'],['cogs','COGS'],['manual','ручному весу']];
+function opts(arr,v){return arr.map(([x,t])=>`<option value="${x}" ${x===v?'selected':''}>${t}</option>`).join('')}
+function renderExpenses(){const filter=document.getElementById('expense_filter')?.value||'all';const rows=state.expenses.filter(e=>filter==='all'||e.category===filter);document.getElementById('expense_body').innerHTML=rows.map(e=>`<tr><td><select onchange="updateExpense('${e.id}','status',this.value,'string')"><option value="review" ${e.status==='review'?'selected':''}>Проверить</option><option value="include" ${e.status==='include'?'selected':''}>Учесть</option><option value="na" ${e.status==='na'?'selected':''}>Не применимо</option></select></td><td><input class="cell-input-wide" value="${esc(e.name)}" onchange="updateExpense('${e.id}','name',this.value,'string')"></td><td><select onchange="updateExpense('${e.id}','category',this.value,'string')">${opts(categoryOptions,e.category)}</select></td><td><select onchange="updateExpense('${e.id}','channels',this.value,'channels')"><option value="all" ${e.channels.includes('all')?'selected':''}>Все</option><option value="dtc" ${e.channels.length===1&&e.channels[0]==='dtc'?'selected':''}>DTC</option><option value="retail" ${e.channels.length===1&&e.channels[0]==='retail'?'selected':''}>Сети</option><option value="partner" ${e.channels.length===1&&e.channels[0]==='partner'?'selected':''}>Партнёры</option><option value="dtc,retail" ${e.channels.join(',')==='dtc,retail'?'selected':''}>DTC + сети</option><option value="retail,partner" ${e.channels.join(',')==='retail,partner'?'selected':''}>Сети + партнёры</option></select></td><td><select onchange="updateExpense('${e.id}','skuMode',this.value,'string')"><option value="all" ${e.skuMode==='all'?'selected':''}>Все SKU</option><option value="include" ${e.skuMode==='include'?'selected':''}>Только список</option><option value="exclude" ${e.skuMode==='exclude'?'selected':''}>Все кроме списка</option></select></td><td><input value="${esc(e.skuList||'')}" placeholder="SKU-1; SKU-2" onchange="updateExpense('${e.id}','skuList',this.value,'string')"></td><td><select onchange="updateExpense('${e.id}','method',this.value,'string')">${opts(methodOptions,e.method)}</select></td><td><input type="number" min="0" step="100" value="${e.value}" onchange="updateExpense('${e.id}','value',this.value)"></td><td><select onchange="updateExpense('${e.id}','base',this.value,'string')">${opts(baseOptions,e.base)}</select></td><td><select onchange="updateExpense('${e.id}','vatTreatment',this.value,'string')">${opts(vatOptions,e.vatTreatment)}</select></td><td><select onchange="updateExpense('${e.id}','taxDeductible',this.value,'boolean')"><option value="true" ${e.taxDeductible!==false?'selected':''}>Вычитается</option><option value="false" ${e.taxDeductible===false?'selected':''}>Не вычитается</option></select></td><td><select onchange="updateExpense('${e.id}','allocationDriver',this.value,'string')">${opts(allocationOptions,e.allocationDriver)}</select></td><td><button class="danger" onclick="deleteExpense('${e.id}')">×</button></td></tr>`).join('');const counts={include:0,review:0,na:0};state.expenses.forEach(e=>counts[e.status]=(counts[e.status]||0)+1);const el=document.getElementById('expense_summary');el.className='status-box '+(counts.review?'warn':'good');el.textContent=`Учтено: ${counts.include}. Требуют проверки и пока не входят в расчёт: ${counts.review}. Подтверждено «не применимо»: ${counts.na}.`}
+function updateExpense(id,field,val,type='number'){const e=state.expenses.find(x=>x.id===id);if(!e)return;if(type==='string')e[field]=val;else if(type==='boolean')e[field]=val==='true';else if(type==='channels')e[field]=val.split(',');else e[field]=Number(val)||0;addAudit(`Расход «${e.name}»: ${field} = ${val}`);recalculate()}
+function deleteExpense(id){state.expenses=state.expenses.filter(e=>e.id!==id);addAudit('Расход удалён');recalculate()}
+function addExpense(){state.expenses.push({id:'exp_'+Date.now(),status:'review',name:'Новый расход',category:'variable',channels:['all'],skuMode:'all',skuList:'',method:'unit',value:0,base:'unitsSold',vatTreatment:'no_vat',taxDeductible:true,allocationDriver:'revenue'});addAudit('Добавлен новый расход');recalculate()}
+function markAllReviewedNa(){state.expenses.forEach(e=>{if(e.status==='review')e.status='na'});addAudit('Все непроверенные расходы отмечены как не применимые');recalculate()}
+function restoreDefaultExpenses(){if(!confirm('Заменить список расходов стандартным?'))return;state.expenses=E.clone(E.DEFAULT_EXPENSES);addAudit('Восстановлен стандартный список расходов');recalculate()}
+
+function renderCash(){
+ const c=singleResult.cash;
+ document.getElementById('cash_answers').innerHTML=[
+  answerCard('Operating cash flow',money(c.operatingCashFlow),'после оборотного капитала и денежного НДС','operating_cash',cls(c.operatingCashFlow)),
+  answerCard('FCF до финансирования',money(c.freeCashFlowBeforeFinancing),'после CAPEX и прочих денежных выплат','fcf_before_financing',cls(c.freeCashFlowBeforeFinancing)),
+  answerCard('Cash после финансирования',money(c.cashAfterFinancing),'учтены новые деньги и тело долга','cash_after_financing',cls(c.cashAfterFinancing)),
+  answerCard('Потенциально собственнику',money(c.potentiallyDistributableCash),'после резерва и указанного налога','owner_cash',c.potentiallyDistributableCash>0?'good':c.financingGap>0?'bad':'warn'),
+  answerCard('Дефицит',money(c.financingGap),'если после резерва cash отрицательный','financing_gap',c.financingGap>0?'bad':'good')].join('');
+ const rows=[
+  ['Net profit',singleResult.totals.netProfit,'Бухгалтерская прибыль после КПН'],
+  ['Плюс: амортизация',singleResult.totals.depr,'Расход без текущей выплаты денег'],
+  ['Минус: рост дебиторки',-c.deltaAR,'Деньги ещё не получены от клиентов'],
+  ['Минус: рост запасов',-c.deltaInventory,'Деньги остались в товаре'],
+  ['Плюс: рост кредиторки',c.deltaAP,'Поставщикам ещё не заплачено'],
+  ['OCF до денежного НДС',c.operatingCashFlowBeforeVat,'Операционный cash до фактической уплаты НДС'],
+  ['Минус: денежный НДС',-c.vatCashSettlement,state.cash.vatCashMode==='manual'?'Введено пользователем':'Консервативная автооценка положительной VAT position'],
+  ['Operating cash flow',c.operatingCashFlow,'Деньги от операционной деятельности'],
+  ['Минус: CAPEX',-c.capex,'Покупка долгосрочных активов'],
+  ['Минус: прочие cash-выплаты',-c.otherOutflows,'Выплаты, не включённые выше'],
+  ['FCF до финансирования',c.freeCashFlowBeforeFinancing,'Результат бизнеса до кредитов и вкладов'],
+  ['Плюс: новые кредиты',state.cash.newDebt,'Привлечённые заёмные деньги'],
+  ['Плюс: вклад собственника',state.cash.ownerInjection,'Новые деньги собственника'],
+  ['Минус: тело кредита',-state.cash.debtPrincipal,'Возврат основного долга'],
+  ['Cash после финансирования',c.cashAfterFinancing,'Денежный остаток после источников финансирования'],
+  ['Минус: обязательный резерв',-c.cashReserve,'Деньги, остающиеся в бизнесе'],
+  ['Минус: налог/удержание собственника',-c.ownerTax,'Применённая пользователем ставка'],
+  ['Потенциально собственнику',c.potentiallyDistributableCash,'Ориентир, не юридическое решение о дивидендах']];
+ const ids=['net_profit','depreciation','dso','closing_inventory','dpo','operating_cash','vat_cash_settlement','operating_cash','capex','other_outflows','fcf_before_financing','new_debt','owner_injection','debt_principal','cash_after_financing','cash_reserve','owner_tax_rate','owner_cash'];
+ document.querySelector('#cash_table tbody').innerHTML=rows.map((x,i)=>`<tr class="clickable-row ${[5,7,10,14,17].includes(i)?'subtotal':''}" data-help="${ids[i]}"><td>${x[0]}</td><td class="num ${x[1]<0?'bad':x[1]>0&&[5,7,10,14,17].includes(i)?'good':''}">${money(x[1])}</td><td style="text-align:left;white-space:normal">${x[2]}</td></tr>`).join('')
+}
+function renderControls(){const issues=E.diagnostics(state,singleResult,portfolioResult);document.getElementById('diagnostics').innerHTML=issues.map(x=>`<div class="notice ${x.severity==='high'?'bad':x.severity==='medium'||x.severity==='low'?'warn':'good'}"><b>${esc(x.title)}</b><br>${esc(x.text)}</div>`).join('');document.getElementById('assumptions_text').value=buildAssumptions();renderSavedScenarios();renderAudit();renderSensitivity()}
+function renderSensitivity(){const scenarios=[['База',1,1,1,'Текущие данные'],['Цена −10%',.9,1,1,'Проверка ценового давления'],['Объём −20%',1,.8,1,'Проверка недопродаж'],['Закупка +10%',1,1,1.1,'Проверка роста себестоимости'],['Стресс-комбо',.95,.8,1.1,'Цена −5%, объём −20%, закупка +10%']];const rows=scenarios.map(([name,pm,vm,cm,note])=>{const st=E.clone(state);st.singleProduct.approvedRrpGross*=pm;st.singleProduct.soldUnits*=vm;st.singleProduct.purchasePrice*=cm;const r=E.calcProduct(st,st.singleProduct);const status=r.totals.netProfit<0?'Убыток':r.cash.financingGap>0?'Нужны деньги':r.cash.potentiallyDistributableCash>0?'Положительный cash':'Cash около нуля';return [name,st.singleProduct.approvedRrpGross,st.singleProduct.soldUnits,st.singleProduct.purchasePrice,r.totals.netProfit,r.cash.potentiallyDistributableCash,note+' · '+status]});document.querySelector('#sensitivity_table tbody').innerHTML=rows.map((x,i)=>`<tr class="${i===0?'subtotal':''}"><td>${x[0]}</td><td>${money(x[1])}</td><td>${number(x[2])}</td><td>${money(x[3])}</td><td class="${cls(x[4])}">${money(x[4])}</td><td class="${cls(x[5])}">${money(x[5])}</td><td style="text-align:left;white-space:normal">${esc(x[6])}</td></tr>`).join('')}
+function buildAssumptions(){const p=state.singleProduct,r=singleResult,c=r.cash;return [`Сценарий: ${state.scenarioName}; период ${state.periodMonths} мес.`,`SKU: ${p.sku}; закупка ${money(p.purchasePrice)} (${p.purchasePriceMode==='net'?'без НДС':'с НДС'}); закуплено ${p.purchasedUnits}; продано ${p.soldUnits}.`,`РРЦ: ${money(p.approvedRrpGross)} с НДС; цель: ${metricTargetLabel(p.targetMetric)} ${formatTarget(p.targetMetric,p.targetValue)}.`,`НДС ${state.vatRate}%; КПН ${state.incomeTaxRate}%; налог/удержание собственника ${state.ownerTaxRate}%.`,`Доли каналов: `+Object.values(state.channels).map(x=>`${x.name} ${x.share}%`).join('; ')+'.',`Учтённые расходы: `+state.expenses.filter(e=>e.status==='include').map(e=>e.name).join('; ')+'.',`Расходы «Проверить», не включённые в результат: `+state.expenses.filter(e=>e.status==='review').map(e=>e.name).join('; ')+'.',`Net revenue ${money(r.totals.netRevenue)}; Gross profit ${money(r.totals.grossProfit)}; Contribution ${money(r.totals.contribution)}; Net profit ${money(r.totals.netProfit)}.`,`Денежный НДС: ${state.cash.vatCashMode==='manual'?'ручной':'автооценка'} ${money(c.vatCashSettlement)}; начальные запасы для cash ${money(c.openingInventoryUsed)}.`,`FCF до финансирования ${money(c.freeCashFlowBeforeFinancing)}; потенциально собственнику ${money(c.potentiallyDistributableCash)}; дефицит ${money(c.financingGap)}.`,`Ограничение: модель является управленческой оценкой, не заменяет бухгалтерский, налоговый, юридический и рыночный анализ.`].join('\n')}
+function renderAudit(){const el=document.getElementById('audit_log');if(!el)return;el.innerHTML=auditLog.length?auditLog.map(x=>`<div class="audit-item"><b>${esc(x.source)}</b> · ${esc(x.time)}<br>${esc(x.text)}</div>`).join(''):'<div class="muted small">Изменений пока нет.</div>'}
+
+function saveScenario(){const name=prompt('Название сценария',state.scenarioName||'Сценарий');if(!name)return;state.scenarioName=name;const all=JSON.parse(safeStorage.get('marginV10Scenarios')||'{}');all[name]={savedAt:new Date().toISOString(),state};safeStorage.set('marginV10Scenarios',JSON.stringify(all));addAudit('Сценарий сохранён: '+name);recalculate()}
+function loadScenario(){const all=JSON.parse(safeStorage.get('marginV10Scenarios')||'{}');const names=Object.keys(all);if(!names.length){alert('Нет сохранённых сценариев');return}const choice=prompt(names.map((n,i)=>`${i+1}. ${n}`).join('\n'));const idx=Number(choice)-1;if(idx<0||idx>=names.length)return;state=E.clone(all[names[idx]].state);addAudit('Сценарий загружен: '+names[idx]);recalculate()}
+function renderSavedScenarios(){const all=JSON.parse(safeStorage.get('marginV10Scenarios')||'{}');const el=document.getElementById('saved_scenarios');if(el)el.textContent=Object.keys(all).length?'Сохранено: '+Object.keys(all).join(', '):'Сохранённых сценариев нет.'}
+function exportScenarioJson(){downloadBlob(JSON.stringify(state,null,2),'margin_model_v10_scenario.json','application/json')}
+function importScenarioJson(e){const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const obj=JSON.parse(rd.result);if(!obj.version||!obj.singleProduct)throw new Error('Неверная структура');state=obj;addAudit('Сценарий импортирован из JSON');recalculate()}catch(err){alert('Не удалось импортировать JSON: '+err.message)}};rd.readAsText(f,'utf-8')}
+function downloadBlob(content,name,type){const b=new Blob([content],{type});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),500)}
+
+function downloadTemplate(){const csv='sep=;\r\nНаименование;Артикул;Закуплено;Продано;Закупочная_цена;Режим_цены;РРЦ_с_НДС;Целевая_метрика;Целевое_значение;Ориентир_рынка\r\nТовар А;SKU-001;50;45;310027;net;450000;grossMargin;20;460000\r\nТовар Б;SKU-002;100;80;125000;net;210000;netProfitPerUnit;15000;220000\r\n';downloadBlob('\ufeff'+csv,'portfolio_v10_template_utf8.csv','text/csv;charset=utf-8')}
+function decodeText(buffer){const b=new Uint8Array(buffer);if(b[0]===0xEF&&b[1]===0xBB&&b[2]===0xBF)return new TextDecoder('utf-8').decode(b);if(b[0]===0xFF&&b[1]===0xFE)return new TextDecoder('utf-16le').decode(b);const u=new TextDecoder('utf-8').decode(b);if((u.match(/�/g)||[]).length>2)try{return new TextDecoder('windows-1251').decode(b)}catch{}return u}
+function parseCsv(text){text=text.replace(/^\ufeff/,'').replace(/\r\n?/g,'\n');let lines=text.split('\n').filter(x=>x.trim());if(/^sep\s*=/.test(lines[0]?.toLowerCase()))lines.shift();const sample=lines.slice(0,4).join('\n');const delims=[';',',','\t'];const d=delims.sort((a,b)=>(sample.split(b).length-sample.split(a).length))[0];const rows=[];let row=[],field='',q=false;for(let i=0;i<text.length;i++){const ch=text[i],nx=text[i+1];if(ch==='"'){if(q&&nx==='"'){field+='"';i++}else q=!q}else if(!q&&ch===d){row.push(field);field=''}else if(!q&&ch==='\n'){row.push(field);if(row.some(x=>x.trim()))rows.push(row.map(x=>x.trim()));row=[];field=''}else field+=ch}row.push(field);if(row.some(x=>x.trim()))rows.push(row.map(x=>x.trim()));if(rows.length&&/^sep\s*=/.test(rows[0][0].toLowerCase()))rows.shift();return rows}
+const hnorm=s=>String(s||'').trim().toLowerCase().replace(/ё/g,'е').replace(/[\s\-\/]+/g,'_').replace(/[()%₸]/g,'').replace(/_+/g,'_');
+function rowsToPortfolio(rows){if(!rows.length)throw new Error('Нет строк');const h=rows[0].map(hnorm);const aliases={name:['наименование','название','name'],sku:['артикул','sku','код'],purchased:['закуплено','количество','purchased'],sold:['продано','sales','sold'],price:['закупочная_цена','закупочная','purchase_price','cost'],mode:['режим_цены','mode'],rrp:['ррц_с_ндс','ррц','rrp'],metric:['целевая_метрика','target_metric'],target:['целевое_значение','целевая_маржа_процент','target'],market:['ориентир_рынка','market_reference']};const idx={};for(const [k,arr] of Object.entries(aliases)){idx[k]=-1;for(const a of arr){const j=h.indexOf(hnorm(a));if(j>=0){idx[k]=j;break}}}const hasHeader=Object.values(idx).filter(x=>x>=0).length>=3;const data=hasHeader?rows.slice(1):rows;if(!hasHeader)Object.assign(idx,{name:0,sku:1,purchased:2,sold:3,price:4,mode:5,rrp:6,metric:7,target:8,market:9});const num=v=>{let s=String(v??'').replace(/\s/g,'').replace(',','.').replace(/[^0-9.\-]/g,'');return Number(s)||0};state.portfolio=data.slice(0,100).filter(r=>r.some(x=>String(x).trim())).map((r,i)=>{const p=E.clone(E.DEFAULT_PRODUCT);p.id='import_'+Date.now()+'_'+i;p.name=r[idx.name]||`Позиция ${i+1}`;p.sku=r[idx.sku]||`SKU-${i+1}`;p.purchasedUnits=num(r[idx.purchased])||1;p.soldUnits=num(r[idx.sold])||p.purchasedUnits;p.purchasePrice=num(r[idx.price]);p.purchasePriceMode=(r[idx.mode]||'net').toLowerCase().includes('gross')?'gross':'net';p.approvedRrpGross=num(r[idx.rrp]);p.targetMetric=['grossMargin','contributionMargin','netProfitMargin','netProfitPerUnit','cashBeforeFinancingPerUnit'].includes(r[idx.metric])?r[idx.metric]:'grossMargin';p.targetValue=num(r[idx.target])||state.singleProduct.targetValue;p.marketReferenceGross=num(r[idx.market]);return p});addAudit(`Загружено ${state.portfolio.length} SKU`);recalculate()}
+async function handlePortfolioFile(e){const f=e.target.files[0];if(!f)return;try{const buf=await f.arrayBuffer();if(f.name.toLowerCase().endsWith('.xlsx'))rowsToPortfolio(await parseXlsxFirstSheet(buf));else rowsToPortfolio(parseCsv(decodeText(buf)))}catch(err){console.error(err);alert('Не удалось прочитать файл: '+err.message)}finally{e.target.value=''}}
+async function inflateRaw(bytes){if(typeof DecompressionStream==='undefined')throw new Error('Браузер не поддерживает локальное чтение XLSX. Сохраните как CSV UTF-8.');const ds=new DecompressionStream('deflate-raw');return new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(ds)).arrayBuffer())}
+async function unzipEntries(buffer){const b=new Uint8Array(buffer),dv=new DataView(buffer);let eocd=-1;for(let i=b.length-22;i>=Math.max(0,b.length-65557);i--){if(dv.getUint32(i,true)===0x06054b50){eocd=i;break}}if(eocd<0)throw new Error('Файл не похож на XLSX/ZIP');const count=dv.getUint16(eocd+10,true),offset=dv.getUint32(eocd+16,true);let p=offset;const out={};for(let n=0;n<count;n++){if(dv.getUint32(p,true)!==0x02014b50)throw new Error('Повреждён XLSX');const method=dv.getUint16(p+10,true),cs=dv.getUint32(p+20,true),nl=dv.getUint16(p+28,true),xl=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true),lo=dv.getUint32(p+42,true);const name=new TextDecoder().decode(b.slice(p+46,p+46+nl));const lnl=dv.getUint16(lo+26,true),lxl=dv.getUint16(lo+28,true),start=lo+30+lnl+lxl;const comp=b.slice(start,start+cs);out[name]=method===0?comp:method===8?await inflateRaw(comp):null;p+=46+nl+xl+cl}return out}
+function xmlText(bytes){return new TextDecoder('utf-8').decode(bytes||new Uint8Array())}
+function colIndex(ref){let n=0;for(const ch of ref.match(/[A-Z]+/i)?.[0]||'A')n=n*26+ch.toUpperCase().charCodeAt(0)-64;return n-1}
+async function parseXlsxFirstSheet(buffer){const z=await unzipEntries(buffer);const parser=new DOMParser();const shared=[];if(z['xl/sharedStrings.xml']){const x=parser.parseFromString(xmlText(z['xl/sharedStrings.xml']),'application/xml');x.querySelectorAll('si').forEach(si=>shared.push(Array.from(si.querySelectorAll('t')).map(t=>t.textContent).join('')))}let sheetPath='xl/worksheets/sheet1.xml';if(z['xl/workbook.xml']&&z['xl/_rels/workbook.xml.rels']){const wb=parser.parseFromString(xmlText(z['xl/workbook.xml']),'application/xml');const relId=wb.querySelector('sheet')?.getAttribute('r:id');const rels=parser.parseFromString(xmlText(z['xl/_rels/workbook.xml.rels']),'application/xml');const target=Array.from(rels.querySelectorAll('Relationship')).find(x=>x.getAttribute('Id')===relId)?.getAttribute('Target');if(target)sheetPath='xl/'+target.replace(/^\//,'').replace(/^xl\//,'')}const sx=z[sheetPath];if(!sx)throw new Error('Не найден первый лист XLSX');const x=parser.parseFromString(xmlText(sx),'application/xml');const rows=[];x.querySelectorAll('sheetData row').forEach(r=>{const arr=[];r.querySelectorAll('c').forEach(c=>{const idx=colIndex(c.getAttribute('r')||'A1'),t=c.getAttribute('t'),v=c.querySelector('v')?.textContent??'';let val=v;if(t==='s')val=shared[Number(v)]??'';else if(t==='inlineStr')val=Array.from(c.querySelectorAll('t')).map(x=>x.textContent).join('');else if(t==='b')val=v==='1'?'TRUE':'FALSE';arr[idx]=val});rows.push(arr.map(x=>x??''))});return rows}
+
+const helpRegistry={
+ scenario_name:{title:'Название сценария',plain:'Имя набора допущений. Оно не влияет на расчёт, но помогает не перепутать версии.',formula:'Формулы нет.',missing:'Если не задать, расчёт сохранится под стандартным названием.',affects:'Только сохранение и идентификацию сценария.',where:'Верхняя часть вкладки «Решение».'},
+ period_months:{title:'Период, месяцев',plain:'За какой период вы вводите продажи, расходы и денежные параметры.',formula:'Все суммы «за период» относятся к указанному горизонту.',missing:'Если годовые расходы введены при периоде 6 месяцев без корректировки, результат будет искажён.',affects:'Интерпретацию продаж, расходов и cash flow.',where:'Решение → шапка сценария.'},
+ purchase_price:{title:'Закупочная цена',plain:'Цена одной единицы у поставщика до дополнительных расходов.',formula:'Accounting purchase cost = цена без НДС, если НДС зачётный; иначе цена с НДС.',current:()=>`Сейчас: ${money(state.singleProduct.purchasePrice)}; учётная база ${money(singleResult.purchase.accounting)} на ед.`,missing:'При нуле COGS будет занижен, а прибыль завышена.',affects:'Landed cost, COGS, Gross profit, налог, запасы и cash.',where:'Решение → Товар и количество.'},
+ purchase_price_mode:{title:'Режим закупочной цены',plain:'Уточняет, включён ли НДС в введённую закупочную цену.',formula:'Если цена gross: Net = Gross / (1 + НДС).',current:()=>state.singleProduct.purchasePriceMode==='net'?'Сейчас цена введена без НДС.':'Сейчас цена введена с НДС.',missing:'Неверный режим обычно завышает или занижает себестоимость на величину НДС.',affects:'COGS, входящий НДС, прибыль и cash.',where:'Решение → Товар и количество.'},
+ input_vat:{title:'Зачёт входящего НДС',plain:'Можно ли уменьшить НДС к уплате на НДС поставщика.',formula:'Если зачёт разрешён, входящий НДС не входит в COGS.',current:()=>`Зачётный НДС по закупке за период: ${money(singleResult.inputVatPurchase)}.`,missing:'Если выбрать «Да» без права на зачёт, прибыль будет завышена.',affects:'COGS, VAT position, прибыль.',where:'Решение → Товар и количество.'},
+ manual_landed:{title:'Ручные затраты на доведение',plain:'Прямые затраты на одну единицу, которые точно входят в стоимость товара, но не заведены отдельной строкой расходов.',formula:'Landed unit cost = accounting purchase cost + ручная сумма + inventory expenses / закупленные единицы.',current:()=>`Сейчас Landed / Accounting cost = ${money(singleResult.accountingUnitCost)} на ед.`,missing:'Если такие расходы существуют, но равны нулю, Gross profit будет завышена.',affects:'COGS, запасы, цена для цели.',where:'Решение → Товар и количество.'},
+ purchased_units:{title:'Закуплено',plain:'Сколько единиц приобретено за период.',formula:'Остаток = начальный остаток + закуплено − продано − списано.',current:()=>`Закуплено ${number(singleResult.purchaseUnits)}, конечный остаток ${number(singleResult.closingUnits)}.`,missing:'Без закупки нельзя корректно оценить деньги в запасах и кредиторку.',affects:'Запасы, cash flow, распределение inventory-cost.',where:'Решение → Товар и количество.'},
+ sold_units:{title:'Продано',plain:'Количество единиц, по которым признаётся выручка и COGS.',formula:'Итоговые суммы = показатели на единицу × проданные единицы, с учётом mix каналов.',current:()=>`Продано ${number(singleResult.soldUnits)}; Net profit / ед. ${money(singleResult.metrics.netProfitPerUnit)}.`,missing:'При нуле нельзя оценить прибыль от продаж и целевую цену.',affects:'Выручку, COGS, прибыль, распределение расходов.',where:'Решение → Товар и количество.'},
+ opening_stock:{title:'Начальный остаток',plain:'Товар, который уже был на складе в начале периода.',formula:'Доступно = начальный остаток + закуплено.',current:()=>`Начальный остаток ${number(singleResult.openingUnits)} шт.`,missing:'Если фактически был остаток, но введён ноль, конечный запас будет неверным.',affects:'Доступное количество и конечный запас.',where:'Профессиональный режим → Товар.'},
+ writeoff_units:{title:'Списано / утеряно',plain:'Единицы без выручки: брак, потеря, устаревание или списание.',formula:'Write-off cost = Landed cost / ед. × списанные единицы.',current:()=>`Списание: ${number(singleResult.writeoffUnits)} шт. на ${money(singleResult.writeoffCost)}.`,missing:'При отсутствии ввода прибыль может быть завышена.',affects:'COGS, прибыль, остаток.',where:'Профессиональный режим → Товар.'},
+ approved_price:{title:'Текущая / утверждённая РРЦ',plain:'Цена, по которой калькулятор считает текущий P&L. Это не автоматически рекомендуемая рыночная цена.',formula:'Invoice gross = РРЦ × (1 − снижение канала) × (1 − invoice discount).',current:()=>`Сейчас РРЦ ${money(state.singleProduct.approvedRrpGross)}; Net revenue ${money(singleResult.totals.netRevenue)}.`,missing:'При нуле нет выручки.',affects:'Все показатели выручки, прибыли, налогов и cash.',where:'Решение → Цена и цель.'},
+ target_metric:{title:'Целевой показатель',plain:'Какой именно результат должна обеспечить цена.',formula:'Калькулятор перебирает цену, пока выбранный показатель не достигнет цели.',current:()=>`Выбрано: ${metricTargetLabel(state.singleProduct.targetMetric)}.`,missing:'Без осознанного выбора можно оптимизировать не тот результат.',affects:'Только расчёт «Цена для цели», не текущий P&L.',where:'Решение → Цена и цель.'},
+ target_value:{title:'Целевое значение',plain:'Желаемый уровень выбранного показателя. Его можно менять для каждого SKU.',formula:'Для процентных целей вводится %, для прибыли на единицу — ₸.',current:()=>`Цель ${formatTarget(state.singleProduct.targetMetric,state.singleProduct.targetValue)}; цена для цели ${money(priceDecision.targetPriceGross)}.`,missing:'При слишком высокой цели цена может выйти за рынок или стать недостижимой.',affects:'Цена для цели и статус рынка.',where:'Решение → Цена и цель.'},
+ market_reference:{title:'Ориентир рынка',plain:'Цена, которую вы считаете реалистичной на рынке. Калькулятор сам не знает спрос и конкурентов.',formula:'Используется для сравнения, а не для автоматического расчёта прибыли.',current:()=>`Ориентир ${money(state.singleProduct.marketReferenceGross)}; цена для цели ${money(priceDecision.targetPriceGross)}.`,missing:'Без рынка калькулятор может предложить математически правильную, но непродаваемую цену.',affects:'Статус ценового решения.',where:'Решение → Цена и цель.'},
+ market_min:{title:'Минимум рынка',plain:'Нижняя граница разумного рыночного диапазона.',formula:'Сравнивается с ценой для цели и текущей ценой.',current:()=>money(state.singleProduct.marketMinGross),missing:'Без диапазона статус рынка менее надёжен.',affects:'Предупреждения о цене.',where:'Профессиональный режим → Цена.'},
+ market_max:{title:'Максимум рынка',plain:'Верхняя граница, выше которой продажи могут быть нереалистичны.',formula:'Если Target Price > Market Max, калькулятор показывает разрыв бизнес-модели.',current:()=>money(state.singleProduct.marketMaxGross),missing:'Без максимума нельзя автоматически заметить недостижимую цель.',affects:'Предупреждения о цене.',where:'Профессиональный режим → Цена.'},
+ vat_rate:{title:'НДС',plain:'Налог, который включён в цену клиенту, но не является выручкой компании.',formula:'Net revenue before discounts = Invoice gross / (1 + НДС).',current:()=>`НДС ${state.vatRate}%; исключено из счетов ${money(singleResult.outputVat)}.`,missing:'Неверная ставка искажает выручку, COGS и цену для цели.',affects:'Net revenue, входящий/исходящий НДС, target price.',where:'Решение → Налоги.'},
+ income_tax_rate:{title:'КПН / налог на прибыль',plain:'Ставка налога на положительную налоговую базу.',formula:'КПН = max(0; PBT + невычитаемые расходы) × ставка.',current:()=>`Налоговая база ${money(singleResult.totals.taxableIncome)}; КПН ${money(singleResult.totals.incomeTax)}.`,missing:'Нулевая ставка завысит чистую прибыль, если налог фактически есть.',affects:'Net profit и cash.',where:'Решение → Налоги.'},
+ owner_tax_rate:{title:'Налог/удержание при выводе',plain:'Пользовательская ставка на деньги, потенциально выводимые собственнику.',formula:'Owner tax = max(0; cash after reserve) × ставка.',current:()=>`Ставка ${state.ownerTaxRate}%; расчётный налог ${money(singleResult.cash.ownerTax)}.`,missing:'Если при выводе есть налог, но введён 0%, сумма собственнику будет завышена.',affects:'Только потенциально распределяемые деньги.',where:'Решение и Деньги.'},
+ cash_reserve:{title:'Резерв денег в бизнесе',plain:'Сумма, которую нельзя выводить, даже если расчётный cash положительный.',formula:'Cash after reserve = cash after financing − reserve.',current:()=>`Резерв ${money(state.cash.cashReserve)}; после резерва ${money(singleResult.cash.cashAfterReserve)}.`,missing:'При нуле можно оставить бизнес без оборотной ликвидности.',affects:'Деньги собственника и дефицит.',where:'Решение / Деньги.'},
+ channel_share:{title:'Доля канала',plain:'Какая часть проданных единиц приходится на конкретный канал.',formula:'Units channel = sold units × normalized share.',current:()=>Object.values(singleResult.byChannel).map(c=>`${c.name}: ${pct(c.share)}`).join('; '),missing:'Если сумма не 100%, модель нормализует доли, что может быть незаметно.',affects:'Среднюю цену, прибыль и target price.',where:'Решение → Каналы.'},
+ sellin_reduction:{title:'Снижение от РРЦ',plain:'Часть полочной цены, которая не попадает в ваш счёт: маржа сети, комиссия партнёра или скидка DTC.',formula:'Sell-in gross = РРЦ × (1 − снижение).',current:()=>Object.values(state.channels).map(c=>`${c.name}: ${number(c.sellInReductionPct)}%`).join('; '),missing:'Если сеть удерживает маржу, но введён 0%, прибыль будет сильно завышена.',affects:'Invoice, Net revenue, все уровни прибыли.',where:'Решение → Каналы.'},
+ invoice_discount:{title:'Дополнительная скидка в счёте',plain:'Скидка сверх основного снижения от РРЦ, применяемая до выставления счёта.',formula:'Invoice gross = РРЦ × (1 − снижение) × (1 − доп. скидка).',missing:'Игнорирование завышает выручку.',affects:'Invoice и прибыль.',where:'Профессиональный режим → Каналы.'},
+ rebate_pct:{title:'Бонус после продажи',plain:'Ретро-бонус или иная скидка, которая уменьшает выручку уже после счёта.',formula:'Contra revenue = Invoice net × bonus %.',missing:'Если бонус существует, но равен нулю, Pocket revenue завышена.',affects:'Net revenue, GP, tax и cash.',where:'Решение → Каналы.'},
+ returns_pct:{title:'Возвраты и компенсации',plain:'Ожидаемая доля возвратов или компенсаций, уменьшающая выручку.',formula:'Returns = Invoice net × returns %.',missing:'Нулевой процент при фактических возвратах завысит прибыль.',affects:'Net revenue и прибыль.',where:'Профессиональный режим → Каналы.'},
+ payment_fee:{title:'Эквайринг / комиссия оплаты',plain:'Переменный расход за приём оплаты.',formula:'Payment fee = Invoice gross × %.',missing:'Игнорирование завышает Contribution.',affects:'Contribution, EBITDA, Net profit.',where:'Профессиональный режим → Каналы.'},
+ last_mile:{title:'Доставка клиенту',plain:'Стоимость доставки одной проданной единицы по каналу.',formula:'Last mile = сумма / ед. × units channel.',missing:'Игнорирование завышает Contribution.',affects:'Contribution и прибыль.',where:'Профессиональный режим → Каналы.'},
+ variable_floor:{title:'Variable floor price',plain:'Минимальная цена, при которой продажа покрывает товар и переменные расходы. Постоянные расходы ещё не покрыты.',formula:'Цена решается так, чтобы Contribution = 0.',current:()=>money(priceDecision.variableFloorGross),missing:'Продажа ниже этой цены обычно уничтожает деньги при каждом дополнительном заказе.',affects:'Решение продавать или не продавать по каналу.',where:'Решение → Карта цены.'},
+ full_cost_floor:{title:'Full-cost floor price',plain:'Цена, при которой PBT равен нулю после введённых постоянных и финансовых расходов.',formula:'Цена решается так, чтобы PBT = 0.',current:()=>money(priceDecision.fullCostFloorGross),missing:'Ниже этой цены полный бизнес-кейс убыточен при текущем объёме.',affects:'Долгосрочную экономическую устойчивость.',where:'Решение → Карта цены.'},
+ target_price:{title:'Цена для цели',plain:'Математическая цена, которая обеспечивает выбранную цель при текущих расходах и mix каналов.',formula:'Binary search по РРЦ до достижения Target Metric.',current:()=>`${money(priceDecision.targetPriceGross)}; статус: ${priceDecision.status}.`,missing:'Это не гарантия спроса и не рыночный прогноз.',affects:'Решение о цене и поиск разрыва бизнес-модели.',where:'Решение → Карта цены.'},
+ price_gap:{title:'Запас текущей цены',plain:'Разница между текущей ценой и ценой, необходимой для выбранной цели.',formula:'Price gap = Approved RRP − Target Price.',current:()=>money(state.singleProduct.approvedRrpGross-priceDecision.targetPriceGross),missing:'Отрицательное значение означает недостижение цели.',affects:'Ценовое решение.',where:'Верхние бизнес-ответы.'},
+ net_revenue:{title:'Net / Pocket revenue',plain:'Выручка без НДС после скидок, бонусов и возвратов.',formula:'Net revenue = Invoice gross / (1 + НДС) − contra revenue.',current:()=>`${money(singleResult.totals.netRevenue)} за период; ${money(singleResult.soldUnits?singleResult.totals.netRevenue/singleResult.soldUnits:0)} на ед.`,missing:'Нельзя вводить вручную: она рассчитывается из цены и условий каналов.',affects:'Все показатели прибыли.',where:'Price Waterfall и P&L.'},
+ cogs:{title:'COGS',plain:'Стоимость проданного и списанного товара. Не включает маркетинг, продажу и финансирование.',formula:'COGS = Landed accounting cost × sold units + write-off cost.',current:()=>`${money(singleResult.totals.cogs)}; Landed ${money(singleResult.accountingUnitCost)} на ед.`,missing:'Если затраты на доведение товара не учтены, COGS занижен.',affects:'Gross profit, запас и tax.',where:'Price Waterfall и P&L.'},
+ gross_profit:{title:'Gross profit',plain:'Что осталось от Net revenue после стоимости товара.',formula:'Gross profit = Net revenue − COGS.',current:()=>money(singleResult.totals.grossProfit),missing:'Положительная Gross profit ещё не означает чистую прибыль.',affects:'GM, Contribution и все нижние уровни.',where:'Price Waterfall и P&L.'},
+ gross_margin:{title:'Gross Margin',plain:'Доля Net revenue, оставшаяся после стоимости товара.',formula:'GM = Gross profit / Net revenue.',current:()=>pct(singleResult.metrics.grossMargin),missing:'Не учитывает продажу, маркетинг, OPEX, проценты и КПН.',affects:'Целевую цену, если выбрана GM.',where:'Каналы, портфель, P&L.'},
+ variable_cost:{title:'Переменные расходы продажи',plain:'Расходы, которые растут вместе с продажами: доставка, эквайринг, гарантия и обслуживание.',formula:'Variable cost = сумма всех активных variable-строк + встроенные условия каналов.',current:()=>money(singleResult.totals.variable),missing:'Если не задать существующие расходы, Contribution завышена.',affects:'Contribution, EBITDA и Net profit.',where:'Price Waterfall и Расходы.'},
+ contribution:{title:'Contribution',plain:'Сколько продажи оставляют для покрытия маркетинга, постоянных расходов и прибыли.',formula:'Contribution = Gross profit − variable selling costs.',current:()=>`${money(singleResult.totals.contribution)}; ${money(singleResult.metrics.contributionPerUnit)} на ед.`,missing:'Отрицательная Contribution означает, что больше продаж обычно увеличивает убыток.',affects:'Break-even и бизнес-решение.',where:'Price Waterfall и P&L.'},
+ contribution_margin:{title:'Contribution Margin',plain:'Доля выручки после товара и переменных расходов.',formula:'CM = Contribution / Net revenue.',current:()=>pct(singleResult.metrics.contributionMargin),missing:'Лучше GM показывает экономику дополнительной продажи.',affects:'Целевую цену и floor.',where:'Каналы и портфель.'},
+ marketing:{title:'Marketing',plain:'Маркетинговые расходы, не включённые в стоимость товара.',formula:'EBITDA уменьшается на активные marketing-строки.',current:()=>money(singleResult.totals.marketing),missing:'При фактическом маркетинге, но нуле в модели Net profit завышена.',affects:'EBITDA и ниже.',where:'P&L и Расходы.'},
+ fixed_opex:{title:'Fixed OPEX',plain:'Постоянные операционные расходы проекта.',formula:'EBITDA = Contribution − Marketing − Fixed OPEX.',current:()=>money(singleResult.totals.fixed),missing:'Нулевой OPEX при наличии команды/офиса завышает прибыль.',affects:'EBITDA, full-cost floor, Net profit.',where:'P&L и Расходы.'},
+ ebitda:{title:'EBITDA',plain:'Операционный результат до амортизации, процентов и КПН.',formula:'EBITDA = Contribution − Marketing − Fixed OPEX.',current:()=>money(singleResult.totals.ebitda),missing:'Не равна cash и не включает обслуживание долга.',affects:'Оценку операционной модели.',where:'P&L.'},
+ depreciation:{title:'Амортизация',plain:'Бухгалтерское распределение стоимости оборудования по периодам. Обычно не является текущей денежной выплатой.',formula:'EBIT = EBITDA − D&A.',current:()=>money(singleResult.totals.depr),missing:'Если оборудование используется, но амортизация не введена, EBIT и PBT завышены.',affects:'EBIT, PBT, налог; обратно добавляется в OCF.',where:'P&L и Расходы.'},
+ ebit:{title:'EBIT',plain:'Прибыль от операций после амортизации, но до процентов и налога.',formula:'EBIT = EBITDA − D&A.',current:()=>money(singleResult.totals.ebit),affects:'PBT и оценку операционной прибыльности.',where:'P&L.'},
+ finance_cost:{title:'Finance cost',plain:'Проценты и стоимость финансирования, но не погашение тела кредита.',formula:'PBT = EBIT − Finance cost.',current:()=>money(singleResult.totals.finance),missing:'Игнорирование процентов завышает чистую прибыль.',affects:'PBT, КПН и Net profit.',where:'P&L и Расходы.'},
+ pbt:{title:'PBT',plain:'Прибыль до КПН после операционных и финансовых расходов.',formula:'PBT = EBIT − Finance cost.',current:()=>money(singleResult.totals.pbt),affects:'Налоговую базу и Net profit.',where:'P&L.'},
+ non_deductible:{title:'Невычитаемые расходы',plain:'Расходы уменьшают бухгалтерскую прибыль, но не уменьшают налоговую базу.',formula:'Taxable income = PBT + non-deductible expenses.',current:()=>money(singleResult.totals.nonDeductible),missing:'Неверная отметка может занизить или завысить КПН.',affects:'КПН.',where:'P&L и Расходы.'},
+ taxable_income:{title:'Налоговая база',plain:'Упрощённая база для КПН в модели.',formula:'Taxable income = PBT + non-deductible expenses.',current:()=>money(singleResult.totals.taxableIncome),missing:'Модель не учитывает перенос убытков и временные разницы.',affects:'КПН.',where:'P&L.'},
+ income_tax:{title:'КПН',plain:'Расчётный налог на положительную налоговую базу.',formula:'Income tax = max(0; taxable income) × rate.',current:()=>money(singleResult.totals.incomeTax),missing:'Нулевая сумма при отрицательной базе не означает отсутствие будущих налоговых эффектов.',affects:'Net profit и cash.',where:'P&L.'},
+ net_profit:{title:'Net profit',plain:'Бухгалтерская чистая прибыль после всех введённых P&L-расходов и КПН.',formula:'Net profit = PBT − Income tax.',current:()=>`${money(singleResult.totals.netProfit)}; ${money(singleResult.metrics.netProfitPerUnit)} на ед.`,missing:'Не равна деньгам собственника из-за запасов, дебиторки, CAPEX и долга.',affects:'Cash flow и оценку бизнеса.',where:'Бизнес-ответы и P&L.'},
+ dso:{title:'DSO',plain:'Сколько дней в среднем клиенты не платят после признания выручки.',formula:'Closing AR ≈ Net revenue × DSO / 365.',current:()=>`DSO ${state.cash.dso} дней; расчётная дебиторка ${money(singleResult.cash.closingAR)}.`,missing:'При нуле модель предполагает немедленную оплату и может завысить cash.',affects:'Оборотный капитал и финансирование.',where:'Деньги → Оборотный капитал.'},
+ dpo:{title:'DPO',plain:'Сколько дней в среднем вы не платите поставщикам.',formula:'Closing AP ≈ purchase value × DPO / 365.',current:()=>`DPO ${state.cash.dpo} дней; кредиторка ${money(singleResult.cash.closingAP)}.`,missing:'При нуле предполагается немедленная оплата поставщику.',affects:'Оборотный капитал и cash.',where:'Деньги → Оборотный капитал.'},
+ opening_ar:{title:'Начальная дебиторка',plain:'Дебиторская задолженность на начало периода без НДС для управленческого cash-расчёта.',formula:'ΔAR = Closing AR − Opening AR.',current:()=>money(state.cash.openingARNet),affects:'Operating cash flow.',where:'Профессиональный режим → Деньги.'},
+ opening_ap:{title:'Начальная кредиторка',plain:'Долг поставщикам на начало периода без НДС.',formula:'ΔAP = Closing AP − Opening AP.',current:()=>money(state.cash.openingAPNet),affects:'Operating cash flow.',where:'Профессиональный режим → Деньги.'},
+ opening_inventory:{title:'Начальные запасы',plain:'Стоимость запасов на начало периода.',formula:'ΔInventory = Closing inventory − Opening inventory.',current:()=>money(state.cash.openingInventory),affects:'Operating cash flow.',where:'Профессиональный режим → Деньги.'},
+ closing_inventory:{title:'Конечные запасы',plain:'Стоимость непроданного товара, в котором остаются деньги бизнеса.',formula:'Closing inventory = Landed cost / ед. × closing units.',current:()=>money(singleResult.closingInventory),missing:'Если закупка и продажи заданы неверно, cash будет искажён.',affects:'Оборотный капитал и cash.',where:'Решение и Деньги.'},
+ operating_cash:{title:'Operating cash flow',plain:'Деньги от основной деятельности после изменения запасов, дебиторки и кредиторки.',formula:'OCF = Net profit + D&A − ΔAR − ΔInventory + ΔAP.',current:()=>money(singleResult.cash.operatingCashFlow),missing:'Это управленческая оценка на net-базе; точный календарь платежей требует помесячной модели.',affects:'FCF и деньги собственника.',where:'Деньги.'},
+ capex:{title:'CAPEX',plain:'Покупка оборудования или других долгосрочных активов.',formula:'FCF before financing = OCF − CAPEX − other cash outflows.',current:()=>money(state.cash.capex),missing:'Игнорирование CAPEX завышает доступные деньги.',affects:'FCF.',where:'Деньги.'},
+ other_outflows:{title:'Прочие денежные выплаты',plain:'Денежные выплаты, которые не входят в P&L и CAPEX.',formula:'Вычитаются из FCF до финансирования.',current:()=>money(state.cash.otherOutflows),missing:'Использовать только без дублирования P&L-расходов.',affects:'FCF.',where:'Деньги.'},
+ fcf_before_financing:{title:'FCF до финансирования',plain:'Сколько денег создаёт бизнес до кредитов, вкладов собственника и возврата тела долга.',formula:'FCF = OCF − CAPEX − cash-only outflows.',current:()=>money(singleResult.cash.freeCashFlowBeforeFinancing),affects:'Потребность во внешнем финансировании.',where:'Деньги.'},
+ new_debt:{title:'Новые кредиты',plain:'Новые заёмные деньги. Они увеличивают cash, но не являются прибылью.',formula:'Cash after financing += new debt.',current:()=>money(state.cash.newDebt),affects:'Cash after financing, но не P&L.',where:'Деньги.'},
+ owner_injection:{title:'Вклад собственника',plain:'Новые деньги, внесённые собственником.',formula:'Cash after financing += owner injection.',current:()=>money(state.cash.ownerInjection),affects:'Cash, но не прибыль.',where:'Деньги.'},
+ debt_principal:{title:'Погашение тела кредита',plain:'Возврат основной суммы долга. Это не расход P&L, но денежный отток.',formula:'Cash after financing -= principal repayment.',current:()=>money(state.cash.debtPrincipal),affects:'Cash after financing.',where:'Деньги.'},
+ cash_after_financing:{title:'Cash после финансирования',plain:'FCF бизнеса с учётом новых кредитов, вкладов и погашения тела долга.',formula:'FCF + new debt + owner injection − principal.',current:()=>money(singleResult.cash.cashAfterFinancing),affects:'Резерв и потенциальные деньги собственника.',where:'Деньги.'},
+ owner_cash:{title:'Потенциально собственнику',plain:'Расчётный денежный остаток после оборотного капитала, CAPEX, финансирования, резерва и введённого налога.',formula:'max(0; cash after financing − reserve) × (1 − owner tax rate).',current:()=>money(singleResult.cash.potentiallyDistributableCash),missing:'Не является автоматическим разрешением на дивиденды.',affects:'Главный денежный ориентир собственника.',where:'Бизнес-ответы и Деньги.'},
+ financing_gap:{title:'Дефицит финансирования',plain:'Сколько денег не хватает после сохранения обязательного резерва.',formula:'Gap = max(0; − cash after reserve).',current:()=>money(singleResult.cash.financingGap),affects:'Потребность в кредите, авансе или вложении собственника.',where:'Бизнес-ответы и Деньги.'},
+ product_name:{title:'Наименование товара',plain:'Понятное название позиции. Оно помогает читать отчёт, но само по себе не меняет цифры.',formula:'Формулы нет.',current:()=>state.singleProduct.name||'Не задано',missing:'Без названия легко перепутать позиции в портфеле.',affects:'Только идентификацию и отчётность.',where:'Решение → Товар и количество; Портфель → Наименование.'},
+ sku:{title:'Артикул / SKU',plain:'Уникальный код товара. По нему калькулятор назначает расходы одной, нескольким или всем позициям.',formula:'Расход применяется, если SKU соответствует правилу строки расхода.',current:()=>state.singleProduct.sku||'Не задан',missing:'Пустой или повторяющийся SKU может привести к неправильному назначению расходов.',affects:'Применимость расходов и идентификацию позиции.',where:'Решение → Товар; Портфель → SKU; Расходы → Список SKU.'},
+ opening_stock_cost:{title:'Себестоимость начального остатка / ед.',plain:'Стоимость одной единицы, которая уже была на складе до начала периода.',formula:'Средняя себестоимость = (начальный остаток × его стоимость + текущие закупки × текущая Landed cost) / доступные единицы.',current:()=>`Введено ${money(state.singleProduct.openingStockUnitCost)}; применено ${money(singleResult.openingStockUnitCost)}.`,missing:'Если оставить 0 при наличии начального остатка, модель использует текущую Landed cost и показывает предупреждение.',affects:'COGS, остаток, прибыль и cash.',where:'Профессиональный режим → Товар и количество.'},
+ vat_cash_mode:{title:'Режим денежного НДС',plain:'Определяет, как учесть реальную выплату НДС в денежном потоке.',formula:'Авто: max(0; исходящий НДС − зачётный входящий НДС). Вручную: используется введённая сумма.',current:()=>state.cash.vatCashMode==='manual'?`Ручной режим: ${money(state.cash.vatCashSettlement)}.`:`Автооценка: ${money(singleResult.cash.vatCashSettlement)}.`,missing:'Если НДС к уплате не учесть, деньги собственника могут быть завышены.',affects:'Operating cash flow, FCF и деньги собственника; не меняет P&L.',where:'Профессиональный режим → Деньги → Оборотный капитал.'},
+ vat_cash_settlement:{title:'НДС уплачен / (возмещён) за период',plain:'Фактическая денежная выплата НДС. Положительное число — уплата, отрицательное — реально полученное возмещение.',formula:'OCF после НДС = OCF до НДС − введённая сумма.',current:()=>`Введено ${money(state.cash.vatCashSettlement)}; в расчёте ${money(singleResult.cash.vatCashSettlement)}.`,missing:'В автоматическом режиме поле игнорируется. В ручном режиме 0 означает, что выплаты или возмещения не было.',affects:'Только денежный поток.',where:'Профессиональный режим → Деньги.'},
+ accounting_landed:{title:'Landed / Accounting cost на единицу',plain:'Средняя стоимость единицы товара после закупки и прямых затрат на доведение до состояния продажи.',formula:'Средняя Landed cost = стоимость начального остатка и текущих закупок / доступные единицы.',current:()=>money(singleResult.accountingUnitCost),missing:'Если не включить логистику, пошлины или сертификацию, цена для цели будет занижена.',affects:'COGS, остаток, Gross profit, target price и cash.',where:'Портфель → Landed / ед.; P&L → COGS.'},
+ pocket_revenue:{title:'Pocket / Net revenue на единицу',plain:'Сколько выручки без НДС реально остаётся компании после снижения цены, бонусов и возвратов.',formula:'Pocket revenue = Invoice gross / (1 + НДС) − бонусы − возвраты.',current:()=>money(singleResult.soldUnits?singleResult.totals.netRevenue/singleResult.soldUnits:0),missing:'Если не задать скидки и бонусы, показатель будет завышен.',affects:'Все уровни прибыли.',where:'Price Waterfall и Портфель.'},
+ price_status_help:{title:'Статус цены',plain:'Сравнение цены для финансовой цели с введённым рыночным диапазоном.',formula:'Target price сопоставляется с Market Min и Market Max.',current:()=>priceDecision.status,missing:'Без рыночного диапазона модель не может оценить продаваемость цены.',affects:'Решение о цене, но не формулы P&L.',where:'Решение → Цена и цель; Портфель → Статус.'},
+ expense_status:{title:'Статус расхода',plain:'«Учесть» включает расход; «Проверить» временно не включает и оставляет предупреждение; «Не применимо» подтверждает, что расход отсутствует.',formula:'В расчёт входят только строки со статусом «Учесть».',current:()=>`Учтено ${state.expenses.filter(e=>e.status==='include').length}; проверить ${state.expenses.filter(e=>e.status==='review').length}; не применимо ${state.expenses.filter(e=>e.status==='na').length}.`,missing:'Если оставить реальный расход в статусе «Проверить» или «Не применимо», прибыль будет завышена.',affects:'Все показатели от Landed cost до денег собственника.',where:'Расходы → Статус.'},
+ expense_name:{title:'Название расхода',plain:'Понятное название конкретной выплаты или начисления.',formula:'Формулы нет.',missing:'Нечёткое название повышает риск дубля или пропуска.',affects:'Понимание модели и аудит.',where:'Расходы → Расход.'},
+ expense_category:{title:'Простая категория расхода',plain:'Определяет, на каком шаге расход уменьшает результат: стоимость товара, выручку, Contribution, EBITDA, EBIT, PBT или только cash.',formula:'Категория задаёт место строки в P&L или cash bridge.',missing:'Неверная категория может не изменить итоговую прибыль при той же сумме, но исказит маржи, цену-floor и управленческий вывод.',affects:'Landed cost, GM, CM, EBITDA, PBT, Net profit или cash.',where:'Расходы → Простая категория.'},
+ expense_channels:{title:'Каналы расхода',plain:'Показывает, для каких каналов возникает расход.',formula:'Сумма распределяется только между выбранными каналами.',missing:'Выбор «Все» для расхода только одного канала занизит прибыль остальных каналов.',affects:'Результат DTC, сетей, партнёров и средний mix.',where:'Расходы → Каналы.'},
+ expense_sku_scope:{title:'Область применения по SKU',plain:'Позволяет применить расход ко всем товарам, только к списку или ко всем кроме списка.',formula:'All / Include list / Exclude list.',missing:'Неверный режим может применить расход к лишним SKU или пропустить нужные.',affects:'Себестоимость и прибыль отдельных позиций.',where:'Расходы → SKU.'},
+ expense_sku_list:{title:'Список SKU',plain:'Артикулы через точку с запятой или запятую, к которым относится правило.',formula:'Сопоставление выполняется по точному SKU без учёта регистра.',missing:'Опечатка означает, что расход не попадёт на ожидаемую позицию.',affects:'Распределение расходов по портфелю.',where:'Расходы → Список SKU.'},
+ expense_method:{title:'Как задан расход',plain:'₸ на единицу, процент от выбранной базы или общая сумма за период.',formula:'Unit = ставка × единицы; % = база × процент; Period = указанная сумма.',missing:'Неверный метод может изменить расход в десятки раз.',affects:'Сумму расхода и чувствительность к объёму/цене.',where:'Расходы → Как задан.'},
+ expense_value:{title:'Значение расхода',plain:'Ставка в тенге, процент или сумма за период — в зависимости от выбранного метода.',formula:'Используется вместе с полями «Как задан» и «База %».',missing:'Ноль исключает денежный эффект даже при статусе «Учесть».',affects:'Соответствующий уровень P&L или cash.',where:'Расходы → Значение.'},
+ expense_base:{title:'База процентного расхода',plain:'Показатель, от которого считается процент: закупка, COGS, счёт, РРЦ или выручка.',formula:'Расход = выбранная база × Значение %.',missing:'Не используется для суммы на единицу и суммы за период. Неверная база искажает расход.',affects:'Сумму процентного расхода и цену для цели.',where:'Расходы → База %.'},
+ expense_vat:{title:'НДС расхода',plain:'Уточняет, включает ли введённая сумма НДС и можно ли его зачесть.',formula:'При зачётном НДС P&L получает сумму без НДС, cash — сумму с НДС.',missing:'Неверный режим искажает COGS/P&L, входящий НДС и cash.',affects:'Прибыль, VAT position и денежный поток.',where:'Расходы → НДС расхода.'},
+ expense_tax:{title:'Вычет по КПН',plain:'Уменьшает ли расход налоговую базу по введённому допущению.',formula:'Невычитаемый P&L-расход добавляется обратно: Taxable income = PBT + add-back.',missing:'Неверная отметка искажает КПН и Net profit.',affects:'Налоговую базу и чистую прибыль.',where:'Расходы → Вычет по КПН.'},
+ expense_allocation:{title:'Драйвер распределения общей суммы',plain:'Как общую сумму за период разделить между SKU и каналами.',formula:'Доля позиции = её драйвер / сумма драйверов подходящих позиций.',missing:'Равное или неверное распределение может сделать прибыль отдельных SKU ложной, хотя итог портфеля останется тем же.',affects:'Прибыль SKU и каналов; не меняет общий расход портфеля.',where:'Расходы → Распределить общую сумму по.'},
+ sensitivity:{title:'Сценарии устойчивости',plain:'Быстрые стресс-тесты показывают, останется ли модель прибыльной при ухудшении ключевых допущений.',formula:'Каждый сценарий пересчитывает текущую модель с заданным изменением цены, объёма или закупочной стоимости.',current:()=>`Стресс-комбо показывает результат отдельно в таблице вкладки «Контроли».`,missing:'Это не прогноз спроса и не заменяет собственные сценарии.',affects:'Оценку риска решения и потребности в запасе прочности.',where:'Контроли → Сценарии устойчивости.'}
+};
+function helpCurrent(item){try{return typeof item.current==='function'?item.current():item.current||'Текущий расчёт для этого параметра не требуется.'}catch{return 'Текущий расчёт пока недоступен.'}}
+function showHelp(id){const x=helpRegistry[id];if(!x)return;openHelp();switchDrawerPane('explain');document.getElementById('help_content').innerHTML=`<div class="help-title">${esc(x.title)}</div><div class="help-section"><h4>Простыми словами</h4><p>${esc(x.plain||'')}</p></div><div class="help-section"><h4>Формула</h4><div class="formula-box">${esc(x.formula||'Формула не применяется.')}</div></div><div class="help-section"><h4>Текущий расчёт</h4><p>${esc(helpCurrent(x))}</p></div><div class="help-section"><h4>Что будет, если не задать или ошибиться</h4><p>${esc(x.missing||'Проверьте исходные данные и смысл параметра.')}</p></div><div class="help-section"><h4>На что влияет</h4><p>${esc(x.affects||'Связанные показатели модели.')}</p></div><div class="help-section"><h4>Где найти</h4><p>${esc(x.where||'В текущей вкладке.')}</p></div>`}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-help]');if(t&&!e.target.closest('input,select,textarea,button'))showHelp(t.dataset.help)});
+function openHelp(){document.getElementById('help_drawer').classList.add('open');document.getElementById('drawer_backdrop').classList.add('open')}
+function closeHelp(){document.getElementById('help_drawer').classList.remove('open');document.getElementById('drawer_backdrop').classList.remove('open')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeHelp()});
+document.querySelectorAll('.drawer-tabs button').forEach(b=>b.onclick=()=>switchDrawerPane(b.dataset.pane));
+function switchDrawerPane(name){document.querySelectorAll('.drawer-tabs button').forEach(b=>b.classList.toggle('active',b.dataset.pane===name));document.querySelectorAll('.drawer-pane').forEach(p=>p.classList.toggle('active',p.id==='pane-'+name))}
+function renderLibrary(q=''){const query=String(q).trim().toLowerCase();const items=Object.entries(helpRegistry).filter(([id,x])=>!query||(`${x.title} ${x.plain} ${x.where} ${id}`).toLowerCase().includes(query));const el=document.getElementById('library_list');if(el)el.innerHTML=items.map(([id,x])=>`<div class="library-item" onclick="showHelp('${id}')"><b>${esc(x.title)}</b><div>${esc(x.plain.slice(0,120))}</div></div>`).join('')||'<div class="muted small">Ничего не найдено.</div>'}
+
+function aiSnapshot(){return {version:state.version,scenarioName:state.scenarioName,periodMonths:state.periodMonths,taxes:{vatRate:state.vatRate,incomeTaxRate:state.incomeTaxRate,ownerTaxRate:state.ownerTaxRate},singleProduct:state.singleProduct,channels:state.channels,expenses:state.expenses,results:{single:{totals:singleResult.totals,metrics:singleResult.metrics,cash:singleResult.cash,warnings:singleResult.warnings,priceDecision},portfolio:{count:portfolioResult.rows.length,totals:portfolioResult.totals,metrics:portfolioResult.metrics,cash:portfolioResult.cash,warnings:portfolioResult.warnings.slice(0,20)}},cashInputs:state.cash,allowedActions:{set_global:['vatRate','incomeTaxRate','ownerTaxRate','periodMonths','scenarioName'],set_product:['name','sku','purchasePrice','purchasePriceMode','inputVatRecoverable','openingStockUnits','openingStockUnitCost','purchasedUnits','soldUnits','writeoffUnits','manualLandedPerUnit','approvedRrpGross','marketMinGross','marketReferenceGross','marketMaxGross','targetMetric','targetValue','allocationWeight'],set_channel:['active','share','sellInReductionPct','invoiceDiscountPct','rebatePct','returnsPct','paymentFeePct','lastMilePerUnit'],set_expense:['status','name','category','channels','skuMode','skuList','method','value','base','vatTreatment','taxDeductible','allocationDriver'],set_sku:['name','sku','purchasePrice','purchasePriceMode','inputVatRecoverable','openingStockUnits','openingStockUnitCost','purchasedUnits','soldUnits','writeoffUnits','manualLandedPerUnit','approvedRrpGross','marketMinGross','marketReferenceGross','marketMaxGross','targetMetric','targetValue','allocationWeight'],set_cash:['dso','dpo','openingARNet','openingAPNet','openingInventory','vatCashMode','vatCashSettlement','capex','newDebt','debtPrincipal','ownerInjection','otherOutflows','cashReserve']}}}
+function addChat(text,kind='ai'){const log=document.getElementById('ai_chat_log');const d=document.createElement('div');d.className='msg '+kind;d.textContent=text;log.appendChild(d);log.scrollTop=log.scrollHeight}
+async function testAiConnection(){const ep=document.getElementById('ai_endpoint').value.trim().replace(/\/api\/assistant$/,'/health');try{const r=await fetch(ep);if(!r.ok)throw new Error(r.status);const j=await r.json();document.getElementById('ai_connection').textContent=`Подключено: ${j.model||'модель через proxy'}`;safeStorage.set('marginV10AiEndpoint',document.getElementById('ai_endpoint').value.trim())}catch(e){document.getElementById('ai_connection').textContent='Proxy недоступен. Локальная справка продолжает работать.'}}
+async function sendAiQuestion(){const box=document.getElementById('ai_question');const q=box.value.trim();if(!q)return;addChat(q,'user');box.value='';const ep=document.getElementById('ai_endpoint').value.trim();safeStorage.set('marginV10AiEndpoint',ep);try{const r=await fetch(ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,snapshot:aiSnapshot(),allowActions:document.getElementById('ai_allow_actions').checked})});if(!r.ok)throw new Error(`HTTP ${r.status}: ${await r.text()}`);const j=await r.json();addChat(j.answer||'Ответ не получен.','ai');pendingAiActions=Array.isArray(j.actions)?j.actions.filter(a=>a.type&&a.type!=='none'):[];renderAiActions(j.warnings||[])}catch(err){addChat('AI proxy недоступен. '+localAnswer(q),'ai');pendingAiActions=[];renderAiActions([])}}
+function localAnswer(q){const s=q.toLowerCase();if(s.includes('собствен'))return `Потенциально собственнику: ${money(singleResult.cash.potentiallyDistributableCash)}. Главные влияния: FCF ${money(singleResult.cash.freeCashFlowBeforeFinancing)}, финансирование ${money(singleResult.cash.cashAfterFinancing-singleResult.cash.freeCashFlowBeforeFinancing)}, резерв ${money(state.cash.cashReserve)}.`;if(s.includes('прибыл'))return `Net profit: ${money(singleResult.totals.netProfit)}; Gross profit: ${money(singleResult.totals.grossProfit)}; Contribution: ${money(singleResult.totals.contribution)}.`;if(s.includes('цен'))return `Текущая цена ${money(state.singleProduct.approvedRrpGross)}, цена для цели ${money(priceDecision.targetPriceGross)}, variable floor ${money(priceDecision.variableFloorGross)}. ${priceDecision.status}.`;const hit=Object.entries(helpRegistry).find(([id,x])=>(x.title+' '+x.plain).toLowerCase().split(/\s+/).some(w=>w.length>4&&s.includes(w)));return hit?`${hit[1].title}: ${hit[1].plain} Текущий расчёт: ${helpCurrent(hit[1])}`:`Текущий Net profit ${money(singleResult.totals.netProfit)}, потенциально собственнику ${money(singleResult.cash.potentiallyDistributableCash)}. Уточните показатель или откройте библиотеку.`}
+function renderAiActions(warnings){const el=document.getElementById('ai_action_box');let html='';if(warnings.length)html+=warnings.map(w=>`<div class="notice warn">${esc(w)}</div>`).join('');if(pendingAiActions.length)html+=`<div class="action-preview"><b>Предлагаемые изменения</b><ul>${pendingAiActions.map(a=>`<li>${esc(describeAction(a))}${a.reason?' — '+esc(a.reason):''}</li>`).join('')}</ul><button class="primary" onclick="applyAiActions()">Применить и пересчитать</button> <button class="secondary" onclick="pendingAiActions=[];renderAiActions([])">Отклонить</button></div>`;el.innerHTML=html}
+function describeAction(a){return `${a.type}: ${a.target||''} ${a.field||''} → ${a.value_text??''}`}
+function parseAiValue(text,field){if(['active','inputVatRecoverable','taxDeductible'].includes(field))return String(text).toLowerCase()==='true'||String(text).toLowerCase()==='да';if(['name','sku','purchasePriceMode','targetMetric','status','category','skuMode','skuList','method','base','vatTreatment','allocationDriver','scenarioName','vatCashMode'].includes(field))return String(text);if(field==='channels')return String(text).split(',').map(x=>x.trim()).filter(Boolean);const n=Number(String(text).replace(',','.'));if(!Number.isFinite(n))throw new Error('Не число: '+text);return n}
+function validateAiAction(a){const allowed=aiSnapshot().allowedActions;const map={set_global:'set_global',set_product:'set_product',set_channel:'set_channel',set_expense:'set_expense',set_sku:'set_sku',set_cash:'set_cash'};if(!map[a.type]||!allowed[map[a.type]].includes(a.field))throw new Error('Недопустимое поле '+a.field);return true}
+function applyAiActions(){if(!pendingAiActions.length)return;lastAiUndo=E.clone(state);try{for(const a of pendingAiActions){validateAiAction(a);const v=parseAiValue(a.value_text,a.field);if(a.type==='set_global')state[a.field]=v;else if(a.type==='set_product')state.singleProduct[a.field]=v;else if(a.type==='set_cash')state.cash[a.field]=v;else if(a.type==='set_channel'){if(!state.channels[a.target])throw new Error('Неизвестный канал');state.channels[a.target][a.field]=v}else if(a.type==='set_expense'){const x=state.expenses.find(e=>e.id===a.target);if(!x)throw new Error('Неизвестный расход');x[a.field]=v}else if(a.type==='set_sku'){const x=state.portfolio.find(p=>p.id===a.target||p.sku===a.target);if(!x)throw new Error('Неизвестный SKU');x[a.field]=v}}addAudit('Применены AI-изменения: '+pendingAiActions.map(describeAction).join('; '),'AI');pendingAiActions=[];renderAiActions([]);recalculate();addChat('Изменения применены. Расчёт обновлён.','ai')}catch(e){state=lastAiUndo;lastAiUndo=null;addChat('Изменения не применены: '+e.message,'error')}}
+function undoAiChange(){if(!lastAiUndo){addChat('Нет AI-изменения для отмены.','ai');return}state=lastAiUndo;lastAiUndo=null;addAudit('Последнее AI-изменение отменено','AI');recalculate();addChat('Последнее AI-изменение отменено.','ai')}
+
+function sum(arr,fn=x=>x){return arr.reduce((a,x)=>a+(Number(fn(x))||0),0)}
+const ep=safeStorage.get('marginV10AiEndpoint');if(ep)document.getElementById('ai_endpoint').value=ep;
+bindStaticInputs();syncInputs();renderLibrary();recalculate();
+
+const isIosDevice = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+function showIosInstallGuide(){document.getElementById('ios_install_sheet').hidden=false;document.body.style.overflow='hidden'}
+function hideIosInstallGuide(){document.getElementById('ios_install_sheet').hidden=true;document.body.style.overflow=''}
+function dismissIosInstall(){document.getElementById('ios_install_bar').hidden=true;try{localStorage.setItem('iosInstallDismissed','1')}catch(e){}}
+function initIosInstall(){
+  const bar=document.getElementById('ios_install_bar');
+  let dismissed=false;try{dismissed=localStorage.getItem('iosInstallDismissed')==='1'}catch(e){}
+  if(isIosDevice && !isStandaloneMode && !dismissed) bar.hidden=false;
+}
+if('serviceWorker' in navigator && location.protocol!=='file:') window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js',{scope:'./'}).catch(()=>{}));
+window.addEventListener('load',initIosInstall);
+
+window.addEventListener('load',()=>{const q=new URLSearchParams(location.search).get('view');if(['decision','portfolio','expenses','cash','controls'].includes(q))openView(q);});
+
+</script>
+</body>
+</html>
