@@ -480,13 +480,37 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent;touch-actio
     if(purchaseUnits<=EPS&&openingUnits<=EPS) warnings.push('Не задано доступное количество товара.');
     if(soldUnits<=EPS) warnings.push('Продажи равны нулю: прибыль и целевая цена неинформативны.');
 
+    /* INVENTORY_BASES_V10_FIX: sales-dependent bases must exist before inventory expenses are calculated. */
+    const approvedRrpGross=Math.max(0,Number(product.approvedRrpGross)||0);
+    const preliminaryChannels=channels.map(c=>{
+      const units=soldUnits*c.normShare;
+      const reduction=clamp(c.sellInReductionPct,0,95)/100;
+      const invoiceDisc=clamp(c.invoiceDiscountPct,0,95)/100;
+      const invoiceGross=approvedRrpGross*(1-reduction)*(1-invoiceDisc)*units;
+      const invoiceNet=invoiceGross/(1+vat);
+      const shelfNet=approvedRrpGross*units/(1+vat);
+      const baseContra=invoiceNet*(clamp(c.rebatePct,0,100)+clamp(c.returnsPct,0,100))/100;
+      return {invoiceGross,invoiceNet,shelfNet,baseContra};
+    });
+    const preliminaryInvoiceGross=sum(preliminaryChannels,c=>c.invoiceGross);
+    const preliminaryInvoiceNet=sum(preliminaryChannels,c=>c.invoiceNet);
+    const preliminaryShelfNet=sum(preliminaryChannels,c=>c.shelfNet);
+    const preliminaryContra=sum(preliminaryChannels,c=>c.baseContra);
+    const preliminaryNetRevenue=preliminaryInvoiceNet-preliminaryContra;
+    const preliminaryAccountingCogs=pCore.accounting*Math.max(0,soldUnits+writeoffUnits);
+
     const expenseOverrides=opts.expenseOverrides||{};
     const expenses=(state.expenses||[]).map(e=>expenseOverrides[e.id]?{...e,...expenseOverrides[e.id]}:e);
     let inventoryPnl=0,inventoryCash=0,inventoryVat=0,inventoryNonDeductible=0;
     const expenseDetails=[];
     for(const exp of expenses){
       if(!included(exp)||exp.category!=='inventory'||!skuMatches(exp,product.sku)) continue;
-      const raw=expenseRaw(exp,{purchaseUnits,purchaseCostAccounting:pCore.accounting});
+      const raw=expenseRaw(exp,{
+        units:soldUnits,purchaseUnits,purchaseCostAccounting:pCore.accounting,
+        accountingCogs:preliminaryAccountingCogs,invoiceGross:preliminaryInvoiceGross,
+        invoiceNet:preliminaryInvoiceNet,shelfNet:preliminaryShelfNet,
+        netRevenueBeforeContra:preliminaryInvoiceNet,netRevenue:preliminaryNetRevenue
+      });
       const a=amountTreatment(raw,exp.vatTreatment,vat);
       inventoryPnl+=a.pnl; inventoryCash+=a.cash; inventoryVat+=a.recoverableVat;
       if(exp.taxDeductible===false) inventoryNonDeductible+=a.pnl;
@@ -505,7 +529,6 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent;touch-actio
     const totalAccountingCogs=cogsSold+writeoffCost;
     const closingInventory=accountingUnitCost*closingUnits;
     const inventoryNonDeductiblePnl=currentPurchaseUnitCost>EPS&&purchaseUnits>EPS?inventoryNonDeductible*Math.min(1,(soldUnits+writeoffUnits)/Math.max(1,availableUnits)):0;
-    const approvedRrpGross=Math.max(0,Number(product.approvedRrpGross)||0);
 
     const byChannel={};
     for(const c of channels){
