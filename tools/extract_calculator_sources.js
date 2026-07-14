@@ -4,135 +4,100 @@ const path=require('path');
 const zlib=require('zlib');
 const vm=require('vm');
 
-const BUILD='20260714k';
+const BUILD='20260714m';
+const report={build:BUILD,generatedAt:new Date().toISOString(),v9:[],v10:[],failures:[]};
+function record(version,name,fn){try{fn();report[version].push({name,status:'passed'});}catch(e){report[version].push({name,status:'failed',error:e.message});report.failures.push(`${version}: ${name}: ${e.message}`);}}
+function approx(actual,expected,tol=0.02,label='value'){if(!Number.isFinite(actual)||Math.abs(actual-expected)>tol)throw new Error(`${label}: expected ${expected}, got ${actual}`)}
+function equal(actual,expected,label='value'){if(actual!==expected)throw new Error(`${label}: expected ${expected}, got ${actual}`)}
+function truthy(v,label='condition'){if(!v)throw new Error(`${label}: expected true`)}
 
-function readPacked(version,count){
-  const dir=path.join('margin-calculators',version);
-  let joined='';
-  for(let i=0;i<count;i++){
-    const name=`part-${String(i).padStart(2,'0')}.b64`;
-    joined+=fs.readFileSync(path.join(dir,name),'utf8').replace(/\s/g,'');
-  }
-  return zlib.gunzipSync(Buffer.from(joined,'base64')).toString('utf8');
-}
-
-function writePacked(version,count,html){
-  const dir=path.join('margin-calculators',version);
-  const packed=zlib.gzipSync(Buffer.from(html,'utf8'),{level:9}).toString('base64');
-  const chunk=Math.ceil(packed.length/count);
-  for(let i=0;i<count;i++){
-    const part=packed.slice(i*chunk,(i+1)*chunk);
-    fs.writeFileSync(path.join(dir,`part-${String(i).padStart(2,'0')}.b64`),part+'\n');
-  }
-}
+function readPacked(version,count){let joined='';const dir=path.join('margin-calculators',version);for(let i=0;i<count;i++)joined+=fs.readFileSync(path.join(dir,`part-${String(i).padStart(2,'0')}.b64`),'utf8').replace(/\s/g,'');return zlib.gunzipSync(Buffer.from(joined,'base64')).toString('utf8')}
+function writePacked(version,count,html){const dir=path.join('margin-calculators',version);const packed=zlib.gzipSync(Buffer.from(html,'utf8'),{level:9}).toString('base64');const chunk=Math.ceil(packed.length/count);for(let i=0;i<count;i++)fs.writeFileSync(path.join(dir,`part-${String(i).padStart(2,'0')}.b64`),packed.slice(i*chunk,(i+1)*chunk)+'\n')}
 
 function patchV10(html){
-  if(html.includes('INVENTORY_BASES_V10_FIX')) return html;
-  const marker='    const expenseOverrides=opts.expenseOverrides||{};';
-  if(!html.includes(marker)) throw new Error('v10 patch marker not found');
-  const preBases=`    /* INVENTORY_BASES_V10_FIX: sales-dependent bases must exist before inventory expenses are calculated. */\n    const approvedRrpGross=Math.max(0,Number(product.approvedRrpGross)||0);\n    const preliminaryChannels=channels.map(c=>{\n      const units=soldUnits*c.normShare;\n      const reduction=clamp(c.sellInReductionPct,0,95)/100;\n      const invoiceDisc=clamp(c.invoiceDiscountPct,0,95)/100;\n      const invoiceGross=approvedRrpGross*(1-reduction)*(1-invoiceDisc)*units;\n      const invoiceNet=invoiceGross/(1+vat);\n      const shelfNet=approvedRrpGross*units/(1+vat);\n      const baseContra=invoiceNet*(clamp(c.rebatePct,0,100)+clamp(c.returnsPct,0,100))/100;\n      return {invoiceGross,invoiceNet,shelfNet,baseContra};\n    });\n    const preliminaryInvoiceGross=sum(preliminaryChannels,c=>c.invoiceGross);\n    const preliminaryInvoiceNet=sum(preliminaryChannels,c=>c.invoiceNet);\n    const preliminaryShelfNet=sum(preliminaryChannels,c=>c.shelfNet);\n    const preliminaryContra=sum(preliminaryChannels,c=>c.baseContra);\n    const preliminaryNetRevenue=preliminaryInvoiceNet-preliminaryContra;\n    const preliminaryAccountingCogs=pCore.accounting*Math.max(0,soldUnits+writeoffUnits);\n\n${marker}`;
-  html=html.replace(marker,preBases);
-
-  const oldRaw='      const raw=expenseRaw(exp,{purchaseUnits,purchaseCostAccounting:pCore.accounting});';
-  const newRaw=`      const raw=expenseRaw(exp,{\n        units:soldUnits,purchaseUnits,purchaseCostAccounting:pCore.accounting,\n        accountingCogs:preliminaryAccountingCogs,invoiceGross:preliminaryInvoiceGross,\n        invoiceNet:preliminaryInvoiceNet,shelfNet:preliminaryShelfNet,\n        netRevenueBeforeContra:preliminaryInvoiceNet,netRevenue:preliminaryNetRevenue\n      });`;
-  if(!html.includes(oldRaw)) throw new Error('v10 inventory expense context marker not found');
-  html=html.replace(oldRaw,newRaw);
-
-  const approvedLine='    const approvedRrpGross=Math.max(0,Number(product.approvedRrpGross)||0);';
-  const first=html.indexOf(approvedLine);
-  const second=html.indexOf(approvedLine,first+approvedLine.length);
-  if(first<0||second<0) throw new Error('v10 approvedRrpGross duplicate not found after patch');
-  html=html.slice(0,second)+html.slice(second+approvedLine.length+1);
-  return html;
+  if(html.includes('INVENTORY_BASES_V10_FIX_V2')) return html;
+  if(html.includes('INVENTORY_BASES_V10_FIX')){
+    html=html.replace('INVENTORY_BASES_V10_FIX:','INVENTORY_BASES_V10_FIX_V2:');
+    const old=`    const preliminaryChannels=channels.map(c=>{\n      const units=soldUnits*c.normShare;\n      const reduction=clamp(c.sellInReductionPct,0,95)/100;\n      const invoiceDisc=clamp(c.invoiceDiscountPct,0,95)/100;\n      const invoiceGross=approvedRrpGross*(1-reduction)*(1-invoiceDisc)*units;\n      const invoiceNet=invoiceGross/(1+vat);\n      const shelfNet=approvedRrpGross*units/(1+vat);\n      const baseContra=invoiceNet*(clamp(c.rebatePct,0,100)+clamp(c.returnsPct,0,100))/100;\n      return {invoiceGross,invoiceNet,shelfNet,baseContra};\n    });`;
+    const neu=`    const preliminaryChannels=channels.map(c=>{\n      const units=soldUnits*c.normShare;\n      const reduction=clamp(c.sellInReductionPct,0,95)/100;\n      const invoiceDisc=clamp(c.invoiceDiscountPct,0,95)/100;\n      const invoiceGross=approvedRrpGross*(1-reduction)*(1-invoiceDisc)*units;\n      const invoiceNet=invoiceGross/(1+vat);\n      const shelfNet=approvedRrpGross*units/(1+vat);\n      const baseContra=invoiceNet*(clamp(c.rebatePct,0,100)+clamp(c.returnsPct,0,100))/100;\n      return {id:c.id,normShare:c.normShare,invoiceGross,invoiceNet,shelfNet,baseContra};\n    });`;
+    if(!html.includes(old))throw new Error('v10 preliminary channel patch marker missing');
+    html=html.replace(old,neu);
+    const oldLoop=`      const raw=expenseRaw(exp,{\n        units:soldUnits,purchaseUnits,purchaseCostAccounting:pCore.accounting,\n        accountingCogs:preliminaryAccountingCogs,invoiceGross:preliminaryInvoiceGross,\n        invoiceNet:preliminaryInvoiceNet,shelfNet:preliminaryShelfNet,\n        netRevenueBeforeContra:preliminaryInvoiceNet,netRevenue:preliminaryNetRevenue\n      });`;
+    const newLoop=`      const eligiblePre=preliminaryChannels.filter(c=>channelMatches(exp,c.id));\n      if(!eligiblePre.length) continue;\n      const eligibleShare=sum(eligiblePre,c=>c.normShare);\n      const invoiceGrossBase=sum(eligiblePre,c=>c.invoiceGross);\n      const invoiceNetBase=sum(eligiblePre,c=>c.invoiceNet);\n      const shelfNetBase=sum(eligiblePre,c=>c.shelfNet);\n      const contraBase=sum(eligiblePre,c=>c.baseContra);\n      const raw=expenseRaw(exp,{\n        units:soldUnits*eligibleShare,purchaseUnits:purchaseUnits*eligibleShare,purchaseCostAccounting:pCore.accounting,\n        accountingCogs:preliminaryAccountingCogs*eligibleShare,invoiceGross:invoiceGrossBase,\n        invoiceNet:invoiceNetBase,shelfNet:shelfNetBase,\n        netRevenueBeforeContra:invoiceNetBase,netRevenue:invoiceNetBase-contraBase\n      });`;
+    if(!html.includes(oldLoop))throw new Error('v10 inventory loop patch marker missing');
+    html=html.replace(oldLoop,newLoop);
+    return html;
+  }
+  throw new Error('Expected prior v10 engine fix is missing');
 }
 
-function extractEngine(html){
-  const start=html.indexOf('(function(root,factory){');
-  const end=html.indexOf('</script>',start);
-  if(start<0||end<0) throw new Error('v10 engine block not found');
-  const code=html.slice(start,end);
-  const sandbox={module:{exports:{}},exports:{},console};
-  vm.runInNewContext(code,sandbox,{timeout:5000});
-  return sandbox.module.exports;
+function extractV10Engine(html){const start=html.indexOf('(function(root,factory){');const end=html.indexOf('</script>',start);if(start<0||end<0)throw new Error('v10 engine block not found');const sandbox={module:{exports:{}},exports:{},console};vm.runInNewContext(html.slice(start,end),sandbox,{timeout:5000});return sandbox.module.exports}
+function baseV10(E){const s=E.clone(E.DEFAULT_STATE);s.vatRate=16;s.incomeTaxRate=20;s.ownerTaxRate=0;s.periodMonths=12;Object.values(s.channels).forEach(c=>Object.assign(c,{active:true,share:0,sellInReductionPct:0,invoiceDiscountPct:0,rebatePct:0,returnsPct:0,paymentFeePct:0,lastMilePerUnit:0}));s.channels.retail.share=100;s.channels.retail.sellInReductionPct=25;Object.assign(s.singleProduct,{sku:'SKU-A',purchasePrice:246000,purchasePriceMode:'net',inputVatRecoverable:true,openingStockUnits:0,purchasedUnits:1,soldUnits:1,writeoffUnits:0,approvedRrpGross:400000});s.expenses.forEach(e=>Object.assign(e,{status:'na',value:0,channels:['all'],skuMode:'all',skuList:'',taxDeductible:true}));Object.assign(s.cash,{dso:0,dpo:0,openingARNet:0,openingAPNet:0,openingInventory:0,vatCashMode:'auto',vatCashSettlement:0,capex:0,newDebt:0,debtPrincipal:0,ownerInjection:0,otherOutflows:0,cashReserve:0});return s}
+function useExpense(s,id,patch){const e=s.expenses.find(x=>x.id===id);if(!e)throw new Error('missing expense '+id);Object.assign(e,{status:'include'},patch);return e}
+
+function testV10(html){const E=extractV10Engine(html);
+  record('v10','01 baseline P&L identities',()=>{const s=baseV10(E),r=E.calcProduct(s,s.singleProduct);approx(r.totals.invoiceGross,300000,0.01);approx(r.totals.invoiceNet,300000/1.16,0.01);approx(r.totals.grossProfit,r.totals.netRevenue-r.totals.cogs,0.01);approx(r.totals.contribution,r.totals.grossProfit-r.totals.variable,0.01);approx(r.totals.ebitda,r.totals.contribution-r.totals.marketing-r.totals.fixed,0.01);approx(r.totals.ebit,r.totals.ebitda-r.totals.depr,0.01);approx(r.totals.pbt,r.totals.ebit-r.totals.finance,0.01);approx(r.totals.netProfit,r.totals.pbt-r.totals.incomeTax,0.01)});
+  record('v10','02 include/review/na statuses',()=>{const s=baseV10(E);const e=useExpense(s,'warranty_returns',{category:'variable',method:'period',value:1000});let r=E.calcProduct(s,s.singleProduct);approx(r.totals.variable,1000);e.status='review';r=E.calcProduct(s,s.singleProduct);approx(r.totals.variable,0);e.status='na';r=E.calcProduct(s,s.singleProduct);approx(r.totals.variable,0)});
+  record('v10','03 inventory invoiceGross and recoverable VAT',()=>{const s=baseV10(E);useExpense(s,'inbound_logistics',{category:'inventory',method:'pct',value:3,base:'invoiceGross',vatTreatment:'gross_recoverable'});const r=E.calcProduct(s,s.singleProduct);approx(r.inventoryCash,9000);approx(r.inventoryPnl,9000/1.16);approx(r.inventoryVat,9000-9000/1.16);approx(r.totals.cogs,246000+9000/1.16)});
+  record('v10','04 inventory purchaseCost no VAT',()=>{const s=baseV10(E);useExpense(s,'customs_cert',{category:'inventory',method:'pct',value:3,base:'purchaseCost',vatTreatment:'no_vat'});const r=E.calcProduct(s,s.singleProduct);approx(r.inventoryPnl,7380);approx(r.totals.cogs,253380)});
+  record('v10','05 inventory unit and period methods',()=>{let s=baseV10(E);s.singleProduct.purchasedUnits=2;s.singleProduct.soldUnits=2;useExpense(s,'inbound_logistics',{category:'inventory',method:'unit',value:4500,vatTreatment:'no_vat'});let r=E.calcProduct(s,s.singleProduct);approx(r.inventoryPnl,9000);s=baseV10(E);useExpense(s,'inbound_logistics',{category:'inventory',method:'period',value:7777,vatTreatment:'no_vat'});r=E.calcProduct(s,s.singleProduct);approx(r.inventoryPnl,7777)});
+  record('v10','06 all percentage bases for inventory',()=>{const expected={purchaseCost:246000,accountingCogs:246000,invoiceGross:300000,invoiceNet:300000/1.16,shelfNet:400000/1.16,netRevenueBeforeContra:300000/1.16,netRevenue:300000/1.16};for(const [base,val] of Object.entries(expected)){const s=baseV10(E);useExpense(s,'inbound_logistics',{category:'inventory',method:'pct',value:1,base,vatTreatment:'no_vat'});const r=E.calcProduct(s,s.singleProduct);approx(r.inventoryPnl,val/100,0.03,'base '+base)}});
+  record('v10','07 inventory channel filter',()=>{const s=baseV10(E);s.channels.dtc.share=50;s.channels.retail.share=50;useExpense(s,'inbound_logistics',{category:'inventory',channels:['retail'],method:'pct',value:10,base:'invoiceGross',vatTreatment:'no_vat'});const r=E.calcProduct(s,s.singleProduct);approx(r.inventoryPnl,15000,0.02)});
+  record('v10','08 SKU include/exclude filters',()=>{const s=baseV10(E);const e=useExpense(s,'customs_cert',{category:'inventory',method:'period',value:1000,vatTreatment:'no_vat',skuMode:'include',skuList:'OTHER'});let r=E.calcProduct(s,s.singleProduct);approx(r.inventoryPnl,0);e.skuList='SKU-A';r=E.calcProduct(s,s.singleProduct);approx(r.inventoryPnl,1000);e.skuMode='exclude';r=E.calcProduct(s,s.singleProduct);approx(r.inventoryPnl,0)});
+  record('v10','09 contra revenue category',()=>{const s=baseV10(E);useExpense(s,'retail_bonus',{category:'contra',method:'pct',value:2,base:'invoiceNet',vatTreatment:'no_vat'});const r=E.calcProduct(s,s.singleProduct);approx(r.totals.contra,(300000/1.16)*.02);approx(r.totals.netRevenue,r.totals.invoiceNet-r.totals.contra)});
+  record('v10','10 variable category',()=>{const s=baseV10(E);useExpense(s,'warranty_returns',{category:'variable',method:'pct',value:2,base:'netRevenueBeforeContra',vatTreatment:'no_vat'});const r=E.calcProduct(s,s.singleProduct);approx(r.totals.variable,(300000/1.16)*.02);approx(r.totals.contribution,r.totals.grossProfit-r.totals.variable)});
+  record('v10','11 marketing category',()=>{const s=baseV10(E);useExpense(s,'performance_marketing',{category:'marketing',method:'period',value:5000,vatTreatment:'no_vat'});const r=E.calcProduct(s,s.singleProduct);approx(r.totals.marketing,5000);approx(r.totals.ebitda,r.totals.contribution-5000-r.totals.fixed)});
+  record('v10','12 fixed category',()=>{const s=baseV10(E);useExpense(s,'sales_team',{category:'fixed',method:'period',value:4000,vatTreatment:'no_vat'});const r=E.calcProduct(s,s.singleProduct);approx(r.totals.fixed,4000);approx(r.totals.ebitda,r.totals.contribution-r.totals.marketing-4000)});
+  record('v10','13 depreciation category',()=>{const s=baseV10(E);useExpense(s,'depreciation',{category:'depr',method:'period',value:3000,vatTreatment:'no_vat'});const r=E.calcProduct(s,s.singleProduct);approx(r.totals.depr,3000);approx(r.totals.ebit,r.totals.ebitda-3000);approx(r.cash.operatingCashFlowBeforeVat,r.totals.netProfit+r.totals.depr-r.cash.deltaWC)});
+  record('v10','14 finance category',()=>{const s=baseV10(E);useExpense(s,'finance_cost',{category:'finance',method:'period',value:2500,vatTreatment:'no_vat'});const r=E.calcProduct(s,s.singleProduct);approx(r.totals.finance,2500);approx(r.totals.pbt,r.totals.ebit-2500)});
+  record('v10','15 cash-only category',()=>{const s=baseV10(E);useExpense(s,'cash_only',{category:'cash',method:'period',value:2000,vatTreatment:'no_vat'});const r=E.calcProduct(s,s.singleProduct);approx(r.totals.pbt,r.totals.ebit-r.totals.finance);approx(r.totals.cashOnly,2000);approx(r.cash.otherOutflows,2000)});
+  record('v10','16 four VAT treatments',()=>{const cases={net_plus_recoverable:[1000,1160,160],gross_recoverable:[1000/1.16,1000,1000-1000/1.16],gross_nonrecoverable:[1000,1000,0],no_vat:[1000,1000,0]};for(const [vatTreatment,x] of Object.entries(cases)){const s=baseV10(E);useExpense(s,'sales_team',{category:'fixed',method:'period',value:1000,vatTreatment});const r=E.calcProduct(s,s.singleProduct);const d=r.expenseDetails.find(z=>z.id==='sales_team');approx(d.pnl,x[0],0.02,vatTreatment+' pnl');approx(d.cash,x[1],0.02,vatTreatment+' cash');approx(d.recoverableVat,x[2],0.02,vatTreatment+' vat')}});
+  record('v10','17 non-deductible expense tax bridge',()=>{const s=baseV10(E);useExpense(s,'sales_team',{category:'fixed',method:'period',value:1000,vatTreatment:'no_vat',taxDeductible:false});const r=E.calcProduct(s,s.singleProduct);approx(r.totals.nonDeductible,1000);approx(r.totals.taxableIncome,r.totals.pbt+1000)});
+  record('v10','18 non-inventory channel filters',()=>{const s=baseV10(E);s.channels.dtc.share=50;s.channels.retail.share=50;useExpense(s,'warranty_returns',{category:'variable',channels:['retail'],method:'pct',value:10,base:'invoiceGross',vatTreatment:'no_vat'});const r=E.calcProduct(s,s.singleProduct);approx(r.totals.variable,15000)});
+  record('v10','19 inactive channel and share normalization',()=>{const s=baseV10(E);s.channels.dtc.active=false;s.channels.dtc.share=90;s.channels.retail.share=10;const r=E.calcProduct(s,s.singleProduct);approx(r.byChannel.retail.units,1);truthy(!r.byChannel.dtc,'inactive DTC absent')});
+  record('v10','20 purchase gross and nonrecoverable VAT',()=>{const s=baseV10(E);Object.assign(s.singleProduct,{purchasePrice:285360,purchasePriceMode:'gross',inputVatRecoverable:false});const r=E.calcProduct(s,s.singleProduct);approx(r.purchase.accounting,285360);approx(r.inputVatPurchase,0);approx(r.totals.cogs,285360)});
+  record('v10','21 writeoff and closing inventory',()=>{const s=baseV10(E);Object.assign(s.singleProduct,{purchasedUnits:10,soldUnits:6,writeoffUnits:1});const r=E.calcProduct(s,s.singleProduct);approx(r.closingUnits,3);approx(r.totals.cogs,246000*7);approx(r.closingInventory,246000*3)});
+  record('v10','22 automatic VAT settlement',()=>{const s=baseV10(E);const r=E.calcProduct(s,s.singleProduct);approx(r.estimatedVatPosition,r.outputVat-r.inputVatPurchase-r.inputVatExpenses);approx(r.cash.vatCashSettlement,Math.max(0,r.estimatedVatPosition))});
+  record('v10','23 manual VAT settlement',()=>{const s=baseV10(E);s.cash.vatCashMode='manual';s.cash.vatCashSettlement=1234;const r=E.calcProduct(s,s.singleProduct);approx(r.cash.vatCashSettlement,1234)});
+  record('v10','24 working capital DSO/DPO',()=>{const s=baseV10(E);s.cash.dso=30;s.cash.dpo=60;const r=E.calcProduct(s,s.singleProduct);approx(r.cash.closingAR,r.totals.netRevenue*30/365);approx(r.cash.closingAP,(246000+r.inventoryPnl)*60/365)});
+  record('v10','25 price solver target GM',()=>{const s=baseV10(E);s.singleProduct.targetMetric='grossMargin';s.singleProduct.targetValue=10;const d=E.priceDecision(s,s.singleProduct);approx(d.targetResult.metrics.grossMargin,.10,0.0001)});
+  record('v10','26 portfolio period allocation',()=>{const s=baseV10(E);const p1=E.clone(s.singleProduct),p2=E.clone(s.singleProduct);p1.id='p1';p1.sku='A';p1.soldUnits=1;p1.purchasedUnits=1;p2.id='p2';p2.sku='B';p2.soldUnits=3;p2.purchasedUnits=3;s.portfolio=[p1,p2];useExpense(s,'sales_team',{category:'fixed',method:'period',value:4000,allocationDriver:'units',vatTreatment:'no_vat'});const r=E.calcPortfolio(s);approx(r.totals.fixed,4000);approx(r.rows[0].result.totals.fixed,1000);approx(r.rows[1].result.totals.fixed,3000)});
+  record('v10','27 expense detail totals reconcile',()=>{const s=baseV10(E);useExpense(s,'sales_team',{category:'fixed',method:'period',value:1000,vatTreatment:'net_plus_recoverable'});useExpense(s,'customs_cert',{category:'inventory',method:'period',value:2000,vatTreatment:'no_vat'});const r=E.calcProduct(s,s.singleProduct);approx(r.expenseDetails.reduce((a,x)=>a+x.pnl,0),3000);approx(r.inputVatExpenses,r.expenseDetails.reduce((a,x)=>a+x.recoverableVat,0))});
+  record('v10','28 all displayed P&L lines reconcile',()=>{const s=baseV10(E);useExpense(s,'retail_bonus',{category:'contra',method:'period',value:100});useExpense(s,'warranty_returns',{category:'variable',method:'period',value:200});useExpense(s,'performance_marketing',{category:'marketing',method:'period',value:300});useExpense(s,'sales_team',{category:'fixed',method:'period',value:400});useExpense(s,'depreciation',{category:'depr',method:'period',value:500});useExpense(s,'finance_cost',{category:'finance',method:'period',value:600});const r=E.calcProduct(s,s.singleProduct);approx(r.totals.netRevenue,r.totals.invoiceNet-100);approx(r.totals.grossProfit,r.totals.netRevenue-r.totals.cogs);approx(r.totals.contribution,r.totals.grossProfit-200);approx(r.totals.ebitda,r.totals.contribution-300-400);approx(r.totals.ebit,r.totals.ebitda-500);approx(r.totals.pbt,r.totals.ebit-600)});
 }
 
-function approx(actual,expected,tol=0.02,label='value'){
-  if(Math.abs(actual-expected)>tol) throw new Error(`${label}: expected ${expected}, got ${actual}`);
+function extractV9Engine(html){const start=html.indexOf('const fmt =');const end=html.indexOf('function recalc()',start);if(start<0||end<0)throw new Error('v9 calculation block not found');const values={};const document={getElementById:id=>values[id]?{value:values[id]}:null};const sandbox={module:{exports:{}},exports:{},console,document,Intl,isFinite,Math,JSON,parseFloat};const code=html.slice(start,end)+`\nmodule.exports={calculate,getCore,basePerUnit,channelsForApply,defaultParams,setParams:x=>{params=x},getParams:()=>params,setValue:(k,v)=>{document.getElementById(k);__values[k]=v}};`;sandbox.__values=values;vm.runInNewContext(code.replace('setValue:(k,v)=>{document.getElementById(k);__values[k]=v}','setValue:(k,v)=>{__values[k]=v}'),sandbox,{timeout:5000});return {E:sandbox.module.exports,values}}
+function baseV9(ctx){Object.assign(ctx.values,{rrp:400000,rrp_mode:'gross',cogs:246000,cogs_mode:'net',vat:16,vat_recoverable:'yes',income_tax:20,units_total:1,share_dtc:0,share_retail:100,share_partner:0,dtc_discount:0,retail_commission:25,partner_commission:15,margin_basis:'net_revenue_cogs_accounting'});ctx.E.setParams([])}
+function v9Expense(overrides={}){return Object.assign({en:true,name:'Test',applies:'all',mode:'period',amount:0,pct:0,base:'cogsAccounting',treat:'fixedOpex',tax:'yes'},overrides)}
+function testV9(html){const ctx=extractV9Engine(html),E=ctx.E;
+  record('v9','01 baseline P&L identities',()=>{baseV9(ctx);const r=E.calculate();approx(r.grossInvoiceRevenue,300000);approx(r.revenueBeforeContra,300000/1.16);approx(r.grossProfit,r.netRevenue-r.totalCogs);approx(r.contribution,r.grossProfit-r.sums.variableSelling);approx(r.ebitda,r.contribution-r.sums.marketing-r.sums.fixedOpex);approx(r.ebit,r.ebitda-r.sums.depr);approx(r.pbt,r.ebit-r.sums.finance);approx(r.netProfit,r.pbt-r.incomeTaxExpense)});
+  record('v9','02 enabled and disabled expenses',()=>{baseV9(ctx);E.setParams([v9Expense({en:false,amount:1000})]);let r=E.calculate();approx(r.sums.fixedOpex,0);E.setParams([v9Expense({en:true,amount:1000})]);r=E.calculate();approx(r.sums.fixedOpex,1000)});
+  record('v9','03 five expense methods',()=>{const cases={unit:1000,annual:1000,pct:2460,unit_pct:3460,annual_pct:3460};for(const [mode,expected] of Object.entries(cases)){baseV9(ctx);E.setParams([v9Expense({mode,amount:1000,pct:1,base:'cogsAccounting'})]);approx(E.calculate().sums.fixedOpex,expected,0.02,mode)}});
+  record('v9','04 all percentage bases',()=>{baseV9(ctx);const expected={rrpShelfGross:400000,rrpShelfNet:400000/1.16,channelInvoiceGross:300000,channelRevenueNet:300000/1.16,sellOutGsvGrossTotal:400000,grossInvoiceTotal:300000,netRevenueBeforeContraTotal:300000/1.16,cogsAccounting:246000,cogsGross:285360,cogsNet:246000};for(const [base,val] of Object.entries(expected)){E.setParams([v9Expense({mode:'pct',pct:1,base})]);approx(E.calculate().sums.fixedOpex,val/100,0.03,base)}});
+  record('v9','05 contra revenue category',()=>{baseV9(ctx);E.setParams([v9Expense({treat:'contraRevenue',mode:'period',amount:1000})]);const r=E.calculate();approx(r.sums.contraRevenue,1000);approx(r.netRevenue,r.revenueBeforeContra-1000)});
+  record('v9','06 COGS category',()=>{baseV9(ctx);E.setParams([v9Expense({treat:'cogs',mode:'period',amount:1000})]);const r=E.calculate();approx(r.cogsAddons,1000);approx(r.totalCogs,r.coreCogs+1000)});
+  record('v9','07 variable category',()=>{baseV9(ctx);E.setParams([v9Expense({treat:'variableSelling',amount:1000})]);const r=E.calculate();approx(r.contribution,r.grossProfit-1000)});
+  record('v9','08 marketing category',()=>{baseV9(ctx);E.setParams([v9Expense({treat:'marketing',amount:1000})]);const r=E.calculate();approx(r.ebitda,r.contribution-1000-r.sums.fixedOpex)});
+  record('v9','09 fixed OPEX category',()=>{baseV9(ctx);E.setParams([v9Expense({treat:'fixedOpex',amount:1000})]);const r=E.calculate();approx(r.ebitda,r.contribution-r.sums.marketing-1000)});
+  record('v9','10 depreciation category',()=>{baseV9(ctx);E.setParams([v9Expense({treat:'depr',amount:1000})]);const r=E.calculate();approx(r.ebit,r.ebitda-1000)});
+  record('v9','11 finance category',()=>{baseV9(ctx);E.setParams([v9Expense({treat:'finance',amount:1000})]);const r=E.calculate();approx(r.pbt,r.ebit-1000)});
+  record('v9','12 deductible and non-deductible',()=>{baseV9(ctx);E.setParams([v9Expense({amount:1000,tax:'no'})]);let r=E.calculate();approx(r.sums.nonDeductible,1000);approx(r.taxableIncome,r.pbt+1000);E.setParams([v9Expense({amount:1000,tax:'yes'})]);r=E.calculate();approx(r.sums.nonDeductible,0);approx(r.taxableIncome,r.pbt)});
+  record('v9','13 channel filter retail only',()=>{baseV9(ctx);ctx.values.share_dtc=50;ctx.values.share_retail=50;E.setParams([v9Expense({applies:'retail',mode:'pct',pct:10,base:'channelInvoiceGross'})]);approx(E.calculate().sums.fixedOpex,15000)});
+  record('v9','14 channel filter with zero-share channel',()=>{baseV9(ctx);E.setParams([v9Expense({applies:'dtc',mode:'unit',amount:3000})]);approx(E.calculate().sums.fixedOpex,0)});
+  record('v9','15 combined channel filters',()=>{baseV9(ctx);ctx.values.share_dtc=25;ctx.values.share_retail=50;ctx.values.share_partner=25;E.setParams([v9Expense({applies:'dtc_partner',mode:'unit',amount:1000})]);approx(E.calculate().sums.fixedOpex,500)});
+  record('v9','16 share normalization',()=>{baseV9(ctx);ctx.values.share_dtc=20;ctx.values.share_retail=20;ctx.values.share_partner=0;const r=E.calculate();approx(r.core.shares.dtc,.5);approx(r.core.shares.retail,.5)});
+  record('v9','17 gross COGS with nonrecoverable VAT',()=>{baseV9(ctx);ctx.values.vat_recoverable='no';const r=E.calculate();approx(r.core.cogsAccounting,285360);approx(r.totalCogs,285360)});
+  record('v9','18 tax cannot be negative',()=>{baseV9(ctx);E.setParams([v9Expense({treat:'fixedOpex',amount:999999})]);const r=E.calculate();approx(r.incomeTaxExpense,0)});
+  record('v9','19 channel and total COGS reconcile',()=>{baseV9(ctx);ctx.values.share_dtc=30;ctx.values.share_retail=50;ctx.values.share_partner=20;E.setParams([v9Expense({treat:'cogs',amount:1000})]);const r=E.calculate();approx(Object.values(r.channelResults).reduce((a,c)=>a+c.cogs,0),r.totalCogs)});
+  record('v9','20 all displayed P&L lines reconcile',()=>{baseV9(ctx);E.setParams([v9Expense({treat:'contraRevenue',amount:100}),v9Expense({treat:'cogs',amount:200}),v9Expense({treat:'variableSelling',amount:300}),v9Expense({treat:'marketing',amount:400}),v9Expense({treat:'fixedOpex',amount:500}),v9Expense({treat:'depr',amount:600}),v9Expense({treat:'finance',amount:700})]);const r=E.calculate();approx(r.netRevenue,r.revenueBeforeContra-100);approx(r.totalCogs,r.coreCogs+200);approx(r.grossProfit,r.netRevenue-r.totalCogs);approx(r.contribution,r.grossProfit-300);approx(r.ebitda,r.contribution-400-500);approx(r.ebit,r.ebitda-600);approx(r.pbt,r.ebit-700)});
 }
 
-function testV10(html){
-  const E=extractEngine(html);
-  const base=E.clone(E.DEFAULT_STATE);
-  base.vatRate=16;base.incomeTaxRate=20;base.ownerTaxRate=0;
-  Object.values(base.channels).forEach(c=>{c.active=true;c.share=0;c.sellInReductionPct=0;c.invoiceDiscountPct=0;c.rebatePct=0;c.returnsPct=0;c.paymentFeePct=0;c.lastMilePerUnit=0;});
-  base.channels.retail.share=100;base.channels.retail.sellInReductionPct=25;
-  Object.assign(base.singleProduct,{purchasePrice:246000,purchasePriceMode:'net',inputVatRecoverable:true,purchasedUnits:1,soldUnits:1,writeoffUnits:0,approvedRrpGross:400000});
-  base.expenses.forEach(e=>{e.status='na';e.value=0;});
+function updateBuildFiles(){for(const version of ['v10']){const indexPath=path.join('margin-calculators',version,'index.html');let index=fs.readFileSync(indexPath,'utf8').replace(/const BUILD='[^']+';/,`const BUILD='${BUILD}';`).replace(/manifest\.webmanifest\?v=[^"']+/g,`manifest.webmanifest?v=${BUILD}`).replace(/icon\.svg\?v=[^"']+/g,`icon.svg?v=${BUILD}`);fs.writeFileSync(indexPath,index);const swPath=path.join('margin-calculators',version,'service-worker.js');fs.writeFileSync(swPath,fs.readFileSync(swPath,'utf8').replace(/const BUILD='[^']+';/,`const BUILD='${BUILD}';`))}}
 
-  const inbound=base.expenses.find(e=>e.id==='inbound_logistics');
-  Object.assign(inbound,{status:'include',category:'inventory',method:'pct',value:3,base:'invoiceGross',vatTreatment:'gross_recoverable',taxDeductible:true});
-  let r=E.calcProduct(base,base.singleProduct);
-  approx(r.inventoryCash,9000,0.02,'inbound cash');
-  approx(r.inventoryPnl,9000/1.16,0.02,'inbound pnl');
-  approx(r.inventoryVat,9000-9000/1.16,0.02,'inbound VAT');
-  approx(r.totals.cogs,246000+9000/1.16,0.02,'COGS with inbound');
-
-  inbound.status='na';
-  const customs=base.expenses.find(e=>e.id==='customs_cert');
-  Object.assign(customs,{status:'include',category:'inventory',method:'pct',value:3,base:'purchaseCost',vatTreatment:'no_vat',taxDeductible:true});
-  r=E.calcProduct(base,base.singleProduct);
-  approx(r.inventoryPnl,7380,0.02,'customs pnl');
-  approx(r.totals.cogs,253380,0.02,'COGS with customs');
-
-  customs.status='na';
-  const warranty=base.expenses.find(e=>e.id==='warranty_returns');
-  Object.assign(warranty,{status:'include',category:'variable',method:'pct',value:2,base:'netRevenueBeforeContra',vatTreatment:'no_vat',taxDeductible:true});
-  r=E.calcProduct(base,base.singleProduct);
-  approx(r.totals.variable,(300000/1.16)*0.02,0.02,'warranty variable');
-
-  warranty.status='review';
-  r=E.calcProduct(base,base.singleProduct);
-  approx(r.totals.variable,0,0.001,'review exclusion');
-  console.log('v10 expense tests passed');
-}
-
-function auditV9(html){
-  const required=[
-    "if(!p.en) return;",
-    "basePerUnit(p.base,ch,core,totalsPre)",
-    "byChannel[ch.key][p.treat]+=v;",
-    "const totalCogs=coreCogs+cogsAddons;",
-    "const netRevenue=revenueBeforeContra-sums.contraRevenue;",
-    "const contribution=grossProfit-sums.variableSelling;",
-    "const ebitda=contribution-sums.marketing-sums.fixedOpex;",
-    "const pbt=ebit-sums.finance;",
-    "const taxableIncome=pbt+sums.nonDeductible;"
-  ];
-  for(const x of required) if(!html.includes(x)) throw new Error('v9 audit marker missing: '+x);
-  console.log('v9 expense audit passed');
-}
-
-function updateBuildFiles(){
-  const indexPath=path.join('margin-calculators','v10','index.html');
-  let index=fs.readFileSync(indexPath,'utf8');
-  index=index.replace(/const BUILD='[^']+';/,`const BUILD='${BUILD}';`)
-             .replace(/manifest\.webmanifest\?v=[^"']+/g,`manifest.webmanifest?v=${BUILD}`)
-             .replace(/icon\.svg\?v=[^"']+/g,`icon.svg?v=${BUILD}`);
-  fs.writeFileSync(indexPath,index);
-  const swPath=path.join('margin-calculators','v10','service-worker.js');
-  let sw=fs.readFileSync(swPath,'utf8').replace(/const BUILD='[^']+';/,`const BUILD='${BUILD}';`);
-  fs.writeFileSync(swPath,sw);
-}
-
-const outDir=path.join('margin-calculators','_debug');
-fs.mkdirSync(outDir,{recursive:true});
-const v9=readPacked('v9',5);
-auditV9(v9);
-fs.writeFileSync(path.join(outDir,'v9-source.html'),v9);
-let v10=readPacked('v10',6);
-v10=patchV10(v10);
-testV10(v10);
-fs.writeFileSync(path.join(outDir,'v10-source.html'),v10);
-writePacked('v10',6,v10);
-updateBuildFiles();
-console.log('v10 patched and packed',v10.length,BUILD);
+const outDir=path.join('margin-calculators','_debug');fs.mkdirSync(outDir,{recursive:true});
+const v9=readPacked('v9',5);testV9(v9);fs.writeFileSync(path.join(outDir,'v9-source.html'),v9);
+let v10=readPacked('v10',6);v10=patchV10(v10);testV10(v10);fs.writeFileSync(path.join(outDir,'v10-source.html'),v10);writePacked('v10',6,v10);updateBuildFiles();
+fs.writeFileSync(path.join(outDir,'formula-audit-report.json'),JSON.stringify(report,null,2));
+console.log(`v9 ${report.v9.filter(x=>x.status==='passed').length}/${report.v9.length}; v10 ${report.v10.filter(x=>x.status==='passed').length}/${report.v10.length}`);
+if(report.failures.length){console.error(report.failures.join('\n'));process.exit(1)}
+console.log('All formula audits passed',BUILD);
