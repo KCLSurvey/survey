@@ -1,1 +1,1 @@
-{"name":"calculator-ai-proxy","version":"2.1.0","private":true,"description":"Secure AI proxy for margin calculators v9.1 and v10.1 with JSON and plain-text model response support","scripts":{"start":"node calculator_ai_proxy_v2.js"},"engines":{"node":">=18"}}
+{"name":"calculator-ai-proxy","version":"2.2.0","private":true,"description":"Secure AI proxy for margin calculators v9.1 and v10.1 with robust GLM final-answer retry","scripts":{"start":"node calculator_ai_proxy_v2_2.js"},"engines":{"node":">=18"}}
