@@ -76,6 +76,8 @@ jobs:
           node --check /tmp/v91-patch.js
           node --check /tmp/v101-patch.js
           node --check /tmp/calculator-ai-proxy.js
+          echo '2ace3fa9bb8ac4c2f8b263657dd75243d11519a5c9a2005170b210e51958e878  /tmp/v91-patch.js' | sha256sum -c -
+          echo 'cc893df3b61eb7f81789bb091c0ceb0414ddee2bf0c866a25cca3125602ead7e  /tmp/v101-patch.js' | sha256sum -c -
           grep -q 'v91-scroll-top' /tmp/v91-patch.js
           grep -q 'v91-shares' /tmp/v91-patch.js
           grep -q 'Резерв, остающийся в бизнесе' /tmp/v91-patch.js
