@@ -1,6 +1,6 @@
 {
   "build": "20260714m",
-  "generatedAt": "2026-07-14T18:32:57.726Z",
+  "generatedAt": "2026-07-14T18:34:07.491Z",
   "v9": [
     {
       "name": "01 baseline P&L identities",
@@ -20,13 +20,11 @@
     },
     {
       "name": "05 contra revenue category",
-      "status": "failed",
-      "error": "value: expected 1000, got 0"
+      "status": "passed"
     },
     {
       "name": "06 COGS category",
-      "status": "failed",
-      "error": "value: expected 1000, got 0"
+      "status": "passed"
     },
     {
       "name": "07 variable category",
@@ -199,8 +197,5 @@
       "status": "passed"
     }
   ],
-  "failures": [
-    "v9: 05 contra revenue category: value: expected 1000, got 0",
-    "v9: 06 COGS category: value: expected 1000, got 0"
-  ]
+  "failures": []
 }
