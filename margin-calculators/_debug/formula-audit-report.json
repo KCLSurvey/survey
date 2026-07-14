@@ -1,6 +1,6 @@
 {
   "build": "20260714m",
-  "generatedAt": "2026-07-14T18:31:34.625Z",
+  "generatedAt": "2026-07-14T18:32:57.726Z",
   "v9": [
     {
       "name": "01 baseline P&L identities",
@@ -8,8 +8,7 @@
     },
     {
       "name": "02 enabled and disabled expenses",
-      "status": "failed",
-      "error": "value: expected 1000, got 0"
+      "status": "passed"
     },
     {
       "name": "03 five expense methods",
@@ -31,33 +30,27 @@
     },
     {
       "name": "07 variable category",
-      "status": "failed",
-      "error": "value: expected 11620.689655172435, got 12620.689655172435"
+      "status": "passed"
     },
     {
       "name": "08 marketing category",
-      "status": "failed",
-      "error": "value: expected 11620.689655172435, got 12620.689655172435"
+      "status": "passed"
     },
     {
       "name": "09 fixed OPEX category",
-      "status": "failed",
-      "error": "value: expected 11620.689655172435, got 12620.689655172435"
+      "status": "passed"
     },
     {
       "name": "10 depreciation category",
-      "status": "failed",
-      "error": "value: expected 11620.689655172435, got 12620.689655172435"
+      "status": "passed"
     },
     {
       "name": "11 finance category",
-      "status": "failed",
-      "error": "value: expected 11620.689655172435, got 12620.689655172435"
+      "status": "passed"
     },
     {
       "name": "12 deductible and non-deductible",
-      "status": "failed",
-      "error": "value: expected 1000, got 0"
+      "status": "passed"
     },
     {
       "name": "13 channel filter retail only",
@@ -81,8 +74,7 @@
     },
     {
       "name": "18 tax cannot be negative",
-      "status": "failed",
-      "error": "value: expected 0, got 2524.1379310344873"
+      "status": "passed"
     },
     {
       "name": "19 channel and total COGS reconcile",
@@ -90,8 +82,7 @@
     },
     {
       "name": "20 all displayed P&L lines reconcile",
-      "status": "failed",
-      "error": "value: expected 258520.68965517243, got 258620.68965517243"
+      "status": "passed"
     }
   ],
   "v10": [
@@ -157,8 +148,7 @@
     },
     {
       "name": "16 four VAT treatments",
-      "status": "failed",
-      "error": "net_plus_recoverable pnl: expected 1000, got 0"
+      "status": "passed"
     },
     {
       "name": "17 non-deductible expense tax bridge",
@@ -210,17 +200,7 @@
     }
   ],
   "failures": [
-    "v9: 02 enabled and disabled expenses: value: expected 1000, got 0",
     "v9: 05 contra revenue category: value: expected 1000, got 0",
-    "v9: 06 COGS category: value: expected 1000, got 0",
-    "v9: 07 variable category: value: expected 11620.689655172435, got 12620.689655172435",
-    "v9: 08 marketing category: value: expected 11620.689655172435, got 12620.689655172435",
-    "v9: 09 fixed OPEX category: value: expected 11620.689655172435, got 12620.689655172435",
-    "v9: 10 depreciation category: value: expected 11620.689655172435, got 12620.689655172435",
-    "v9: 11 finance category: value: expected 11620.689655172435, got 12620.689655172435",
-    "v9: 12 deductible and non-deductible: value: expected 1000, got 0",
-    "v9: 18 tax cannot be negative: value: expected 0, got 2524.1379310344873",
-    "v9: 20 all displayed P&L lines reconcile: value: expected 258520.68965517243, got 258620.68965517243",
-    "v10: 16 four VAT treatments: net_plus_recoverable pnl: expected 1000, got 0"
+    "v9: 06 COGS category: value: expected 1000, got 0"
   ]
 }
