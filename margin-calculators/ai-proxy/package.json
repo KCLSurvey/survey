@@ -1,0 +1,1 @@
+{"name":"calculator-ai-proxy","version":"2.0.0","private":true,"description":"Secure AI proxy for margin calculators v9.1 and v10.1","scripts":{"start":"node calculator_ai_proxy_v2.js"},"engines":{"node":">=18"}}
