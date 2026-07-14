@@ -15,10 +15,11 @@ jobs:
         with:
           node-version: '20'
       - run: node tools/extract_calculator_sources.js
-      - name: Commit extracted sources
+      - name: Commit rebuilt calculators
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add margin-calculators/_debug/v9-source.html margin-calculators/_debug/v10-source.html
-          git diff --cached --quiet || git commit -m 'Extract calculator sources for formula audit'
+          git add margin-calculators/v10/index.html margin-calculators/v10/service-worker.js margin-calculators/v10/part-*.b64
+          git diff --cached --quiet || git commit -m 'Fix v10 inventory expense bases in calculation engine'
           git push
