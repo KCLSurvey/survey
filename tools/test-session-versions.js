@@ -14,7 +14,7 @@ assert.deepStrictEqual(Core.read(storage,'sessions',3).map(x=>x.id),['s4','s2'])
 const afterRestart=new Storage({...storage.data});
 assert.deepStrictEqual(Core.read(afterRestart,'sessions',3).map(x=>x.id),['s4','s2']);
 assert.deepStrictEqual(Core.read(new Storage({sessions:'{broken'}),'sessions',3),[]);
-for(const file of ['margin-calculators/v9-2/session-manager.js','margin-calculators/v10-2/session-manager.js','margin-calculators/v9-2/ai-action-fix.js','margin-calculators/v10-2/ai-action-fix.js','margin-calculators/v9-2/ai-action-fix-v2.js','margin-calculators/v10-2/ai-action-fix-v2.js','margin-calculators/v9-2/sw.js','margin-calculators/v10-2/sw.js']){
+for(const file of ['margin-calculators/v9-2/session-manager.js','margin-calculators/v10-2/session-manager.js','margin-calculators/v9-2/ai-action-fix.js','margin-calculators/v10-2/ai-action-fix.js','margin-calculators/v9-2/ai-action-fix-v2.js','margin-calculators/v10-2/ai-action-fix-v2.js','margin-calculators/v9-2/ai-action-fix-v3.js','margin-calculators/v10-2/ai-action-fix-v3.js','margin-calculators/v9-2/sw.js','margin-calculators/v10-2/sw.js']){
   const code=fs.readFileSync(path.join(__dirname,'..',file),'utf8');
   new Function(code);
 }
@@ -24,14 +24,11 @@ for(const version of ['v9-2','v10-2']){
   assert(html.includes('session-manager.js'));
   assert(html.includes('ai-action-fix.js'));
   assert(html.includes('ai-action-fix-v2.js'));
+  assert(html.includes('ai-action-fix-v3.js'));
   assert(html.includes(`embedded=${version}`));
 }
-const v9fix=fs.readFileSync(path.join(__dirname,'..','margin-calculators/v9-2/ai-action-fix-v2.js'),'utf8');
-const v10fix=fs.readFileSync(path.join(__dirname,'..','margin-calculators/v10-2/ai-action-fix-v2.js'),'utf8');
-for(const token of ['new_value_text','proposed_value_text','changes','updates','AI не указал новое значение']){
-  assert(v9fix.includes(token),`v9.2 v2 normalizer missing ${token}`);
-  assert(v10fix.includes(token),`v10.2 v2 normalizer missing ${token}`);
-}
-for(const token of ['inbound_logistics','performance_marketing','sales_team','resolveParamIndex'])assert(v9fix.includes(token),`v9.2 expense resolver missing ${token}`);
-for(const token of ['findNestedValue','target_value','amount','percentage','resolveExpense'])assert(v10fix.includes(token),`v10.2 nested value resolver missing ${token}`);
-console.log('v9.2/v10.2 session and AI action v2 tests passed');
+const v9fix=fs.readFileSync(path.join(__dirname,'..','margin-calculators/v9-2/ai-action-fix-v3.js'),'utf8');
+const v10fix=fs.readFileSync(path.join(__dirname,'..','margin-calculators/v10-2/ai-action-fix-v3.js'),'utf8');
+for(const token of ['resolveParamIndex','performance_marketing','sales_team','textSources','Последнее AI-изменение отменено'])assert(v9fix.includes(token)!==(token==='Последнее AI-изменение отменено'),`v9.2 v3 check failed for ${token}`);
+for(const token of ['inferStatus','fieldValue','new_status','target_status','status'])assert(v10fix.includes(token),`v10.2 v3 status resolver missing ${token}`);
+console.log('v9.2/v10.2 session and AI action v3 tests passed');
