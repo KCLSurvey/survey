@@ -14,7 +14,7 @@ assert.deepStrictEqual(Core.read(storage,'sessions',3).map(x=>x.id),['s4','s2'])
 const afterRestart=new Storage({...storage.data});
 assert.deepStrictEqual(Core.read(afterRestart,'sessions',3).map(x=>x.id),['s4','s2']);
 assert.deepStrictEqual(Core.read(new Storage({sessions:'{broken'}),'sessions',3),[]);
-for(const file of ['margin-calculators/v9-2/session-manager.js','margin-calculators/v10-2/session-manager.js','margin-calculators/v9-2/sw.js','margin-calculators/v10-2/sw.js']){
+for(const file of ['margin-calculators/v9-2/session-manager.js','margin-calculators/v10-2/session-manager.js','margin-calculators/v9-2/ai-action-fix.js','margin-calculators/v10-2/ai-action-fix.js','margin-calculators/v9-2/sw.js','margin-calculators/v10-2/sw.js']){
   const code=fs.readFileSync(path.join(__dirname,'..',file),'utf8');
   new Function(code);
 }
@@ -22,6 +22,17 @@ for(const version of ['v9-2','v10-2']){
   const html=fs.readFileSync(path.join(__dirname,'..','margin-calculators',version,'index.html'),'utf8');
   assert(html.includes('session-store-core.js'));
   assert(html.includes('session-manager.js'));
+  assert(html.includes('ai-action-fix.js'));
   assert(html.includes(`embedded=${version}`));
 }
-console.log('v9.2/v10.2 session persistence tests passed');
+const v9fix=fs.readFileSync(path.join(__dirname,'..','margin-calculators/v9-2/ai-action-fix.js'),'utf8');
+const v10fix=fs.readFileSync(path.join(__dirname,'..','margin-calculators/v10-2/ai-action-fix.js'),'utf8');
+for(const token of ['field_name','parameter_name','changes','set_channel','set_expense','AI не указал изменяемое поле']){
+  assert(v9fix.includes(token),`v9.2 normalizer missing ${token}`);
+  assert(v10fix.includes(token),`v10.2 normalizer missing ${token}`);
+}
+assert(v9fix.includes("retail_commission"));
+assert(v9fix.includes("partner_commission"));
+assert(v9fix.includes("dtc_discount"));
+assert(v10fix.includes("sellInReductionPct"));
+console.log('v9.2/v10.2 session and AI action tests passed');
