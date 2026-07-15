@@ -1,0 +1,36 @@
+name: Build AI proxy v2.4
+on:
+  push:
+    paths:
+      - 'margin-calculators/ai-proxy/calculator_ai_proxy_v2_3.js'
+      - 'margin-calculators/ai-proxy/action-normalizer.js'
+      - 'margin-calculators/ai-proxy/action-normalizer-v2.js'
+      - 'tools/build-ai-proxy-v24.js'
+      - 'tools/test-ai-action-normalizer.js'
+      - '.github/workflows/build-ai-proxy-v24.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: node tools/test-ai-action-normalizer.js
+      - run: node tools/build-ai-proxy-v24.js
+      - run: node --check margin-calculators/ai-proxy/calculator_ai_proxy_v2_4.js
+      - run: node tools/test-ai-action-normalizer.js
+      - name: Commit generated proxy
+        run: |
+          if git diff --quiet -- margin-calculators/ai-proxy/calculator_ai_proxy_v2_4.js margin-calculators/ai-proxy/package.json; then
+            echo "Generated files are current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add margin-calculators/ai-proxy/calculator_ai_proxy_v2_4.js margin-calculators/ai-proxy/package.json
+          git commit -m "Build AI proxy v2.4 with canonical actions [skip ci]"
+          git push
