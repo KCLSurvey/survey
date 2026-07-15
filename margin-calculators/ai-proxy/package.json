@@ -1,1 +1,1 @@
-{"name":"calculator-ai-proxy","version":"2.3.0","private":true,"description":"Secure AI proxy for margin calculators v9.1 and v10.1 with robust CORS, large snapshot support and GLM retry","scripts":{"start":"node calculator_ai_proxy_v2_3.js"},"engines":{"node":">=18"}}
+{"name":"calculator-ai-proxy","version":"2.4.0","private":true,"description":"Secure AI proxy for margin calculators with canonical AI action normalization","scripts":{"start":"node calculator_ai_proxy_v2_4.js"},"engines":{"node":">=18"}}
